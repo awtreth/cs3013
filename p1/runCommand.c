@@ -12,12 +12,23 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
+#include <sys/time.h>
+#include <sys/resource.h>
+
+
 //PROTOTYPES
 
 
 char** extract_args(int argc, char **argv);
 
 void free_args(char** args);
+
+int diff_time(struct timeval init, struct timeval end);
+
+int timeval_to_millisec(struct timeval tval);
+
+void print_rusage(struct rusage data);
+
 
 //MAIN
 int main(int argc, char **argv) {
@@ -38,7 +49,20 @@ int main(int argc, char **argv) {
 		free_args(cmd_args);
 
 	}else if (pid > 0) { //parent
+		struct timeval init, end;
+		
+		gettimeofday(&init,NULL);
 		wait(NULL);//wait for child execution
+		gettimeofday(&end,NULL);
+	
+		
+		printf("\n***REPORT***\n");
+	
+		struct rusage rep;
+		getrusage(RUSAGE_CHILDREN,&rep);
+		
+		printf("wall-clock:\t\t%d\n",diff_time(init,end));
+		print_rusage(rep);
 	
 	}else { //error
 		perror(NULL);
@@ -75,4 +99,26 @@ void free_args(char** args) {
 	}
 	
 	free(args);
+}
+
+int diff_time(struct timeval init, struct timeval end) {
+	struct timeval res;
+	
+	timersub(&end,&init,&res);
+	
+	return timeval_to_millisec(res);
+}
+
+int timeval_to_millisec(struct timeval tval) {
+	return tval.tv_sec*1000 + tval.tv_usec/1000;
+}
+
+void print_rusage(struct rusage data) {
+	
+	printf("User CPU time:\t\t%d\n", timeval_to_millisec(data.ru_utime));
+	printf("System CPU time:\t%d\n", timeval_to_millisec(data.ru_stime));
+	printf("Involuntary Switches:\t%ld\n", data.ru_nivcsw);
+	printf("Voluntary Switches:\t%ld\n", data.ru_nvcsw);
+	printf("Page Faults:\t\t%ld\n", data.ru_majflt);
+	printf("Page Reclaims:\t\t%ld\n", data.ru_minflt);
 }
