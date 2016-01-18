@@ -44,17 +44,24 @@ int main(int argc, char **argv) {
 	if (pid == 0) { //child
 		char** cmd_args = extract_args(argc, argv);
 		
-		execvp(cmd_args[0], cmd_args);
-		
+		if(execvp(cmd_args[0], cmd_args) == -1){
+			perror(NULL);
+			free_args(cmd_args);
+			exit(EXIT_FAILURE);
+		}
 		free_args(cmd_args);
 
 	}else if (pid > 0) { //parent
 		struct timeval init, end;
+		int status = 0;
+		
 		
 		gettimeofday(&init,NULL);
-		wait(NULL);//wait for child execution
+		wait(&status);//wait for child execution
 		gettimeofday(&end,NULL);
-	
+		
+		if(WEXITSTATUS(status) == EXIT_FAILURE)
+			exit(EXIT_FAILURE);
 		
 		printf("\n***REPORT***\n");
 	
