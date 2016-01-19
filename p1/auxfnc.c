@@ -23,12 +23,12 @@
  */
 char** args_from_cmdline(int argc, char **argv) {
 	int n_args = argc-1;//first str is always "./runCommand"
-	char** args = (char**) malloc(n_args+1);//last one for NULL (requirement of execpv function)
+	char** args = (char**) malloc((n_args+1)*sizeof(char*));//last one for NULL (requirement of execpv function)
 	int i = 0;
 	
 	for (i = 0; i < n_args; i++)
 	{
-		args[i] = (char*) malloc(strlen(argv[i+1])+1);//+1 for \0 caracter
+		args[i] = (char*) malloc((strlen(argv[i+1])+1)*sizeof(char));//+1 for \0 caracter
 		strcpy(args[i],argv[i+1]);
 	}
 	
@@ -38,7 +38,21 @@ char** args_from_cmdline(int argc, char **argv) {
 }
 
 char** args_from_str(char* str) {
-	char** args = (char**) NULL;
+	char** args = (char**)malloc(33*sizeof(char*));
+	int n_args = 0;
+	
+	char* token = strtok(str," \n");
+	
+	while(token!=NULL) {
+		//~ if(n_args >= 32) printf("Number of arguments exceeded\n");
+		args[n_args] = (char*) malloc((strlen(token)+1)*sizeof(char));
+		strcpy(args[n_args], token);
+		n_args++;
+		token = strtok(NULL," \n");
+	}
+	args = (char**) realloc(args, (n_args+1)*sizeof(char*));
+	args[n_args] = NULL;
+
 	return args;
 }
 

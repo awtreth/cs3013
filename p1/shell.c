@@ -21,11 +21,21 @@
 //MAIN
 int main(int argc, char **argv) {
 	
-	//Check the number of arguments to runCommand
-	if (argc <= 1) {
-		printf("No provided command\n");
-		exit(EXIT_FAILURE);
+	
+	char str[129];
+	
+	printf(">");
+	fgets(str,129,stdin);
+	
+	char** args = args_from_str(str);
+	int i = 0;
+	
+	while(args[i]!=NULL) {
+		printf("%s\n", args[i]);
+		i++;
 	}
+	
+	return 0;
 	
 	pid_t pid = fork(); //create a new process
 	
