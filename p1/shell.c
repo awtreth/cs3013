@@ -30,13 +30,18 @@ int main(int argc, char **argv) {
 	
 	while(1) {
 		printf(">");
-		fgets(str,129,stdin);
+		if(fgets(str,129,stdin)==NULL)
+			break;
+
 		//TODO: check string size and pop up error if it's invalid or continue if it's zero
+		
 		int n_args = args_from_str(str, cmd_args);
 		
 		if(strcmp(cmd_args[0],"exit") == 0 && n_args == 1) break;
-		if(strcmp(cmd_args[0],"cd") == 0 && n_args == 2) {
-			
+		if(strcmp(cmd_args[0],"cd") == 0) {
+			if(n_args==1)chdir(".");
+			else chdir(cmd_args[1]);
+			continue;
 		}
 		
 		struct timeval init, end; //checkpoint to measure wall-clock time
@@ -53,15 +58,18 @@ int main(int argc, char **argv) {
 			}
 
 		}else if (pid > 0) { //PARENT
+			free_args(cmd_args);//free memory allocaded in args_from_str function
+			
 			int status = 0;//return from wait function
 			
 			wait(&status);//wait for child execution
 			gettimeofday(&end,NULL);
 			
 			//if the child returned EXIT_FAILURE (when something goes wrong)
-			if(WEXITSTATUS(status) == EXIT_FAILURE)
-				exit(EXIT_FAILURE);
-			
+			if(WEXITSTATUS(status) == EXIT_FAILURE) {
+				continue;
+				//exit(EXIT_FAILURE);
+			}
 			//get child execution statistics
 			struct rusage rep;
 			getrusage(RUSAGE_CHILDREN,&rep);
@@ -73,10 +81,10 @@ int main(int argc, char **argv) {
 		
 		}else { //error
 			perror(NULL);//error in fork
+			free_args(cmd_args);//free memory allocaded in args_from_str function
 			exit(EXIT_FAILURE);
 		}
 		
-		free_args(cmd_args);//free memory allocaded in args_from_str function
 	}
 	
 	free_args(cmd_args);//free memory allocaded in args_from_str function
