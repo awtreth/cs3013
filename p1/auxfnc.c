@@ -89,3 +89,17 @@ void print_rusage(struct rusage data) {
 	printf("Page Faults:\t\t%ld\n", data.ru_majflt);
 	printf("Page Reclaims:\t\t%ld\n", data.ru_minflt);
 }
+
+
+struct rusage diff_rusage(struct rusage current, struct rusage previous) {
+	struct rusage result;
+	
+	timersub(&current.ru_utime,&previous.ru_utime,&result.ru_utime);
+	timersub(&current.ru_stime,&previous.ru_stime,&result.ru_stime);
+	result.ru_nivcsw = current.ru_nivcsw - previous.ru_nivcsw;
+	result.ru_nvcsw = current.ru_nvcsw - previous.ru_nvcsw;
+	result.ru_majflt = current.ru_majflt - previous.ru_majflt;
+	result.ru_minflt = current.ru_minflt - previous.ru_minflt;
+	
+	return result;
+}

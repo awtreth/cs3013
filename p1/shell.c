@@ -23,7 +23,10 @@
 //MAIN
 int main(int argc, char **argv) {
 	
-	mtrace();
+	//Initialize prev_rusage with 0 values
+	struct rusage prev_rusage;
+	getrusage(RUSAGE_CHILDREN,&prev_rusage);
+	
 	
 	char str[129];
 	char* cmd_args[32];
@@ -33,13 +36,16 @@ int main(int argc, char **argv) {
 		if(fgets(str,129,stdin)==NULL)
 			break;
 
-		//TODO: check string size and pop up error if it's invalid or continue if it's zero
+		//TODO: check string size and pop up error if it's invalid or continue if it's one (only '\n')
+		
 		
 		int n_args = args_from_str(str, cmd_args);
 		
-		if(strcmp(cmd_args[0],"exit") == 0 && n_args == 1) break;
-		if(strcmp(cmd_args[0],"cd") == 0) {
-			if(n_args==1)chdir(".");
+		//Special cases
+		if(n_args==0) continue;//no argument
+		if(strcmp(cmd_args[0],"exit") == 0 && n_args == 1) break;//exit command
+		if(strcmp(cmd_args[0],"cd") == 0) {//change directory built in command
+			if(n_args==1)chdir(".");//default value (in this case, the current directory)
 			else chdir(cmd_args[1]);
 			continue;
 		}
@@ -67,17 +73,19 @@ int main(int argc, char **argv) {
 			
 			//if the child returned EXIT_FAILURE (when something goes wrong)
 			if(WEXITSTATUS(status) == EXIT_FAILURE) {
+				//the child print the error
 				continue;
 				//exit(EXIT_FAILURE);
 			}
 			//get child execution statistics
-			struct rusage rep;
-			getrusage(RUSAGE_CHILDREN,&rep);
+			struct rusage current_rusage;
+			getrusage(RUSAGE_CHILDREN,&current_rusage);
 			
 			//Print report
 			printf("\n***REPORT***\n");
 			printf("wall-clock:\t\t%d\n",diff_time(init,end));
-			print_rusage(rep);
+			print_rusage(diff_rusage(current_rusage, prev_rusage));
+			prev_rusage = current_rusage;
 		
 		}else { //error
 			perror(NULL);//error in fork
