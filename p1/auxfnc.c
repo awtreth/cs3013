@@ -10,35 +10,22 @@
 
 //FUNCTIONS
 
-/* Extract arguments from command line to be used in execpv function
+/* Extract arguments from input string to be used in execpv function
  * 
- * call void free_args(char** args) function when you are done with this function output
+ * Map: char*->char**
+ * 
+ * @str input str (assume it has less or equal 128 characters)
+ * @args output array of strings, separating the arguments of the input string 
+ * (assume it will have at most 32 arguments)
+ * 
+ * @return number of arguments
  * 
  * Example:
- * "./runCommand ls /home"
- * 
- * argc = 3; argv = {"./runCommand", "ls", "/home"}
- * 
- * returns: {"./runCommand", "ls", "/home", NULL}
+ * in str: "ls /home"
+ * out args: {"ls","/home", NULL}
+ * return: 2
  */
-char** args_from_cmdline(int argc, char **argv) {
-	int n_args = argc-1;//first str is always "./runCommand"
-	char** args = (char**) malloc((n_args+1)*sizeof(char*));//last one for NULL (requirement of execpv function)
-	int i = 0;
-	
-	for (i = 0; i < n_args; i++)
-	{
-		args[i] = (char*) malloc((strlen(argv[i+1])+1)*sizeof(char));//+1 for \0 caracter
-		strcpy(args[i],argv[i+1]);
-	}
-	
-	args[n_args] = (char*) NULL;//force last to be NULL (requirement of execpv function)
-
-	return args;
-}
-
-char** args_from_str(char* str) {
-	char** args = (char**)malloc(33*sizeof(char*));
+int args_from_str(char str[129], char* args[33]) {
 	int n_args = 0;
 	
 	char* token = strtok(str," \n");
@@ -50,15 +37,15 @@ char** args_from_str(char* str) {
 		n_args++;
 		token = strtok(NULL," \n");
 	}
-	args = (char**) realloc(args, (n_args+1)*sizeof(char*));
+	
 	args[n_args] = NULL;
 
-	return args;
+	return n_args;
 }
 
 /* Free the memory of the arguments from args_from_cmdline and args_from_str fucntions
  */
-void free_args(char** args) {
+int free_args(char* args[33]) {
 	int i = 0;
 	
 	while(args[i] != NULL) {
@@ -66,8 +53,7 @@ void free_args(char** args) {
 		i++;
 	}
 	
-	free(args[i]);
-	free(args);
+	return i;
 }
 
 /* return the difference between init and end in miliseconds

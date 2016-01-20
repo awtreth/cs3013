@@ -23,17 +23,24 @@
 //MAIN
 int main(int argc, char **argv) {
 	
+	mtrace();
 	
 	char str[129];
+	char* cmd_args[32];
 	
 	while(1) {
 		printf(">");
 		fgets(str,129,stdin);
 		//TODO: check string size and pop up error if it's invalid or continue if it's zero
-		char** cmd_args = args_from_str(str);
+		int n_args = args_from_str(str, cmd_args);
 		
-		if(strcmp(cmd_args[0],"exit") == 0) break;
+		if(strcmp(cmd_args[0],"exit") == 0 && n_args == 1) break;
+		if(strcmp(cmd_args[0],"cd") == 0 && n_args == 2) {
+			
+		}
 		
+		struct timeval init, end; //checkpoint to measure wall-clock time
+		gettimeofday(&init,NULL);
 		pid_t pid = fork(); //create a new process
 		
 		//CHILD
@@ -44,13 +51,10 @@ int main(int argc, char **argv) {
 				free_args(cmd_args);//free memory allocaded in args_from_cmdline function
 				exit(EXIT_FAILURE);
 			}
-			free_args(cmd_args);//free memory allocaded in args_from_cmdline function
 
 		}else if (pid > 0) { //PARENT
-			struct timeval init, end; //checkpoint to measure wall-clock time
 			int status = 0;//return from wait function
 			
-			gettimeofday(&init,NULL);
 			wait(&status);//wait for child execution
 			gettimeofday(&end,NULL);
 			
@@ -71,6 +75,10 @@ int main(int argc, char **argv) {
 			perror(NULL);//error in fork
 			exit(EXIT_FAILURE);
 		}
+		
+		free_args(cmd_args);//free memory allocaded in args_from_str function
 	}
+	
+	free_args(cmd_args);//free memory allocaded in args_from_str function
 	return 0;
 }

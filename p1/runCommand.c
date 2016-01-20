@@ -27,25 +27,23 @@ int main(int argc, char **argv) {
 		exit(EXIT_FAILURE);
 	}
 	
+	argv[argc]=(char*)NULL;
+	
+	struct timeval init, end; //checkpoint to measure wall-clock time
+	gettimeofday(&init,NULL);
 	pid_t pid = fork(); //create a new process
 	
 	//CHILD
 	if (pid == 0) { 
-		//prepare arguments for exec function
-		char** cmd_args = args_from_cmdline(argc, argv);
 		
-		if(execvp(cmd_args[0], cmd_args) == -1){ //error with de command
+		if(execvp(argv[1], &argv[1]) == -1){ //error with de command
 			perror(NULL);//print error message
-			free_args(cmd_args);//free memory allocaded in args_from_cmdline function
 			exit(EXIT_FAILURE);
 		}
-		free_args(cmd_args);//free memory allocaded in args_from_cmdline function
-
+		
 	}else if (pid > 0) { //PARENT
-		struct timeval init, end; //checkpoint to measure wall-clock time
 		int status = 0;//return from wait function
 		
-		gettimeofday(&init,NULL);
 		wait(&status);//wait for child execution
 		gettimeofday(&end,NULL);
 		
