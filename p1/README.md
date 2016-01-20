@@ -4,6 +4,19 @@ Version:					1.0
 Project ID:					Project 1
 CS Class:					CS 3013 (Operating Systems)
 Programming Language:		C
+How to build the program:	make all
+How to test:			./runCommand [shell commands]
+				./shell < [input file] (Ex: input_test.txt)
+				./shell
+					then enter commands (special built-in commands: 'exit' and 'cd')
+				
+
+
+
+
+
+
+
 OS/Hardware dependencies:	how does the program rely on the operating system,
 				   or on the hardware?
 
