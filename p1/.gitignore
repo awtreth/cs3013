@@ -1,4 +1,4 @@
 runCommand
 shell
-test*
+test
 mtrace.txt

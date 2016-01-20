@@ -18,26 +18,28 @@
 //custom library
 #include "auxfnc.h"
 
-#include <mcheck.h>
+#include <mcheck.h>// for memory leakage tracking
 
 //MAIN
 int main(int argc, char **argv) {
+	
+	//mtrace();//to check memory leakage problems
 	
 	//Initialize prev_rusage with 0 values
 	struct rusage prev_rusage;
 	getrusage(RUSAGE_CHILDREN,&prev_rusage);
 	
 	
-	char str[129];
-	char* cmd_args[32];
+	char str[129];//input string
+	char* cmd_args[32]; //vector of strings (arguments for the shell)
 	
 	while(1) {
-		printf(">");
-		if(fgets(str,129,stdin)==NULL)
+		printf(">");//prompt character
+		
+		if(fgets(str,129,stdin)==NULL)//EOF or error (to be able to pipe input files)
 			break;
 
-		//TODO: check string size and pop up error if it's invalid or continue if it's one (only '\n')
-		
+		//TODO: check string size
 		
 		int n_args = args_from_str(str, cmd_args);
 		
@@ -51,7 +53,8 @@ int main(int argc, char **argv) {
 		}
 		
 		struct timeval init, end; //checkpoint to measure wall-clock time
-		gettimeofday(&init,NULL);
+		
+		gettimeofday(&init,NULL);//get time right before creating the child
 		pid_t pid = fork(); //create a new process
 		
 		//CHILD
@@ -77,15 +80,17 @@ int main(int argc, char **argv) {
 				continue;
 				//exit(EXIT_FAILURE);
 			}
-			//get child execution statistics
+			//get CHILDREN execution statistics
 			struct rusage current_rusage;
 			getrusage(RUSAGE_CHILDREN,&current_rusage);
 			
 			//Print report
 			printf("\n***REPORT***\n");
 			printf("wall-clock:\t\t%d\n",diff_time(init,end));
+			//use the difference to get the measurements of the most recent child
 			print_rusage(diff_rusage(current_rusage, prev_rusage));
-			prev_rusage = current_rusage;
+			
+			prev_rusage = current_rusage;//update previous accumulated rusage
 		
 		}else { //error
 			perror(NULL);//error in fork
@@ -95,6 +100,6 @@ int main(int argc, char **argv) {
 		
 	}
 	
-	free_args(cmd_args);//free memory allocaded in args_from_str function
+	//free_args(cmd_args);//free memory allocaded in args_from_str function
 	return 0;
 }

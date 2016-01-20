@@ -43,12 +43,15 @@ int args_from_str(char str[129], char* args[33]) {
 	return n_args;
 }
 
-/* Free the memory of the arguments from args_from_cmdline and args_from_str fucntions
+/* Free the memory of the arguments from args_from_str function
+ * (assume it will have at most 32 arguments)
+ * 
+ * @return number of arguments
  */
 int free_args(char* args[33]) {
 	int i = 0;
 	
-	while(args[i] != NULL) {
+	while(args[i] != NULL) {//terminate condition
 		free(args[i]);
 		i++;
 	}
@@ -56,7 +59,12 @@ int free_args(char* args[33]) {
 	return i;
 }
 
-/* return the difference between init and end in miliseconds
+/* Return the difference between init and end in miliseconds
+ * 
+ * @param init: initial time (older)
+ * @param end:  end time (more recent)
+ * 
+ * @return: difference (interval time) in milisseconds
  * 
  * the arguments can be gotten by gettimeofday function
  */
@@ -90,7 +98,13 @@ void print_rusage(struct rusage data) {
 	printf("Page Reclaims:\t\t%ld\n", data.ru_minflt);
 }
 
-
+/* Calculate the differences between 2 rusages structs
+ * 
+ * @current recent rusage status (for all children. From getrusage function)
+ * @previous previous rusage status (for all children. From getrusage function)
+ * 
+ * @return rusage resulting from the difference between current and previous (just of the main parameters. Not all)
+ */
 struct rusage diff_rusage(struct rusage current, struct rusage previous) {
 	struct rusage result;
 	

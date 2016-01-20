@@ -11,6 +11,6 @@ shell: auxfnc.o
 test: auxfnc.o
 
 clean:
-	rm runCommand shell test mtrace.txt *.o
+	rm runCommand shell test mtrace.txt *.o *~
 
 .PHONY: clean all
