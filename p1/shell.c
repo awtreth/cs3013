@@ -18,6 +18,8 @@
 //custom library
 #include "auxfnc.h"
 
+#include <mcheck.h>
+
 //MAIN
 int main(int argc, char **argv) {
 	
