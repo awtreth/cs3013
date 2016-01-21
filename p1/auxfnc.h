@@ -3,6 +3,7 @@
 
 #include <sys/time.h>
 #include <sys/resource.h>
+#include <unistd.h>
 
 /* Return the difference between init and end in miliseconds
  * 
@@ -60,6 +61,9 @@ int args_from_str(char str[129], char* args[33]);
  * @return number of arguments
  */
 int free_args(char* args[33]);
+
+
+void print_report(pid_t pid, char* name, int time, struct rusage usage, int status);
 
 
 #endif

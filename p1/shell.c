@@ -44,11 +44,12 @@ int main(int argc, char **argv) {
 		int n_args = args_from_str(str, cmd_args);
 		
 		//Special cases
-		if(n_args==0) continue;//no argument
-		if(strcmp(cmd_args[0],"exit") == 0 && n_args == 1) break;//exit command
+		if(n_args==0) {free_args(cmd_args); continue;}//no argument
+		if(strcmp(cmd_args[0],"exit") == 0 && n_args == 1) {free_args(cmd_args); break;}//exit command
 		if(strcmp(cmd_args[0],"cd") == 0) {//change directory built in command
 			if(n_args==1)chdir(".");//default value (in this case, the current directory)
 			else chdir(cmd_args[1]);
+			free_args(cmd_args);
 			continue;
 		}
 		
@@ -62,17 +63,18 @@ int main(int argc, char **argv) {
 			
 			if(execvp(cmd_args[0], cmd_args) == -1){ //error with de command
 				perror(NULL);//print error message
-				free_args(cmd_args);//free memory allocaded in args_from_cmdline function
+				//free_args(cmd_args);//free memory allocaded in args_from_cmdline function
 				exit(EXIT_FAILURE);
 			}
 
 		}else if (pid > 0) { //PARENT
-			free_args(cmd_args);//free memory allocaded in args_from_str function
 			
 			int status = 0;//return from wait function
 			
 			wait(&status);//wait for child execution
 			gettimeofday(&end,NULL);
+		
+			free_args(cmd_args);//free memory allocaded in args_from_str function
 			
 			//if the child returned EXIT_FAILURE (when something goes wrong)
 			if(WEXITSTATUS(status) == EXIT_FAILURE) {

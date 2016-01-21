@@ -17,8 +17,10 @@
 
 //custom library
 #include "auxfnc.h"
+#include "bgprocess.h"
 
 #include <mcheck.h>// for memory leakage tracking
+
 
 //MAIN
 int main(int argc, char **argv) {
@@ -26,12 +28,15 @@ int main(int argc, char **argv) {
 	//mtrace();//to check memory leakage problems
 	
 	//Initialize prev_rusage with 0 values
-	struct rusage prev_rusage;
-	getrusage(RUSAGE_CHILDREN,&prev_rusage);
-	
+	struct rusage usage;
+	int status = 0;//return from wait function
 	
 	char str[129];//input string
 	char* cmd_args[32]; //vector of strings (arguments for the shell)
+	struct timeval init, end; //checkpoint to measure wall-clock time
+	
+	bgprocessLL bgpLL = init_bgprocessLL();
+	
 	
 	while(1) {
 		printf(">");//prompt character
@@ -52,10 +57,6 @@ int main(int argc, char **argv) {
 			continue;
 		}
 		
-		
-		
-		struct timeval init, end; //checkpoint to measure wall-clock time
-		
 		gettimeofday(&init,NULL);//get time right before creating the child
 		pid_t pid = fork(); //create a new process
 		
@@ -64,39 +65,32 @@ int main(int argc, char **argv) {
 			
 			if(execvp(cmd_args[0], cmd_args) == -1){ //error with de command
 				perror(NULL);//print error message
-				free_args(cmd_args);//free memory allocaded in args_from_cmdline function
+				//free_args(cmd_args);//free memory allocaded in args_from_cmdline function
 				exit(EXIT_FAILURE);
 			}
 
 		}else if (pid > 0) { //PARENT
-			if(strcmp(cmd_args[0],"&") != 0) {//false
-				
+			if(strcmp(cmd_args[n_args-1],"&") != 0) {//false
+				int pid = wait3(&status, 0, &usage);
+				gettimeofday(&end, NULL);
+				print_report(pid, cmd_args[0], diff_time(init,end), usage, status);
+			}else {
+				bgprocess bgp = init_bgprocess(pid, init, cmd_args[0]);
+				add2bgprocessLL(&bgpLL, &bgp);
 			}
+			
+			
+			/*while(1) {
+				int pid = wait3(&status, WNOHANG, &usage);
+				gettimeofday(&end,NULL);
+				if(pid <= 0) break; //TODO: treat -1 condition
+				else {
+					print_report(pid);
+				}
+			}*/
+			
 			
 			free_args(cmd_args);//free memory allocaded in args_from_str function
-			
-			int status = 0;//return from wait function
-			
-			wait(&status);//wait for child execution
-			gettimeofday(&end,NULL);
-			
-			//if the child returned EXIT_FAILURE (when something goes wrong)
-			if(WEXITSTATUS(status) == EXIT_FAILURE) {
-				//the child print the error
-				continue;
-				//exit(EXIT_FAILURE);
-			}
-			//get CHILDREN execution statistics
-			struct rusage current_rusage;
-			getrusage(RUSAGE_CHILDREN,&current_rusage);
-			
-			//Print report
-			printf("\n***REPORT***\n");
-			printf("wall-clock:\t\t%d\n",diff_time(init,end));
-			//use the difference to get the measurements of the most recent child
-			print_rusage(diff_rusage(current_rusage, prev_rusage));
-			
-			prev_rusage = current_rusage;//update previous accumulated rusage
 		
 		}else { //error
 			perror(NULL);//error in fork

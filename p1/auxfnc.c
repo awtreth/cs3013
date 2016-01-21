@@ -8,6 +8,10 @@
 #include <sys/time.h>
 #include <sys/resource.h>
 
+#include <sys/types.h>
+#include <sys/wait.h>
+
+
 //FUNCTIONS
 
 /* Extract arguments from input string to be used in execpv function
@@ -119,32 +123,10 @@ struct rusage diff_rusage(struct rusage current, struct rusage previous) {
 }
 
 
-struct bgprocess {
-	pid_t pid;
-	timeval init_time;
-};
-
-struct bgprocessLL {
-	bgprocess *first;
-	bgprocess *last;
-	int n;
-};
-
-bgprocessLL init_bgprocessLL() {
-	bgprocessLL bg;
-	bg.first = NULL;
-	bg.last = NULL;
-	n = 0;
-}
-
-int add2bgprocessLL(bgprocessLL* bgpLL, bgprocess bgp) {
-	return 0;
-}
-
-bgprocess remove_bgprocess(bgprocessLL* bgpLL, pid_t pid) {
-	bgprocess bgp;
-	return bgp;
-}
-
-void print_bgprocessLL(bgprocessLL bgpLL) {
+void print_report(pid_t pid, char* name, int time, struct rusage usage, int status) {
+	//Print report
+	if(WEXITSTATUS(status) == EXIT_FAILURE) return;
+	printf("\n***REPORT***\n");
+	printf("Wall-clock:\t\t%d\n",time);
+	print_rusage(usage);
 }
