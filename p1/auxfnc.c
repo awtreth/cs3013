@@ -117,3 +117,34 @@ struct rusage diff_rusage(struct rusage current, struct rusage previous) {
 	
 	return result;
 }
+
+
+struct bgprocess {
+	pid_t pid;
+	timeval init_time;
+};
+
+struct bgprocessLL {
+	bgprocess *first;
+	bgprocess *last;
+	int n;
+};
+
+bgprocessLL init_bgprocessLL() {
+	bgprocessLL bg;
+	bg.first = NULL;
+	bg.last = NULL;
+	n = 0;
+}
+
+int add2bgprocessLL(bgprocessLL* bgpLL, bgprocess bgp) {
+	return 0;
+}
+
+bgprocess remove_bgprocess(bgprocessLL* bgpLL, pid_t pid) {
+	bgprocess bgp;
+	return bgp;
+}
+
+void print_bgprocessLL(bgprocessLL bgpLL) {
+}
