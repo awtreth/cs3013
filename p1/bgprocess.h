@@ -8,18 +8,18 @@
 
 /* Store useful background process information
  */
-typedef struct {
+typedef struct bgprocess{
 	pid_t pid;
 	struct timeval init_time;
 	char* name;
+	struct bgprocess *next;
 } bgprocess;
 
 /* bgprocess Linked List
  */
-typedef struct {
+typedef struct bgprocessLL{
 	bgprocess *first;
-	bgprocess *last;
-	int n;
+	int size;
 } bgprocessLL;
 
 bgprocess init_bgprocess(pid_t pid, struct timeval init_time, char* name);
@@ -28,9 +28,9 @@ void free_bgprocess(bgprocess* bgp);
 
 bgprocessLL init_bgprocessLL();
 
-int add2bgprocessLL(bgprocessLL* bgpLL, bgprocess bgp);
+int add2bgprocessLL(bgprocessLL* bgpLL, bgprocess* bgp);
 
-bgprocess remove_bgprocess(bgprocessLL* bgpLL, pid_t pid);
+bgprocess* remove_bgprocess(bgprocessLL* bgpLL, pid_t pid);
 
 void print_bgprocessLL(bgprocessLL bgpLL);
 
