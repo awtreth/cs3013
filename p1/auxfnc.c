@@ -99,7 +99,7 @@ void print_rusage(struct rusage data) {
 	printf("Involuntary Switches:\t%ld\n", data.ru_nivcsw);
 	printf("Voluntary Switches:\t%ld\n", data.ru_nvcsw);
 	printf("Page Faults:\t\t%ld\n", data.ru_majflt);
-	printf("Page Reclaims:\t\t%ld\n", data.ru_minflt);
+	printf("Page Reclaims:\t\t%ld\n\n", data.ru_minflt);
 }
 
 /* Calculate the differences between 2 rusages structs
@@ -122,11 +122,10 @@ struct rusage diff_rusage(struct rusage current, struct rusage previous) {
 	return result;
 }
 
-
-void print_report(pid_t pid, char* name, int time, struct rusage usage, int status) {
+void print_report(int time, struct rusage usage, int status) {
 	//Print report
 	if(WEXITSTATUS(status) == EXIT_FAILURE) return;
-	printf("\n***REPORT***\n");
+	printf("***REPORT***\n");
 	printf("Wall-clock:\t\t%d\n",time);
 	print_rusage(usage);
 }

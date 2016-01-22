@@ -63,7 +63,7 @@ int args_from_str(char str[129], char* args[33]);
 int free_args(char* args[33]);
 
 
-void print_report(pid_t pid, char* name, int time, struct rusage usage, int status);
+void print_report(int time, struct rusage usage, int status);
 
 
 #endif

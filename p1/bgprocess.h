@@ -13,25 +13,28 @@ typedef struct bgprocess{
 	struct timeval init_time;
 	char* name;
 	struct bgprocess *next;
+	int number;
 } bgprocess;
 
 /* bgprocess Linked List
  */
 typedef struct bgprocessLL{
-	bgprocess *first;
+	bgprocess* first;
 	int size;
 } bgprocessLL;
 
 bgprocess init_bgprocess(pid_t pid, struct timeval init_time, char* name);
 
-void free_bgprocess(bgprocess* bgp);
+void free_bgprocess_name(bgprocess* bgp);
 
 bgprocessLL init_bgprocessLL();
 
-int add2bgprocessLL(bgprocessLL* bgpLL, bgprocess* bgp);
+int add2bgprocessLL(bgprocessLL* bgpLL, bgprocess bgp);
 
-bgprocess* remove_bgprocess(bgprocessLL* bgpLL, pid_t pid);
+bgprocess remove_bgprocess(bgprocessLL* bgpLL, pid_t pid);
 
 void print_bgprocessLL(bgprocessLL bgpLL);
+
+void print_bgprocess(bgprocess proc);
 
 #endif

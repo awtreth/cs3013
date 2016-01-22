@@ -1,8 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <math.h>
-
 int main() {
 	
 	int v = 1, i = 0;

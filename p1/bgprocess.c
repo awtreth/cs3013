@@ -22,10 +22,36 @@ bgprocess init_bgprocess(pid_t pid, struct timeval init_time, char* name) {
 	
 	bgp.next = NULL;
 	
+	bgp.number = 0;
+	
 	return bgp;
 }
 
+bgprocess init_null_bgprocess() {
+	struct timeval t;
+	t.tv_sec = 0; t.tv_usec = 0;
+	return init_bgprocess(0, t, NULL);
+}
+
+bgprocess* dynamic_copy_bgprocess(bgprocess other) {
+	bgprocess* b = (bgprocess*)malloc(sizeof(bgprocess));
+	*b = other;
+	
+	return b;
+}
+
+bgprocess copy_bgprocess(bgprocess other) {
+	return init_bgprocess(other.pid, other.init_time, other.name);
+}
+
 void free_bgprocess(bgprocess* bgp) {
+	free_bgprocess_name(bgp);
+	if(bgp != NULL) {
+		free(bgp);
+	}
+}
+
+void free_bgprocess_name(bgprocess* bgp) {
 	if(bgp->name != NULL) {
 		free(bgp->name);
 	}
@@ -40,29 +66,57 @@ bgprocessLL init_bgprocessLL() {
 	return bg;
 }
 
-int add2bgprocessLL(bgprocessLL* bgpLL, bgprocess* bgp) {
+int add2bgprocessLL(bgprocessLL* bgpLL, bgprocess bgp) {
 	
-	bgp->next = bgpLL->first;
-	bgpLL->first = bgp;
+	
+	if(bgpLL->first == NULL)
+		bgpLL->first = dynamic_copy_bgprocess(bgp);
+	else {
+		bgprocess* old_first = bgpLL->first;
+		bgpLL->first = dynamic_copy_bgprocess(bgp);
+		bgpLL->first->next = old_first;
+	}
 	
 	bgpLL->size++;
+	
+	bgpLL->first->number = bgpLL->size;
 	
 	return 0;
 }
 
-bgprocess* remove_bgprocess(bgprocessLL* bgpLL, pid_t pid) {
+bgprocess remove_bgprocess(bgprocessLL* bgpLL, pid_t pid) {
 	
 	bgprocess* node = bgpLL->first;
 	
-	while(node!=NULL) {
-		if (node->pid == pid) {
-			bgpLL->size--;
-			break;
+	if(node->pid == pid) {
+		
+		bgprocess b = copy_bgprocess(*bgpLL->first);
+		free_bgprocess(bgpLL->first);
+		bgpLL->first = NULL;
+		
+		bgpLL->size--;
+		
+		return b;
+	}else {
+		while(node->next!=NULL) {
+			if (node->next->pid == pid) {
+				bgprocess* old_next = node->next;
+				bgprocess b = copy_bgprocess(*old_next);
+				node->next = node->next->next;
+				free_bgprocess(old_next);
+				bgpLL->size--;
+				
+				return b;
+			}
+			node = node->next;
 		}
-		node = node->next;
 	}
 	
-	return node;
+	return *node;
+}
+
+void print_bgprocess(bgprocess proc) {
+	printf("[%d] %d %s\n", proc.number, proc.pid, proc.name);
 }
 
 void print_bgprocessLL(bgprocessLL bgpLL) {
@@ -70,7 +124,7 @@ void print_bgprocessLL(bgprocessLL bgpLL) {
 	bgprocess* node = bgpLL.first;
 	
 	while(node!=NULL) {
-		printf("[%d] %s\n", node->pid, node->name);
+		print_bgprocess(*node);
 		node = node->next;
 	}
 }
