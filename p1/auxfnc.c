@@ -129,3 +129,4 @@ void print_report(int time, struct rusage usage, int status) {
 	printf("Wall-clock:\t\t%d\n",time);
 	print_rusage(usage);
 }
+

@@ -37,4 +37,6 @@ void print_bgprocessLL(bgprocessLL bgpLL);
 
 void print_bgprocess(bgprocess proc);
 
+void check_background_processes(bgprocessLL * bgpLL);
+
 #endif

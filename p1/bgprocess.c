@@ -1,4 +1,5 @@
 #include "bgprocess.h"
+#include "auxfnc.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -7,6 +8,9 @@
 
 #include <sys/time.h>
 #include <sys/resource.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
 
 bgprocess init_bgprocess(pid_t pid, struct timeval init_time, char* name) {
 	bgprocess bgp;
@@ -33,15 +37,17 @@ bgprocess init_null_bgprocess() {
 	return init_bgprocess(0, t, NULL);
 }
 
-bgprocess* dynamic_copy_bgprocess(bgprocess other) {
-	bgprocess* b = (bgprocess*)malloc(sizeof(bgprocess));
-	*b = other;
-	
-	return b;
-}
 
 bgprocess copy_bgprocess(bgprocess other) {
 	return init_bgprocess(other.pid, other.init_time, other.name);
+}
+
+bgprocess* dynamic_copy_bgprocess(bgprocess other) {
+	bgprocess* b = (bgprocess*)malloc(sizeof(bgprocess));
+	free_bgprocess_name(b);
+	*b = copy_bgprocess(other);
+	
+	return b;
 }
 
 void free_bgprocess(bgprocess* bgp) {
@@ -69,9 +75,10 @@ bgprocessLL init_bgprocessLL() {
 int add2bgprocessLL(bgprocessLL* bgpLL, bgprocess bgp) {
 	
 	
-	if(bgpLL->first == NULL)
+	if(bgpLL->first == NULL){
 		bgpLL->first = dynamic_copy_bgprocess(bgp);
-	else {
+		bgpLL->first->next = NULL;
+	}else {
 		bgprocess* old_first = bgpLL->first;
 		bgpLL->first = dynamic_copy_bgprocess(bgp);
 		bgpLL->first->next = old_first;
@@ -126,6 +133,25 @@ void print_bgprocessLL(bgprocessLL bgpLL) {
 	while(node!=NULL) {
 		print_bgprocess(*node);
 		node = node->next;
+	}
+}
+
+void check_background_processes(bgprocessLL * bgpLL) {
+	int status = 0;
+	struct rusage usage;
+	struct timeval end;
+	
+	while(1) {
+		int pid_done = wait3(&status, WNOHANG, &usage);
+		gettimeofday(&end, NULL);
+		
+		if(pid_done <= 0) break; //TODO: treat -1 condition
+		else {
+			bgprocess bgp = remove_bgprocess(bgpLL, pid_done);
+			print_bgprocess(bgp);
+			print_report(diff_time(bgp.init_time,end), usage, status);
+			free_bgprocess_name(&bgp);
+		}
 	}
 }
 

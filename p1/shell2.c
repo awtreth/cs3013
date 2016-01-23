@@ -28,7 +28,7 @@
 //MAIN
 int main(int argc, char **argv) {
 	
-	//mtrace();//to check memory leakage problems
+	mtrace();//to check memory leakage problems
 	
 	//Initialize prev_rusage with 0 values
 	struct rusage usage;
@@ -70,6 +70,7 @@ int main(int argc, char **argv) {
 		if(strcmp(cmd_args[n_args-1],"&") == 0) {
 			free(cmd_args[n_args-1]);
 			cmd_args[n_args-1]=NULL;
+			n_args--;
 			background = TRUE;
 		}else
 			background = FALSE;
@@ -93,7 +94,9 @@ int main(int argc, char **argv) {
 					gettimeofday(&end, NULL);
 					
 					if(pid_done!=pid) {
+						printf("before\n");
 						bgprocess bgp = remove_bgprocess(&bgpLL, pid_done);
+						printf("after\n");
 						print_bgprocess(bgp);
 						print_report(diff_time(bgp.init_time,end), usage, status);
 						free_bgprocess_name(&bgp);
@@ -107,6 +110,8 @@ int main(int argc, char **argv) {
 				
 				add2bgprocessLL(&bgpLL, bgp);
 				
+				free_bgprocess_name(&bgp);
+				
 				print_bgprocess(*bgpLL.first);
 			}
 			
@@ -118,18 +123,20 @@ int main(int argc, char **argv) {
 			exit(EXIT_FAILURE);
 		}
 		
-		while(1) {
-			int pid_done = wait3(&status, WNOHANG, &usage);
-			gettimeofday(&end, NULL);
-			
-			if(pid_done <= 0) break; //TODO: treat -1 condition
-			else {
-				bgprocess bgp = remove_bgprocess(&bgpLL, pid_done);
-				print_bgprocess(bgp);
-				print_report(diff_time(bgp.init_time,end), usage, status);
-				free_bgprocess_name(&bgp);
-			}
-		}
+		check_background_processes(&bgpLL);
+		
+		//~ while(1) {
+			//~ int pid_done = wait3(&status, WNOHANG, &usage);
+			//~ gettimeofday(&end, NULL);
+			//~ 
+			//~ if(pid_done <= 0) break; //TODO: treat -1 condition
+			//~ else {
+				//~ bgprocess bgp = remove_bgprocess(&bgpLL, pid_done);
+				//~ print_bgprocess(bgp);
+				//~ print_report(diff_time(bgp.init_time,end), usage, status);
+				//~ free_bgprocess_name(&bgp);
+			//~ }
+		//~ }
 		
 	}
 	
