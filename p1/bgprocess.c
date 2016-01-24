@@ -14,8 +14,7 @@
 /*Create a bgprocess instance
  * 
  * It allocates memory for name dinamically. Then, you need to call free_bgprocess_name
- * 
- * bgprocess.next starts with NULL and bgprocess.next starts with zero by default
+ *
  * @see bgprocessLL
  * @see free_bgprocess_name
  */
@@ -212,6 +211,8 @@ void check_background_processes(bgprocessLL * bgpLL, int wait_option) {
 	}
 }
 
+/* Wait all wait4bgprocess in bgpLL finish
+ */
 void wait4bgprocess(bgprocessLL *bgpLL) {
 	if(bgpLL->size>0) {
 		printf("Waiting for:\n");
