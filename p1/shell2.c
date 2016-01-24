@@ -46,44 +46,17 @@ int main(int argc, char **argv) {
 		printf(">");//prompt character
 		
 		if(fgets(str,129,stdin)==NULL){//EOF or error (to be able to pipe input files)
-			if(bgpLL.size>0) {
-				printf("Waiting for:\n");
-				print_bgprocessLL(bgpLL);
-				check_background_processes(&bgpLL, 0);
-			}
+			wait4bgprocess(&bgpLL);
 			break;
 		}
 
-		//TODO: check string size
-		
 		int n_args = args_from_str(str, cmd_args);
 		
-		//SPECIAL CASES (TODO: put special cases in a function)
-		if(n_args==0) {
-			check_background_processes(&bgpLL, WNOHANG);
-			free_args(cmd_args);
-			continue;}//no argument
-		if(strcmp(cmd_args[0],"exit") == 0 && n_args == 1) {
-			if(bgpLL.size>0) {
-				printf("Waiting for:\n");
-				print_bgprocessLL(bgpLL);
-				check_background_processes(&bgpLL, 0);
-			}
-			free_args(cmd_args);
-			break;}//exit command
-		if(strcmp(cmd_args[0],"cd") == 0) {//change directory built in command
-			check_background_processes(&bgpLL, WNOHANG);
-			if(n_args==1)chdir(".");//default value (in this case, the current directory)
-			else chdir(cmd_args[1]);
-			free_args(cmd_args);
-			continue;
-		}
-		if(strcmp(cmd_args[0],"jobs") == 0 && n_args == 1) {//change directory built in command
-			check_background_processes(&bgpLL, WNOHANG);
-			print_bgprocessLL(bgpLL);
-			free_args(cmd_args);
-			continue;
-		}
+		int builtin_effect = treat_builtin_cmds(cmd_args, n_args, &bgpLL);
+		
+		if(builtin_effect==CONTINUE) continue;
+		else if (builtin_effect==BREAK) break;
+		//else: continue normally
 		
 		if(strcmp(cmd_args[n_args-1],"&") == 0) {
 			free(cmd_args[n_args-1]);

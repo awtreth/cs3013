@@ -4,6 +4,8 @@
 #include <sys/time.h>
 #include <sys/resource.h>
 #include <unistd.h>
+#include "bgprocess.h"
+
 
 /* Return the difference between init and end in miliseconds
  * 
@@ -65,6 +67,10 @@ int free_args(char* args[33]);
 
 void print_report(int time, struct rusage usage, int status);
 
+#define NO_BUILTIN	0
+#define CONTINUE	1
+#define BREAK		2
 
+int treat_builtin_cmds(char** cmd_args, int n_args, bgprocessLL *bgpLL);
 
 #endif

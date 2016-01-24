@@ -212,3 +212,10 @@ void check_background_processes(bgprocessLL * bgpLL, int wait_option) {
 	}
 }
 
+void wait4bgprocess(bgprocessLL *bgpLL) {
+	if(bgpLL->size>0) {
+		printf("Waiting for:\n");
+		print_bgprocessLL(*bgpLL);
+		check_background_processes(bgpLL, 0);
+	}
+}

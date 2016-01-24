@@ -39,4 +39,6 @@ void print_bgprocess(bgprocess proc, const char* complement);
 
 void check_background_processes(bgprocessLL * bgpLL, int wait_option);
 
+void wait4bgprocess(bgprocessLL *bgpLL);
+
 #endif
