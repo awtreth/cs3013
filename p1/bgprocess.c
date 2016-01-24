@@ -20,7 +20,7 @@
  * @see free_bgprocess_name
  */
  //TODO: make it simpler, without dynamic allocation
-bgprocess init_bgprocess(pid_t pid, struct timeval init_time, char* name) {
+bgprocess init_bgprocess(pid_t pid, struct timeval init_time, char* name, int number, bgprocess* next) {
 	bgprocess bgp;
 	
 	//assign values
@@ -34,9 +34,9 @@ bgprocess init_bgprocess(pid_t pid, struct timeval init_time, char* name) {
 	}else
 		bgp.name = NULL;
 	
-	bgp.next = NULL;// for linked list (used in bgprocessLL)
+	bgp.next = next;// for linked list (used in bgprocessLL)
 	
-	bgp.number = 0;//used in bgprocessLL
+	bgp.number = number;//used in bgprocessLL
 	
 	return bgp;
 }
@@ -46,7 +46,7 @@ bgprocess init_bgprocess(pid_t pid, struct timeval init_time, char* name) {
 bgprocess init_null_bgprocess() {
 	struct timeval t;
 	t.tv_sec = 0; t.tv_usec = 0;
-	return init_bgprocess(0, t, NULL);
+	return init_bgprocess(0, t, NULL, 0, NULL);
 }
 
 /*Copy bgprocess from "other" to the return value
@@ -58,7 +58,7 @@ bgprocess init_null_bgprocess() {
  * @return output copy
  */
 bgprocess copy_bgprocess(bgprocess other) {
-	return init_bgprocess(other.pid, other.init_time, other.name);
+	return init_bgprocess(other.pid, other.init_time, other.name, other.number, other.next);
 }
 
 /* Same as copy_bgprocess but the copy is dynamically allocated and returns the pointer
@@ -68,7 +68,7 @@ bgprocess copy_bgprocess(bgprocess other) {
 bgprocess* dynamic_copy_bgprocess(bgprocess other) {
 	bgprocess* b = (bgprocess*)malloc(sizeof(bgprocess));
 	
-	free_bgprocess_name(b);//FIXME: is it necessary? I don't think so
+	//free_bgprocess_name(b);//FIXME: is it necessary? I don't think so
 	*b = copy_bgprocess(other);
 	
 	return b;
@@ -172,8 +172,8 @@ bgprocess remove_bgprocess(bgprocessLL* bgpLL, pid_t pid) {
  * 
  * [number] pid name complement
  */
-void print_bgprocess(bgprocess proc) {
-	printf("[%d] %d %s\n", proc.number, proc.pid, proc.name);
+void print_bgprocess(bgprocess proc, const char* complement) {
+	printf("[%d] %d %s %s\n", proc.number, proc.pid, proc.name, (complement!=NULL)?complement:"");
 }
 
 /* Print the contents in the linkedlist (in the oposite order. Stack) TODO: make it a queue
@@ -183,7 +183,7 @@ void print_bgprocessLL(bgprocessLL bgpLL) {
 	bgprocess* node = bgpLL.first;
 	
 	while(node!=NULL) {
-		print_bgprocess(*node);
+		print_bgprocess(*node, "");
 		node = node->next;
 	}
 }
@@ -193,19 +193,19 @@ void print_bgprocessLL(bgprocessLL bgpLL) {
  * It returns imediatally if no one is done
  * It also print the report of the finished bgprocess 
  */
-void check_background_processes(bgprocessLL * bgpLL) {
+void check_background_processes(bgprocessLL * bgpLL, int wait_option) {
 	int status = 0;
 	struct rusage usage;
 	struct timeval end;
 	
-	while(1) {
-		int pid_done = wait3(&status, WNOHANG, &usage); // It returns imediatally if no one is done (returns 0 when it happens)
+	while(bgpLL->size > 0) {
+		int pid_done = wait3(&status, wait_option, &usage); // It returns imediatally if no one is done (returns 0 when it happens)
 		gettimeofday(&end, NULL);//get end time
 		
 		if(pid_done <= 0) break;// //TODO: treat -1 condition
 		else {
 			bgprocess bgp = remove_bgprocess(bgpLL, pid_done);//remove from LL
-			print_bgprocess(bgp);//print the name
+			print_bgprocess(bgp, " completed");//print the name
 			print_report(diff_time(bgp.init_time,end), usage, status);//print the report
 			free_bgprocess_name(&bgp);//free name
 		}

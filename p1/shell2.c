@@ -45,23 +45,41 @@ int main(int argc, char **argv) {
 	while(1) {
 		printf(">");//prompt character
 		
-		if(fgets(str,129,stdin)==NULL)//EOF or error (to be able to pipe input files)
+		if(fgets(str,129,stdin)==NULL){//EOF or error (to be able to pipe input files)
+			if(bgpLL.size>0) {
+				printf("Waiting for:\n");
+				print_bgprocessLL(bgpLL);
+				check_background_processes(&bgpLL, 0);
+			}
 			break;
+		}
 
 		//TODO: check string size
 		
 		int n_args = args_from_str(str, cmd_args);
 		
-		//SPECIAL CASES
-		if(n_args==0) {free_args(cmd_args); continue;}//no argument
-		if(strcmp(cmd_args[0],"exit") == 0 && n_args == 1) {free_args(cmd_args); break;}//exit command
+		//SPECIAL CASES (TODO: put special cases in a function)
+		if(n_args==0) {
+			check_background_processes(&bgpLL, WNOHANG);
+			free_args(cmd_args);
+			continue;}//no argument
+		if(strcmp(cmd_args[0],"exit") == 0 && n_args == 1) {
+			if(bgpLL.size>0) {
+				printf("Waiting for:\n");
+				print_bgprocessLL(bgpLL);
+				check_background_processes(&bgpLL, 0);
+			}
+			free_args(cmd_args);
+			break;}//exit command
 		if(strcmp(cmd_args[0],"cd") == 0) {//change directory built in command
+			check_background_processes(&bgpLL, WNOHANG);
 			if(n_args==1)chdir(".");//default value (in this case, the current directory)
 			else chdir(cmd_args[1]);
 			free_args(cmd_args);
 			continue;
 		}
 		if(strcmp(cmd_args[0],"jobs") == 0 && n_args == 1) {//change directory built in command
+			check_background_processes(&bgpLL, WNOHANG);
 			print_bgprocessLL(bgpLL);
 			free_args(cmd_args);
 			continue;
@@ -94,10 +112,9 @@ int main(int argc, char **argv) {
 					gettimeofday(&end, NULL);
 					
 					if(pid_done!=pid) {
-						printf("before\n");
 						bgprocess bgp = remove_bgprocess(&bgpLL, pid_done);
-						printf("after\n");
-						print_bgprocess(bgp);
+
+						print_bgprocess(bgp, "completed");
 						print_report(diff_time(bgp.init_time,end), usage, status);
 						free_bgprocess_name(&bgp);
 					}else {
@@ -106,13 +123,13 @@ int main(int argc, char **argv) {
 					}
 				}
 			}else {
-				bgprocess bgp = init_bgprocess(pid, init, cmd_args[0]);
+				bgprocess bgp = init_bgprocess(pid, init, cmd_args[0],0,NULL);
 				
 				add2bgprocessLL(&bgpLL, bgp);
 				
 				free_bgprocess_name(&bgp);
 				
-				print_bgprocess(*bgpLL.first);
+				print_bgprocess(*bgpLL.first, "");
 			}
 			
 			free_args(cmd_args);//free memory allocaded in args_from_str function
@@ -123,7 +140,7 @@ int main(int argc, char **argv) {
 			exit(EXIT_FAILURE);
 		}
 		
-		check_background_processes(&bgpLL);
+		check_background_processes(&bgpLL, WNOHANG);
 		
 		//~ while(1) {
 			//~ int pid_done = wait3(&status, WNOHANG, &usage);

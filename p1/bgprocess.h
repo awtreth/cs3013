@@ -23,7 +23,7 @@ typedef struct bgprocessLL{
 	int size;
 } bgprocessLL;
 
-bgprocess init_bgprocess(pid_t pid, struct timeval init_time, char* name);
+bgprocess init_bgprocess(pid_t pid, struct timeval init_time, char* name, int number, bgprocess* next);
 
 void free_bgprocess_name(bgprocess* bgp);
 
@@ -35,8 +35,8 @@ bgprocess remove_bgprocess(bgprocessLL* bgpLL, pid_t pid);
 
 void print_bgprocessLL(bgprocessLL bgpLL);
 
-void print_bgprocess(bgprocess proc);
+void print_bgprocess(bgprocess proc, const char* complement);
 
-void check_background_processes(bgprocessLL * bgpLL);
+void check_background_processes(bgprocessLL * bgpLL, int wait_option);
 
 #endif
