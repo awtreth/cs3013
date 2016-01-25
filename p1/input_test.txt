@@ -1,5 +1,6 @@
 ls
-ls /etc
+cd /etc
+ls
 ps -aux
 lspci
 ./test

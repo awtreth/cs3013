@@ -78,4 +78,23 @@ void check_background_processes(bgprocessLL * bgpLL, int wait_option);
  */
 void wait4bgprocess(bgprocessLL *bgpLL);
 
+
+/* Take care of special built-in programs
+ * 
+ * @param cmd_args: vector of string taken form args_from_str fucntion
+ * @param n_args: number of arguments in cmd_args
+ * @param bgpLL: pointer to the current background process LinkedList
+ * 
+ * @return result (3 possible results)
+ * 
+ * NO_BUILTIN:	it is not a built-in function request
+ * CONTINUE:	simply request to ask for the next command
+ * BREAK:		stop the program
+ * 
+ */
+#define NO_BUILTIN	0
+#define CONTINUE	1
+#define BREAK		2
+int treat_builtin_cmds(char** cmd_args, int n_args, bgprocessLL *bgpLL);
+
 #endif

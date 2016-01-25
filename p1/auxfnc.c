@@ -123,6 +123,11 @@ struct rusage diff_rusage(struct rusage current, struct rusage previous) {
 	return result;
 }
 
+/* Print the report of a child process that has already completed
+	@param time: wall-clock time (in milisseconds)
+	@param rusage: rusage status of the process (it can be gotten by getrusage function for example)
+	@param status: returned by wait functions
+ */
 void print_report(int time, struct rusage usage, int status) {
 	//Print report
 	if(WEXITSTATUS(status) == EXIT_FAILURE) return;
@@ -131,31 +136,4 @@ void print_report(int time, struct rusage usage, int status) {
 	print_rusage(usage);
 }
 
-int treat_builtin_cmds(char** cmd_args, int n_args, bgprocessLL *bgpLL) {
-	//SPECIAL CASES (TODO: put special cases in a function)
-	if(n_args==0) {
-		check_background_processes(bgpLL, WNOHANG);
-		free_args(cmd_args);
-		return CONTINUE;
-	}//no argument
-	if(strcmp(cmd_args[0],"exit") == 0 && n_args == 1) {
-		wait4bgprocess(bgpLL);
-		free_args(cmd_args);
-		return BREAK;
-	}//exit command
-	if(strcmp(cmd_args[0],"cd") == 0) {//change directory built in command
-		check_background_processes(bgpLL, WNOHANG);
-		if(n_args==1)chdir(".");//default value (in this case, the current directory)
-		else chdir(cmd_args[1]);
-		free_args(cmd_args);
-		return CONTINUE;
-	}
-	if(strcmp(cmd_args[0],"jobs") == 0 && n_args == 1) {//change directory built in command
-		check_background_processes(bgpLL, WNOHANG);
-		print_bgprocessLL(*bgpLL);
-		free_args(cmd_args);
-		return CONTINUE;
-	}
-	
-	return NO_BUILTIN;
-}
+

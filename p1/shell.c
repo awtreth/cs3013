@@ -23,7 +23,7 @@
 //MAIN
 int main(int argc, char **argv) {
 	
-	//mtrace();//to check memory leakage problems
+	mtrace();//to check memory leakage problems
 	
 	//Initialize prev_rusage with 0 values
 	struct rusage prev_rusage;

@@ -64,8 +64,8 @@ int main(int argc, char **argv) {
 		//Check if the process is supposed to run in background
 		if(strcmp(cmd_args[n_args-1],"&") == 0) {
 			free(cmd_args[n_args-1]);//transparent to the rest
-			n_args--;
 			cmd_args[n_args-1]=NULL;//necesary condition for exec functions
+			n_args--;
 			background = TRUE;
 		}else
 			background = FALSE;

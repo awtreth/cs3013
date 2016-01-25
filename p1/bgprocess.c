@@ -220,3 +220,45 @@ void wait4bgprocess(bgprocessLL *bgpLL) {
 		check_background_processes(bgpLL, 0);
 	}
 }
+
+/* Take care of special built-in programs
+ * 
+ * @param cmd_args: vector of string taken form args_from_str fucntion
+ * @param n_args: number of arguments in cmd_args
+ * @param bgpLL: pointer to the current background process LinkedList
+ * 
+ * @return result (3 possible results)
+ * 
+ * NO_BUILTIN:	it is not a built-in function request
+ * CONTINUE:	simply request to ask for the next command
+ * BREAK:		stop the program
+ * 
+ */
+int treat_builtin_cmds(char** cmd_args, int n_args, bgprocessLL *bgpLL) {
+	//SPECIAL CASES (TODO: put special cases in a function)
+	if(n_args==0) {
+		check_background_processes(bgpLL, WNOHANG);
+		free_args(cmd_args);
+		return CONTINUE;
+	}//no argument
+	if(strcmp(cmd_args[0],"exit") == 0 && n_args == 1) {
+		wait4bgprocess(bgpLL);
+		free_args(cmd_args);
+		return BREAK;
+	}//exit command
+	if(strcmp(cmd_args[0],"cd") == 0) {//change directory built in command
+		check_background_processes(bgpLL, WNOHANG);
+		if(n_args==1)chdir(".");//default value (in this case, the current directory)
+		else chdir(cmd_args[1]);
+		free_args(cmd_args);
+		return CONTINUE;
+	}
+	if(strcmp(cmd_args[0],"jobs") == 0 && n_args == 1) {//change directory built in command
+		check_background_processes(bgpLL, WNOHANG);
+		print_bgprocessLL(*bgpLL);
+		free_args(cmd_args);
+		return CONTINUE;
+	}
+	
+	return NO_BUILTIN;
+}

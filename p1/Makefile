@@ -1,10 +1,10 @@
 CFLAGS=-Wall -g
 
-all: runCommand shell test
-
-auxfnc.o:
+all: runCommand shell test shell2
 
 bgprocess.o:
+
+auxfnc.o:
 
 runCommand: auxfnc.o
 

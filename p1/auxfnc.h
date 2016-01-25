@@ -64,13 +64,11 @@ int args_from_str(char str[129], char* args[33]);
  */
 int free_args(char* args[33]);
 
-
+/* Print the report of a child process that has already completed
+	@param time: wall-clock time (in milisseconds)
+	@param rusage: rusage status of the process (it can be gotten by getrusage function for example)
+	@param status: returned by wait functions
+ */
 void print_report(int time, struct rusage usage, int status);
-
-#define NO_BUILTIN	0
-#define CONTINUE	1
-#define BREAK		2
-
-int treat_builtin_cmds(char** cmd_args, int n_args, bgprocessLL *bgpLL);
 
 #endif
