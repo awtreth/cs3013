@@ -15,6 +15,6 @@ shell2: auxfnc.o bgprocess.o
 test: auxfnc.o
 
 clean:
-	rm runCommand shell test mtrace.txt *.o *~
+	rm runCommand shell shell2 test mtrace.txt *.o *~
 
 .PHONY: clean all

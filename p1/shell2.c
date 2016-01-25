@@ -19,7 +19,7 @@
 #include "auxfnc.h"
 #include "bgprocess.h"
 
-#include <mcheck.h>// for memory leakage tracking
+//#include <mcheck.h>// for memory leakage tracking
 
 
 #define TRUE  1
@@ -28,7 +28,7 @@
 //MAIN
 int main(int argc, char **argv) {
 	
-	mtrace();//to check memory leakage problems
+	//mtrace();//to check memory leakage problems
 	
 	//Initialize prev_rusage with 0 values
 	struct rusage usage;

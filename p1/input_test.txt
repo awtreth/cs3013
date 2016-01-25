@@ -1,6 +1,13 @@
 ls
+echo a s d
 cd /etc
-ls
+sleep
+ldfs
+pwd
+dafsjlad
 ps -aux
 lspci
+ls
+
+cd
 ./test

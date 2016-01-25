@@ -18,12 +18,12 @@
 //custom library
 #include "auxfnc.h"
 
-#include <mcheck.h>// for memory leakage tracking
+//#include <mcheck.h>// for memory leakage tracking
 
 //MAIN
 int main(int argc, char **argv) {
 	
-	mtrace();//to check memory leakage problems
+	//mtrace();//to check memory leakage problems
 	
 	//Initialize prev_rusage with 0 values
 	struct rusage prev_rusage;
@@ -47,7 +47,7 @@ int main(int argc, char **argv) {
 		if(n_args==0) {free_args(cmd_args); continue;}//no argument
 		if(strcmp(cmd_args[0],"exit") == 0 && n_args == 1) {free_args(cmd_args); break;}//exit command
 		if(strcmp(cmd_args[0],"cd") == 0) {//change directory built in command
-			if(n_args==1)chdir(".");//default value (in this case, the current directory)
+			if(n_args==1)chdir("/home");//default value (in this case, the current directory)
 			else chdir(cmd_args[1]);
 			free_args(cmd_args);
 			continue;

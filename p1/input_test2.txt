@@ -1,4 +1,15 @@
 sleep 1 &
+jobs
 sleep 1 &
-./test
+jobs
+cd home
+ls &
+sleep 5 &
+pwd
+dafsjlad
+ps -aux
+lspci
+ls
+
+cds
 ./test
