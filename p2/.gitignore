@@ -1,1 +1,6 @@
 test
+modules.order
+Module.symvers
+*.mod.*
+*o.cmd
+.tmp_versions
