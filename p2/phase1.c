@@ -20,14 +20,14 @@ int strcmp(const char* s1, const char* s2) {
 
 //New version of sys_open
 asmlinkage long new_sys_open(const char __user *filename, int flags, umode_t mode){
-	printk(KERN_INFO "User %u is opening file: %s\n", current_uid().val, filename);
+	//printk(KERN_INFO "User %u is opening file: %s\n", current_uid().val, filename);
 	
 	return (*ref_sys_open)(filename, flags, mode);
 }
 
 //New version of sys_close
 asmlinkage long new_sys_close(unsigned int fd) {
-	printk(KERN_INFO "User %u is closing file descriptor: %u", current_uid().val, fd);
+	//printk(KERN_INFO "User %u is closing file descriptor: %u", current_uid().val, fd);
 	
 	return (*ref_sys_close)(fd);
 }
