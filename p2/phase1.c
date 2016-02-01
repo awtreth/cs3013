@@ -2,6 +2,7 @@
 #include <linux/module.h>
 #include <linux/syscalls.h>
 #include <linux/cred.h>
+#include <linux/slab.h>//kmalloc
 
 unsigned long **sys_call_table;
 
@@ -56,12 +57,21 @@ asmlinkage long new_sys_close(unsigned int fd) {
 //New version of sys_read
 asmlinkage long new_sys_read(unsigned int fd, char __user *buf, size_t count) {
     
-    long n_bytes = (*ref_sys_read)(fd, buf, count);
 
-	if(contain_str("VI""RUS", buf, count) == TRUE)
+	/*char* kbuf = (char*) kmalloc(count,GFP_KERNEL);
+
+	if(copy_from_user(kbuf,buf,count))
+		return EFAULT;
+
+    long n_bytes = (*ref_sys_read)(fd, buf, count);
+	
+	if(contain_str("VI""RUS", kbuf, count) == TRUE)
 		printk(KERN_EMERG "User %u read from file descriptor %u, but that read contained malicious code!\n", current_uid().val, fd);
     
-    return n_bytes;
+    kfree(kbuf);
+    
+    return n_bytes;*/
+    return (*ref_sys_read)(fd, buf, count);
 }
 
 
@@ -124,8 +134,8 @@ static int __init interceptor_start(void) {
     /* Replace the existing system calls */
     disable_page_protection();
     
-    sys_call_table[__NR_open] = (unsigned long *)new_sys_open;
-    sys_call_table[__NR_close] = (unsigned long *)new_sys_close;
+    //sys_call_table[__NR_open] = (unsigned long *)new_sys_open;
+    //sys_call_table[__NR_close] = (unsigned long *)new_sys_close;
     sys_call_table[__NR_read] = (unsigned long *)new_sys_read;
 
     enable_page_protection();
@@ -141,8 +151,8 @@ static void __exit interceptor_end(void) {
     /* Revert all system calls to what they were before we began. */
     disable_page_protection();
     
-    sys_call_table[__NR_open] = (unsigned long *)ref_sys_open;
-    sys_call_table[__NR_close] = (unsigned long *)ref_sys_close;
+    //sys_call_table[__NR_open] = (unsigned long *)ref_sys_open;
+    //sys_call_table[__NR_close] = (unsigned long *)ref_sys_close;
     sys_call_table[__NR_read] = (unsigned long *)ref_sys_read;
     
     enable_page_protection();
