@@ -10,24 +10,45 @@ asmlinkage long (*ref_sys_read)(unsigned int fd, char __user *buf, size_t count)
 asmlinkage long (*ref_sys_open)(const char __user *filename, int flags, umode_t mode);
 asmlinkage long (*ref_sys_close)(unsigned int fd);
 
-//Extracted from string.h STD C Library
-int strcmp(const char* s1, const char* s2) {
-	for ( ; *s1 == *s2; s1++, s2++)
-	if (*s1 == '\0')
-	    return 0;
-    return ((*(unsigned char *)s1 < *(unsigned char *)s2) ? -1 : +1);
+#define TRUE  1
+#define FALSE 0
+
+//Adapted from: https://stuff.mit.edu/afs/sipb/project/tcl80/src/tcl8.0/compat/strstr.c
+int contain_str(char* substring_, char* string_, size_t size) {
+	
+	char *string = string_, *substring = substring_;
+	char *b = substring;
+	size_t i = 0;
+    /* First scan quickly through the two strings looking for a
+     * single-character match.  When it's found, then compare the
+     * rest of the substring.
+     */
+    
+    for (; i < size; i++, string += 1) {
+		
+		if (*b == *string) {
+			b++;
+			if(*b=='\0')
+				return TRUE;
+			continue;
+		}
+
+		b = substring;
+    }
+    
+    return FALSE;
 }
 
 //New version of sys_open
 asmlinkage long new_sys_open(const char __user *filename, int flags, umode_t mode){
-	//printk(KERN_INFO "User %u is opening file: %s\n", current_uid().val, filename);
+	printk(KERN_INFO "User %u is opening file: %s\n", current_uid().val, filename);
 	
 	return (*ref_sys_open)(filename, flags, mode);
 }
 
 //New version of sys_close
 asmlinkage long new_sys_close(unsigned int fd) {
-	//printk(KERN_INFO "User %u is closing file descriptor: %u", current_uid().val, fd);
+	printk(KERN_INFO "User %u is closing file descriptor: %u\n", current_uid().val, fd);
 	
 	return (*ref_sys_close)(fd);
 }
@@ -36,12 +57,9 @@ asmlinkage long new_sys_close(unsigned int fd) {
 asmlinkage long new_sys_read(unsigned int fd, char __user *buf, size_t count) {
     
     long n_bytes = (*ref_sys_read)(fd, buf, count);
-    long i = 0;
-    
-    for(i=0;i <= (n_bytes-5); i++) {
-		if(strcmp("VIRUS", (char*) &buf[i])==0)
-			printk(KERN_EMERG "User %u read from file descriptor %u, but that read contained malicious code!\n", current_uid().val, fd);
-    }
+
+	if(contain_str("VI""RUS", buf, count) == TRUE)
+		printk(KERN_EMERG "User %u read from file descriptor %u, but that read contained malicious code!\n", current_uid().val, fd);
     
     return n_bytes;
 }
@@ -56,7 +74,7 @@ static unsigned long **find_sys_call_table(void) {
     while (offset < ULLONG_MAX) {
         sct = (unsigned long **)offset;
         if (sct[__NR_close] == (unsigned long *) sys_close) {
-            printk(KERN_INFO "Interceptor: Found syscall table at address: 0x%02lX",
+            printk(KERN_INFO "Interceptor: Found syscall table at address: 0x%02lX\n",
                    (unsigned long) sct);
             return sct;
         }
@@ -105,13 +123,14 @@ static int __init interceptor_start(void) {
     
     /* Replace the existing system calls */
     disable_page_protection();
+    
     sys_call_table[__NR_open] = (unsigned long *)new_sys_open;
     sys_call_table[__NR_close] = (unsigned long *)new_sys_close;
     sys_call_table[__NR_read] = (unsigned long *)new_sys_read;
 
     enable_page_protection();
     /* And indicate the load was successful */
-    printk(KERN_INFO "Loaded interceptor!");
+    printk(KERN_INFO "Loaded interceptor!\n");
     return 0;
 }
 
@@ -121,11 +140,15 @@ static void __exit interceptor_end(void) {
         return;
     /* Revert all system calls to what they were before we began. */
     disable_page_protection();
+    
     sys_call_table[__NR_open] = (unsigned long *)ref_sys_open;
     sys_call_table[__NR_close] = (unsigned long *)ref_sys_close;
     sys_call_table[__NR_read] = (unsigned long *)ref_sys_read;
+    
     enable_page_protection();
-    printk(KERN_INFO "Unloaded interceptor!");
+    
+    
+    printk(KERN_INFO "Unloaded interceptor!\n");
 }
 
 MODULE_LICENSE("GPL");
