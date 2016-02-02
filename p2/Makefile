@@ -1,4 +1,4 @@
-obj-m := phase0.o phase1.o
+obj-m := phase0.o phase1.o phase2.o
 
 KDIR := /lib/modules/$(shell uname -r)/build
 PWD := $(shell pwd)
@@ -10,4 +10,4 @@ test0:
 
 clean:
 	$(MAKE) -C $(KDIR) M=$(PWD) clean
-	rm test0
+	rm test0 *~
