@@ -1,6 +1,10 @@
 #include <linux/kernel.h>
 #include <linux/module.h>
 #include <linux/syscalls.h>
+#include <linux/cred.h>
+#include <linux/slab.h>//kmalloc
+#include <asm/current.h>//current
+#include <linux/sched.h>//task_struct
 
 unsigned long **sys_call_table;
 
@@ -18,10 +22,34 @@ long (*ref_sys_cs3013_syscall3)(unsigned short *target_pid, unsigned short *targ
 //~ }
 
 long new_sys_cs3013_syscall2(unsigned short *target_pid, unsigned short *target_uid) {
+	
+	//Copy parameters from user
+	unsigned short ktarget_pid = 0, ktarget_uid = 0;
+	
+	if(	copy_from_user(&ktarget_pid, target_pid, sizeof(unsigned short)) |
+		copy_from_user(&ktarget_uid, target_uid, sizeof(unsigned short)) ) {
+			return EFAULT;
+	}
+	
     return 0;
 }
 
 long new_sys_cs3013_syscall3(unsigned short *target_pid, unsigned short *actual_uid) {
+	
+	//Copy parameters from user
+	unsigned short ktarget_pid = 0, kactual_uid = 0;
+	
+	if(	copy_from_user(&ktarget_pid, target_pid, sizeof(unsigned short)) |
+		copy_from_user(&kactual_uid, actual_uid, sizeof(unsigned short)) ) {
+			return EFAULT;
+	}
+	
+	
+	
+	//Copy actual_id to uinclude/linux/sched.hser
+	copy_to_user(actual_uid, &kactual_uid, sizeof(unsigned short));
+	
+	
     return 0;
 }
 
