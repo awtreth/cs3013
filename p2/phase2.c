@@ -9,8 +9,8 @@
 unsigned long **sys_call_table;
 
 //asmlinkage long (*ref_sys_cs3013_syscall1)(void);
-long (*ref_sys_cs3013_syscall2)(unsigned short *target_pid, unsigned short *target_uid);
-long (*ref_sys_cs3013_syscall3)(unsigned short *target_pid, unsigned short *target_uid);
+asmlinkage long (*ref_sys_cs3013_syscall2)(unsigned short *target_pid, unsigned short *target_uid);
+asmlinkage long (*ref_sys_cs3013_syscall3)(unsigned short *target_pid, unsigned short *target_uid);
 
 
 //new system call functions
@@ -21,20 +21,24 @@ long (*ref_sys_cs3013_syscall3)(unsigned short *target_pid, unsigned short *targ
     //~ return 0;
 //~ }
 
-long new_sys_cs3013_syscall2(unsigned short *target_pid, unsigned short *target_uid) {
+asmlinkage long new_sys_cs3013_syscall2(unsigned short *target_pid, unsigned short *target_uid) {
 	
 	//Copy parameters from user
 	unsigned short ktarget_pid = 0, ktarget_uid = 0;
 	
-	if(	copy_from_user(&ktarget_pid, target_pid, sizeof(unsigned short)) |
+	
+	if(	copy_from_user(&ktarget_pid, target_pid, sizeof(unsigned short)) ||
 		copy_from_user(&ktarget_uid, target_uid, sizeof(unsigned short)) ) {
+			printk(KERN_INFO "ERRO\n");
 			return EFAULT;
 	}
+	
+	//printk(KERN_INFO "target_pid: %u;\t pid: %u\n",ktarget_pid, current->pid);
 	
     return 0;
 }
 
-long new_sys_cs3013_syscall3(unsigned short *target_pid, unsigned short *actual_uid) {
+asmlinkage long new_sys_cs3013_syscall3(unsigned short *target_pid, unsigned short *actual_uid) {
 	
 	//Copy parameters from user
 	unsigned short ktarget_pid = 0, kactual_uid = 0;
