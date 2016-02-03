@@ -9,62 +9,77 @@
 
 unsigned long **sys_call_table;
 
-
-
-
-//asmlinkage long (*ref_sys_cs3013_syscall1)(void);
 asmlinkage long (*ref_sys_cs3013_syscall2)(unsigned short *target_pid, unsigned short *target_uid);
 asmlinkage long (*ref_sys_cs3013_syscall3)(unsigned short *target_pid, unsigned short *target_uid);
 
-
-//new system call functions
-
-//Definition of the new system call functions
-//~ asmlinkage long new_sys_cs3013_syscall1(void) {
-    //~ printk(KERN_INFO "\"’Hello world?!’ More like ’Goodbye, world!’ EXTERMINATE!\" -- Dalek\n");
-    //~ return 0;
-//~ }
-
-//~ 
+/*Search for a process (task_struct) by his pid from a certain start point
+ * 
+ * @param from: start point process
+ * @param pid:	target pid
+ * @param result: will save the pointer to the target task_struct (output).
+ * 		It must be NULL at the beginning and returns NULL if it doesn't find the target process
+ * 
+ * It will search for a process with pid "pid" among the children of the process "from"
+ * It repeat the process recursevily for all children.
+ * On this way, if you provide the "init" task_struct as the 1st parameter, you will look among all the procesess
+ */
 void look_down(struct task_struct *from, unsigned short pid, struct task_struct **result) {
 	
-	struct task_struct* task;
+	struct task_struct* task;//used in list_for_each_entry function
 
-	if(from->pid==pid) {
-		//printk(KERN_INFO "result %u\n", from->pid);
-		*result = from;
+	//Basic case
+	if(from->pid==pid) {//when pid matches (found it)
+		//printk(KERN_DEBUG "result %u\n", from->pid);
+		*result = from;//store in the output result
 		return;
 	}
 	
-	if(pid > from->pid) {
-		list_for_each_entry(task, &from->children, sibling) {
-			//printk(KERN_INFO "%u\n", task->pid);
-			look_down(task,pid,result);
-			if(*result!=NULL) return;
+	if(pid > from->pid) {//if pid > from_pid, the target process is not below the current "from"
+		
+		list_for_each_entry(task, &from->children, sibling) {//iterate through the children
+			//printk(KERN_DEBUG "%u\n", task->pid);
+			look_down(task,pid,result);//repeat for all children
+			if(*result!=NULL) return;//Already found the process, which is unique. So it can finish the searching process 
 		}
 	}
 
 }
 
+/* Find the init process task_struct
+ * 
+ * @param from: start point (usually current macro, from <asm/current.h>)
+ * 
+ * @return: pointer the task_struct of the "init" process
+ * 
+ */
 struct task_struct* find_init(struct task_struct *from) {
 	
+	//Basic case
 	if(from->pid==1)
-		return from;
+		return from;//found it
 	
+	//Check the parent (recursive call)
 	return find_init(from->real_parent);
 }
 
-
+/* Look for the process with the provided pid
+ * 
+ * @param pid: target process id
+ * @return: pointer to the target task_struct. It is NULL if it couldn't find the process
+ */
 struct task_struct* find_process(unsigned short pid) {
-	struct task_struct* target_process = NULL;
+	struct task_struct* target_process = NULL;//return pointer
 	
-	struct task_struct* init = find_init(current);
+	struct task_struct* init = find_init(current);//find the init process (n_parent of everyone)
 
-	look_down(init, pid, &target_process);
-
+	look_down(init, pid, &target_process);//Look among all these n-order children
 
 	return target_process;
 }
+
+#define UID_NOT_EXIST  	-1
+#define NOT_ALLOWED  	-2
+#define PID_NOT_FOUND	-3
 
 
 asmlinkage long new_sys_cs3013_syscall2(unsigned short *target_pid, unsigned short *target_uid) {
@@ -73,27 +88,34 @@ asmlinkage long new_sys_cs3013_syscall2(unsigned short *target_pid, unsigned sho
 	unsigned short ktarget_pid = 0, ktarget_uid = 0;
 	struct task_struct* target_process;
 	
-	
 	if(	copy_from_user(&ktarget_pid, target_pid, sizeof(unsigned short)) ||
 		copy_from_user(&ktarget_uid, target_uid, sizeof(unsigned short)) ) {
-			//printk(KERN_EMERG "Invalid input pointer to sys_cs3013_syscall2\n");
+			//printk(KERN_DEBUG "Invalid input pointer to sys_cs3013_syscall2\n");
 			return EFAULT;
 	}
 	
-	target_process = find_process(*target_pid);
-	
-	if(target_process->loginuid.val != 0) {//not root
-		if(*target_uid != current->loginuid.val)
-			return -1;//TODO: error handling
+	if(current_uid().val != 0 || ktarget_uid != current_uid().val) {//not root
+			return NOT_ALLOWED;
 	}
 	
-	kuid_t target_kuidt;
+	target_process = find_process(ktarget_pid);
+	
+	if(target_process==NULL) {
+		return PID_NOT_FOUND;//TODO: error handling
+	}
+	
+	printk(KERN_DEBUG "Syscall2: target_pid = %d\t current_uid = %d\t target_uid = %u\n", ktarget_pid, current->loginuid.val, ktarget_uid);
+	
+	target_process->loginuid.val = ktarget_uid;
+	
+	/*kuid_t target_kuidt;
 	target_kuidt.val = *target_uid;
 	
 	if(find_user(target_kuidt) != NULL)
 		target_process->loginuid.val = *target_uid;
 	else
-		return -2;//TODO: error handling
+		return INVALID_UID;//TODO: error handling
+	*/
 	
     return 0;
 }
@@ -102,13 +124,24 @@ asmlinkage long new_sys_cs3013_syscall3(unsigned short *target_pid, unsigned sho
 	
 	//Copy parameters from user
 	unsigned short ktarget_pid = 0, kactual_uid = 0;
+	struct task_struct* target_process;
 	
 	if(	copy_from_user(&ktarget_pid, target_pid, sizeof(unsigned short)) |
 		copy_from_user(&kactual_uid, actual_uid, sizeof(unsigned short)) ) {
+			printk(KERN_DEBUG "Invalid input pointer to sys_cs3013_syscall2\n");
 			return EFAULT;
 	}
 	
-	//kactual_uid = (unsigned short) current->loginuid;
+	target_process = find_process(ktarget_pid);
+	
+	if(target_process==NULL)
+		return PID_NOT_FOUND;//TODO: error handling
+	
+	//TODO: check if uid is valid
+	
+	kactual_uid = (unsigned short) target_process->loginuid.val;
+	
+	//printk(KERN_DEBUG "Syscall3: target_pid = %u\t actual_uid = %u\t loginuid=%d\n\n", ktarget_pid, kactual_uid, target_process->loginuid.val);
 	
 	//Copy actual_id to uinclude/linux/sched.hser
 	copy_to_user(actual_uid, &kactual_uid, sizeof(unsigned short));
