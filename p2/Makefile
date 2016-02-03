@@ -3,10 +3,12 @@ obj-m := phase0.o phase1.o phase2.o
 KDIR := /lib/modules/$(shell uname -r)/build
 PWD := $(shell pwd)
 
-all: test0 my_syscalls.o shift2user getlogiuid
+all: test0 my_syscalls.o shift2user getlogiuid test
 	$(MAKE) -C $(KDIR) M=$(PWD) modules
 
 test0:
+
+test: my_syscalls.o
 
 shift2user: my_syscalls.o
 
@@ -16,4 +18,4 @@ my_syscalls.o:
 
 clean:
 	$(MAKE) -C $(KDIR) M=$(PWD) clean
-	rm test0 *~
+	rm test0 test shift2user getlogiuid *~ *.o

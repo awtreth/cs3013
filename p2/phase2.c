@@ -5,8 +5,12 @@
 #include <linux/slab.h>//kmalloc
 #include <asm/current.h>//current
 #include <linux/sched.h>//task_struct
+#include <linux/list.h>//LinkedLists
 
 unsigned long **sys_call_table;
+
+
+
 
 //asmlinkage long (*ref_sys_cs3013_syscall1)(void);
 asmlinkage long (*ref_sys_cs3013_syscall2)(unsigned short *target_pid, unsigned short *target_uid);
@@ -21,19 +25,75 @@ asmlinkage long (*ref_sys_cs3013_syscall3)(unsigned short *target_pid, unsigned 
     //~ return 0;
 //~ }
 
+//~ 
+void look_down(struct task_struct *from, unsigned short pid, struct task_struct **result) {
+	
+	struct task_struct* task;
+
+	if(from->pid==pid) {
+		//printk(KERN_INFO "result %u\n", from->pid);
+		*result = from;
+		return;
+	}
+	
+	if(pid > from->pid) {
+		list_for_each_entry(task, &from->children, sibling) {
+			//printk(KERN_INFO "%u\n", task->pid);
+			look_down(task,pid,result);
+			if(*result!=NULL) return;
+		}
+	}
+
+}
+
+struct task_struct* find_init(struct task_struct *from) {
+	
+	if(from->pid==1)
+		return from;
+	
+	return find_init(from->real_parent);
+}
+
+
+struct task_struct* find_process(unsigned short pid) {
+	struct task_struct* target_process = NULL;
+	
+	struct task_struct* init = find_init(current);
+
+	look_down(init, pid, &target_process);
+
+
+	return target_process;
+}
+
+
 asmlinkage long new_sys_cs3013_syscall2(unsigned short *target_pid, unsigned short *target_uid) {
 	
 	//Copy parameters from user
 	unsigned short ktarget_pid = 0, ktarget_uid = 0;
+	struct task_struct* target_process;
 	
 	
 	if(	copy_from_user(&ktarget_pid, target_pid, sizeof(unsigned short)) ||
 		copy_from_user(&ktarget_uid, target_uid, sizeof(unsigned short)) ) {
-			printk(KERN_INFO "ERRO\n");
+			//printk(KERN_EMERG "Invalid input pointer to sys_cs3013_syscall2\n");
 			return EFAULT;
 	}
 	
-	//printk(KERN_INFO "target_pid: %u;\t pid: %u\n",ktarget_pid, current->pid);
+	target_process = find_process(*target_pid);
+	
+	if(target_process->loginuid.val != 0) {//not root
+		if(*target_uid != current->loginuid.val)
+			return -1;//TODO: error handling
+	}
+	
+	kuid_t target_kuidt;
+	target_kuidt.val = *target_uid;
+	
+	if(find_user(target_kuidt) != NULL)
+		target_process->loginuid.val = *target_uid;
+	else
+		return -2;//TODO: error handling
 	
     return 0;
 }
@@ -48,7 +108,7 @@ asmlinkage long new_sys_cs3013_syscall3(unsigned short *target_pid, unsigned sho
 			return EFAULT;
 	}
 	
-	
+	//kactual_uid = (unsigned short) current->loginuid;
 	
 	//Copy actual_id to uinclude/linux/sched.hser
 	copy_to_user(actual_uid, &kactual_uid, sizeof(unsigned short));

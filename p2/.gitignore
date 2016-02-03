@@ -6,3 +6,4 @@ Module.symvers
 .tmp_versions
 shift2user
 getlogiuid
+test
