@@ -77,77 +77,114 @@ struct task_struct* find_process(unsigned short pid) {
 	return target_process;
 }
 
-#define UID_NOT_EXIST  	-1
-#define NOT_ALLOWED  	-2
-#define PID_NOT_FOUND	-3
+//Possible errors for new_sys_cs3013_syscall2
+//PID_NOT_FOUND can be returned by new_sys_cs3013_syscall3 too
+#define DO_NOT_OWN_PROCESS  	-2 //current user does not own the target_process and it is not root
+#define PID_NOT_FOUND			-3 //there is not a process with the target_pid
+#define TARGETUID_NOT_ALLOWED	-4 //current user is not root and target_uid is not DEFAULT_TARGETUID
+
+#define DEFAULT_TARGETUID 1001 //non-privileged secondary-user (with limited-access)
 
 
+/*shift2user
+ * 
+ * Try to shift the loginuid value of process with pid *target_pid to *target_uid.
+ * 
+ * Restrictions when the current user is not root:
+ * 		- It must own the target process
+ * 		- target_uid must contain DEFAULT_TARGETUID
+ * 
+ * @param target_pid: pointer to the process id number of the process that you want to change uid
+ * @param target_uid: pointer to the user id number that you want to switch to
+ * 
+ * @return: 0 when it's OK
+ * 			can return DO_NOT_OWN_PROCESS, PID_NOT_FOUND, TARGETUID_NOT_ALLOWED or EFAULT (described above) for errors
+ * 
+ */
 asmlinkage long new_sys_cs3013_syscall2(unsigned short *target_pid, unsigned short *target_uid) {
 	
 	//Copy parameters from user
 	unsigned short ktarget_pid = 0, ktarget_uid = 0;
 	struct task_struct* target_process;
 	
+	//Safely copy input variables from user space to kernel space
 	if(	copy_from_user(&ktarget_pid, target_pid, sizeof(unsigned short)) ||
 		copy_from_user(&ktarget_uid, target_uid, sizeof(unsigned short)) ) {
-			//printk(KERN_DEBUG "Invalid input pointer to sys_cs3013_syscall2\n");
+			printk(KERN_EMERG  "In sys_cs3013_syscall2: Invalid input pointer\n");
 			return EFAULT;
-	}
-	
-	if(current_uid().val != 0 || ktarget_uid != current_uid().val) {//not root
-			return NOT_ALLOWED;
 	}
 	
 	target_process = find_process(ktarget_pid);
 	
-	if(target_process==NULL) {
-		return PID_NOT_FOUND;//TODO: error handling
+	//CHECKING
+
+	if(target_process==NULL) {//did not find the target process
+		printk(KERN_ERR "In sys_cs3013_syscall2: there is no process with pid %u\n", ktarget_pid);
+		return PID_NOT_FOUND;
 	}
 	
-	printk(KERN_DEBUG "Syscall2: target_pid = %d\t current_uid = %d\t target_uid = %u\n", ktarget_pid, current->loginuid.val, ktarget_uid);
+	if(current_uid().val != 0) {//current user is not root
+		
+		if(current_uid().val != task_uid(target_process).val) {//Does the current process own target_process?
+			printk(KERN_ERR "In sys_cs3013_syscall2: current user (%d) does not own process %d from user %d\n", current_uid().val, ktarget_pid, task_uid(target_process).val);
+			return DO_NOT_OWN_PROCESS;
+		}
+		
+		if(ktarget_uid != DEFAULT_TARGETUID) {//Is target_uid the DEFAULT_TARGETUID?
+			printk(KERN_ERR "In sys_cs3013_syscall2: current user is not root. target_uid must be %d\n", DEFAULT_TARGETUID);
+			return TARGETUID_NOT_ALLOWED;
+		}
+	}
 	
-	target_process->loginuid.val = ktarget_uid;
+	target_process->loginuid.val = ktarget_uid;//change the loginuid
 	
-	/*kuid_t target_kuidt;
-	target_kuidt.val = *target_uid;
-	
-	if(find_user(target_kuidt) != NULL)
-		target_process->loginuid.val = *target_uid;
-	else
-		return INVALID_UID;//TODO: error handling
-	*/
+	printk(KERN_DEBUG "Syscall2: shifted process %d from user %d to user %d\n", ktarget_pid, current_uid().val, ktarget_uid);
 	
     return 0;
 }
 
+/*getloginuid
+ * 
+ * Read the loginuid value of process with pid *target_pid. Store result in target_uid pointer
+
+ * 
+ * @param target_pid: pointer to the process id number of the process that you read the loginuid from
+ * @param target_uid: where you store the result (must be pre-allocated by theuser)
+ * 
+ * @return: 0 when it's OK
+ * 			can PID_NOT_FOUND or EFAULT (described above) for errors
+ * 
+ */
 asmlinkage long new_sys_cs3013_syscall3(unsigned short *target_pid, unsigned short *actual_uid) {
 	
 	//Copy parameters from user
 	unsigned short ktarget_pid = 0, kactual_uid = 0;
 	struct task_struct* target_process;
 	
+	//Safely copy input variables from user space to kernel space
 	if(	copy_from_user(&ktarget_pid, target_pid, sizeof(unsigned short)) |
 		copy_from_user(&kactual_uid, actual_uid, sizeof(unsigned short)) ) {
-			printk(KERN_DEBUG "Invalid input pointer to sys_cs3013_syscall2\n");
+			printk(KERN_EMERG  "In sys_cs3013_syscall3: Invalid input pointer\n");
 			return EFAULT;
 	}
 	
 	target_process = find_process(ktarget_pid);
 	
-	if(target_process==NULL)
+	if(target_process==NULL) {//did not find the target process
+		printk(KERN_ERR "In sys_cs3013_syscall2: there is no process with pid %u\n", ktarget_pid);
 		return PID_NOT_FOUND;//TODO: error handling
+	}
 	
-	//TODO: check if uid is valid
+	//TODO: check if uid is valid (not necessary)
 	
 	kactual_uid = (unsigned short) target_process->loginuid.val;
 	
-	//printk(KERN_DEBUG "Syscall3: target_pid = %u\t actual_uid = %u\t loginuid=%d\n\n", ktarget_pid, kactual_uid, target_process->loginuid.val);
+	printk(KERN_DEBUG "Syscall3: target_pid = %u\t actual_uid = %u\n", ktarget_pid, kactual_uid);
 	
-	//Copy actual_id to uinclude/linux/sched.hser
+	//Copy kactual_id to user space
 	copy_to_user(actual_uid, &kactual_uid, sizeof(unsigned short));
 	
-	
-    return 0;
+	return 0;
 }
 
 
