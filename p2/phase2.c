@@ -45,6 +45,12 @@ void look_down(struct task_struct *from, unsigned short pid, struct task_struct 
 
 }
 
+//~ #define list_for_each_entry_continue(pos, head, member) 		\
+	//~ for (pos = list_next_entry(pos, member);			\
+	     //~ &pos->member != (head);					\
+	     //~ pos = list_next_entry(pos, member))
+
+
 /* Find the init process task_struct
  * 
  * @param from: start point (usually current macro, from <asm/current.h>)
@@ -80,7 +86,7 @@ struct task_struct* find_process(unsigned short pid) {
 //Possible errors for new_sys_cs3013_syscall2
 //PID_NOT_FOUND can be returned by new_sys_cs3013_syscall3 too
 #define DO_NOT_OWN_PROCESS  	-2 //current user does not own the target_process and it is not root
-#define PID_NOT_FOUND			-3 //there is not a process with the target_pid
+#define PID_NOT_FOUND		-3 //there is not a process with the target_pid
 #define TARGETUID_NOT_ALLOWED	-4 //current user is not root and target_uid is not DEFAULT_TARGETUID
 
 #define DEFAULT_TARGETUID 1001 //non-privileged secondary-user (with limited-access)

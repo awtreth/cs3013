@@ -12,10 +12,10 @@ int main(int argc, char **argv) {
 	unsigned short uid = atoi(argv[2]);
 	unsigned short pid = atoi(argv[1]);
 	
-	long status = cs3013_syscall3(&pid, &uid);
-	
+	long status = cs3013_syscall2(&pid, &uid);
+
 	if(status!=0) {
-		print_error(status);
+		printf("Couldn't shift user. Check syslog\n");
 		return -1;
 	}
 	

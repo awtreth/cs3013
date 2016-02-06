@@ -1,0 +1,29 @@
+COMMANDS
+
+mateus@ubuntu:~/cs3013/p2$ ./test0 
+The return values of the system calls are:
+	cs3013_syscall1: 0
+	cs3013_syscall2: 0
+	cs3013_syscall3: 0
+mateus@ubuntu:~/cs3013/p2$ sudo insmod phase0.ko
+[sudo] password for mateus: 
+mateus@ubuntu:~/cs3013/p2$ ./test0
+The return values of the system calls are:
+	cs3013_syscall1: 0
+	cs3013_syscall2: 0
+	cs3013_syscall3: 0
+mateus@ubuntu:~/cs3013/p2$ sudo rmmod phase0.ko
+mateus@ubuntu:~/cs3
+
+SYSLOG
+
+
+Feb  5 23:13:28 ubuntu kernel: [ 5469.727515] ‘Hello, world!’ -- syscall1
+Feb  5 23:13:28 ubuntu kernel: [ 5469.727543] ‘Hello, world!’ -- syscall2
+Feb  5 23:13:28 ubuntu kernel: [ 5469.727545] ‘Hello, world!’ -- syscall3
+Feb  5 23:13:43 ubuntu kernel: [ 5485.098133] Interceptor: Found syscall table at address: 0xC166A140
+Feb  5 23:13:43 ubuntu kernel: [ 5485.098157] Loaded interceptor!
+Feb  5 23:13:51 ubuntu kernel: [ 5492.455291] "’Hello world?!’ More like ’Goodbye, world!’ EXTERMINATE!" -- Dalek
+Feb  5 23:13:51 ubuntu kernel: [ 5492.455304] ‘Hello, world!’ -- syscall2
+Feb  5 23:13:51 ubuntu kernel: [ 5492.455307] ‘Hello, world!’ -- syscall3
+Feb  5 23:14:02 ubuntu kernel: [ 5504.242796] Unloaded interceptor!

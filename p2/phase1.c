@@ -58,7 +58,7 @@ asmlinkage long new_sys_close(unsigned int fd) {
 asmlinkage long new_sys_read(unsigned int fd, char __user *buf, size_t count) {
     
 
-	/*char* kbuf = (char*) kmalloc(count,GFP_KERNEL);
+	char* kbuf = (char*) kmalloc(count,GFP_KERNEL);
 
 	if(copy_from_user(kbuf,buf,count))
 		return EFAULT;
@@ -70,7 +70,7 @@ asmlinkage long new_sys_read(unsigned int fd, char __user *buf, size_t count) {
     
     kfree(kbuf);
     
-    return n_bytes;*/
+    return n_bytes;
     return (*ref_sys_read)(fd, buf, count);
 }
 
@@ -134,8 +134,8 @@ static int __init interceptor_start(void) {
     /* Replace the existing system calls */
     disable_page_protection();
     
-    //sys_call_table[__NR_open] = (unsigned long *)new_sys_open;
-    //sys_call_table[__NR_close] = (unsigned long *)new_sys_close;
+    sys_call_table[__NR_open] = (unsigned long *)new_sys_open;
+    sys_call_table[__NR_close] = (unsigned long *)new_sys_close;
     sys_call_table[__NR_read] = (unsigned long *)new_sys_read;
 
     enable_page_protection();
@@ -151,8 +151,8 @@ static void __exit interceptor_end(void) {
     /* Revert all system calls to what they were before we began. */
     disable_page_protection();
     
-    //sys_call_table[__NR_open] = (unsigned long *)ref_sys_open;
-    //sys_call_table[__NR_close] = (unsigned long *)ref_sys_close;
+    sys_call_table[__NR_open] = (unsigned long *)ref_sys_open;
+    sys_call_table[__NR_close] = (unsigned long *)ref_sys_close;
     sys_call_table[__NR_read] = (unsigned long *)ref_sys_read;
     
     enable_page_protection();

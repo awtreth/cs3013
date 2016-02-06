@@ -1,0 +1,59 @@
+COMMANDS
+
+mateus@ubuntu:~/cs3013/p2$ sudo insmod phase2.ko
+mateus@ubuntu:~/cs3013/p2$ ./shift2user 1 1001
+Couldn't shift user. Check syslog
+mateus@ubuntu:~/cs3013/p2$ sleep 1000000 &
+[2] 4468
+mateus@ubuntu:~/cs3013/p2$ ./shift2user 4468 1002
+Couldn't shift user. Check syslog
+mateus@ubuntu:~/cs3013/p2$ ./shift2user 4468 1001
+DONE
+mateus@ubuntu:~/cs3013/p2$ ./shift2user 4468 1000
+Couldn't shift user. Check syslog
+mateus@ubuntu:~/cs3013/p2$ sudo ./shift2user 4468 1000
+DONE
+mateus@ubuntu:~/cs3013/p2$ ./getlogiuid 4468
+look for 4468
+actual_uid=1000
+mateus@ubuntu:~/cs3013/p2$ ./shift2user 4468 1001
+DONE
+mateus@ubuntu:~/cs3013/p2$ ./getlogiuid 4468
+look for 4468
+actual_uid=1001
+mateus@ubuntu:~/cs3013/p2$ sudo ./shift2user 4468 1000
+DONE
+mateus@ubuntu:~/cs3013/p2$ ./getlogiuid 4468
+look for 4468
+actual_uid=1000
+mateus@ubuntu:~/cs3013/p2$ sudo rmmod phase2.ko
+mateus@ubuntu:~/cs3013/p2$ 
+
+
+
+SYSLOG
+
+Feb  5 23:42:15 ubuntu kernel: [  832.069965] Loaded interceptor!
+Feb  5 23:42:19 ubuntu dhclient: DHCPREQUEST of 192.168.119.130 on eth0 to 192.168.119.254 port 67 (xid=0x72840208)
+Feb  5 23:42:19 ubuntu dhclient: DHCPACK of 192.168.119.130 from 192.168.119.254
+Feb  5 23:42:19 ubuntu dhclient: bound to 192.168.119.130 -- renewal in 826 seconds.
+Feb  5 23:42:19 ubuntu NetworkManager[756]: <info> (eth0): DHCPv4 state changed bound -> renew
+Feb  5 23:42:19 ubuntu NetworkManager[756]: <info>   address 192.168.119.130
+Feb  5 23:42:19 ubuntu NetworkManager[756]: <info>   prefix 24 (255.255.255.0)
+Feb  5 23:42:19 ubuntu NetworkManager[756]: <info>   gateway 192.168.119.2
+Feb  5 23:42:19 ubuntu NetworkManager[756]: <info>   nameserver '192.168.119.2'
+Feb  5 23:42:19 ubuntu NetworkManager[756]: <info>   domain name 'localdomain'
+Feb  5 23:42:19 ubuntu NetworkManager[756]: <info>   wins '192.168.119.2'
+Feb  5 23:42:19 ubuntu dbus[498]: [system] Activating service name='org.freedesktop.nm_dispatcher' (using servicehelper)
+Feb  5 23:42:19 ubuntu dbus[498]: [system] Successfully activated service 'org.freedesktop.nm_dispatcher'
+Feb  5 23:42:22 ubuntu kernel: [  839.548646] In sys_cs3013_syscall2: current user (1000) does not own process 1 from user 0
+Feb  5 23:42:44 ubuntu kernel: [  860.895448] In sys_cs3013_syscall2: current user is not root. target_uid must be 1001
+Feb  5 23:42:53 ubuntu kernel: [  870.239764] Syscall2: shifted process 4468 from user 1000 to user 1001
+Feb  5 23:43:06 ubuntu kernel: [  883.022547] In sys_cs3013_syscall2: current user is not root. target_uid must be 1001
+Feb  5 23:43:17 ubuntu kernel: [  894.033662] Syscall2: shifted process 4468 from user 0 to user 1000
+Feb  5 23:43:27 ubuntu kernel: [  904.374168] Syscall3: target_pid = 4468	 actual_uid = 1000
+Feb  5 23:43:37 ubuntu kernel: [  914.636920] Syscall2: shifted process 4468 from user 1000 to user 1001
+Feb  5 23:43:40 ubuntu kernel: [  916.803968] Syscall3: target_pid = 4468	 actual_uid = 1001
+Feb  5 23:43:56 ubuntu kernel: [  932.729547] Syscall2: shifted process 4468 from user 0 to user 1000
+Feb  5 23:44:00 ubuntu kernel: [  937.007406] Syscall3: target_pid = 4468	 actual_uid = 1000
+Feb  5 23:44:06 ubuntu kernel: [  943.021068] Unloaded interceptor!

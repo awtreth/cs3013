@@ -1,0 +1,320 @@
+COMMANDS
+
+mateus@ubuntu:~/cs3013/p2$ sudo insmod phase1.ko
+mateus@ubuntu:~/cs3013/p2$ cat Makefile
+obj-m := phase0.o phase1.o phase2.o
+
+KDIR := /lib/modules/$(shell uname -r)/build
+PWD := $(shell pwd)
+
+all: test0 my_syscalls.o shift2user getlogiuid test
+	$(MAKE) -C $(KDIR) M=$(PWD) modules
+
+test0:
+
+test: my_syscalls.o
+
+shift2user: my_syscalls.o
+
+getlogiuid: my_syscalls.o
+
+my_syscalls.o:
+
+clean:
+	$(MAKE) -C $(KDIR) M=$(PWD) clean
+	rm test0 test shift2user getlogiuid *~ *.o
+mateus@ubuntu:~/cs3013/p2$ echo VIRUS > file.txt
+mateus@ubuntu:~/cs3013/p2$ cat file.txt 
+VIRUS
+mateus@ubuntu:~/cs3013/p2$ sudo rmmod phase1.ko
+mateus@ubuntu:~/cs3013/p2$ 
+
+
+SYSLOG
+
+
+Feb  5 23:50:19 ubuntu kernel: [  200.740614] Loaded interceptor!
+Feb  5 23:50:19 ubuntu kernel: [  200.740746] User 0 is closing file descriptor: 3
+Feb  5 23:50:19 ubuntu kernel: [  200.740901] User 0 is opening file: /etc/login.defs
+Feb  5 23:50:19 ubuntu kernel: [  200.740957] User 0 is closing file descriptor: 4
+Feb  5 23:50:19 ubuntu kernel: [  200.741026] User 0 is closing file descriptor: 4
+Feb  5 23:50:20 ubuntu kernel: [  202.113999] User 1000 read from file descriptor 14, but that read contained malicious code!
+Feb  5 23:50:20 ubuntu kernel: [  202.117171] User 101 is opening file: /var/run/utmp
+Feb  5 23:50:20 ubuntu kernel: [  202.117364] User 101 is opening file: /dev/:0
+Feb  5 23:50:20 ubuntu kernel: [  202.117399] User 101 is opening file: /dev/pts/8
+Feb  5 23:50:20 ubuntu kernel: [  202.117430] User 101 is opening file: /dev/pts/15
+Feb  5 23:50:20 ubuntu kernel: [  202.117451] User 101 is closing file descriptor: 5
+Feb  5 23:50:21 ubuntu kernel: [  203.165964] User 1000 is closing file descriptor: 3
+Feb  5 23:50:21 ubuntu kernel: [  203.165969] User 1000 is closing file descriptor: 4
+Feb  5 23:50:21 ubuntu kernel: [  203.165969] User 1000 is closing file descriptor: 4
+Feb  5 23:50:21 ubuntu kernel: [  203.165983] User 1000 is closing file descriptor: 3
+Feb  5 23:50:21 ubuntu kernel: [  203.166449] User 1000 is opening file: /etc/ld.so.cache
+Feb  5 23:50:21 ubuntu kernel: [  203.166460] User 1000 is closing file descriptor: 3
+Feb  5 23:50:21 ubuntu kernel: [  203.166485] User 1000 is opening file: /lib/i386-linux-gnu/libc.so.6
+Feb  5 23:50:21 ubuntu kernel: [  203.166526] User 1000 is closing file descriptor: 3
+Feb  5 23:50:21 ubuntu kernel: [  203.166807] User 1000 is opening file: /usr/lib/locale/locale-archive
+Feb  5 23:50:21 ubuntu kernel: [  203.166834] User 1000 is closing file descriptor: 3
+Feb  5 23:50:21 ubuntu kernel: [  203.166872] User 1000 is opening file: Makefile
+Feb  5 23:50:21 ubuntu kernel: [  203.167014] User 1000 is closing file descriptor: 3
+Feb  5 23:50:21 ubuntu kernel: [  203.167038] User 1000 is closing file descriptor: 1
+Feb  5 23:50:21 ubuntu kernel: [  203.167040] User 1000 is closing file descriptor: 2
+Feb  5 23:50:21 ubuntu kernel: [  203.169501] User 101 is opening file: /dev/xconsole
+Feb  5 23:50:21 ubuntu kernel: [  203.169514] User 101 is opening file: /dev/xconsole
+Feb  5 23:50:21 ubuntu kernel: [  203.169517] User 101 is opening file: /dev/xconsole
+Feb  5 23:50:21 ubuntu kernel: [  203.169519] User 101 is opening file: /dev/xconsole
+Feb  5 23:50:21 ubuntu kernel: [  203.169522] User 101 is opening file: /dev/xconsole
+Feb  5 23:50:21 ubuntu kernel: [  203.169524] User 101 is opening file: /dev/xconsole
+Feb  5 23:50:21 ubuntu kernel: [  203.169527] User 101 is opening file: /dev/xconsole
+Feb  5 23:50:21 ubuntu kernel: [  203.169530] User 101 is opening file: /dev/xconsole
+Feb  5 23:50:21 ubuntu kernel: [  203.169533] User 101 is opening file: /dev/xconsole
+Feb  5 23:50:21 ubuntu kernel: [  203.169535] User 101 is opening file: /dev/xconsole
+Feb  5 23:50:22 ubuntu kernel: [  203.720421] User 0 is closing file descriptor: 3
+Feb  5 23:50:22 ubuntu kernel: [  203.720429] User 0 is closing file descriptor: 4
+Feb  5 23:50:22 ubuntu kernel: [  203.720433] User 0 is closing file descriptor: 6
+Feb  5 23:50:22 ubuntu kernel: [  203.720434] User 0 is closing file descriptor: 9
+Feb  5 23:50:22 ubuntu kernel: [  203.720481] User 0 is closing file descriptor: 10
+Feb  5 23:50:22 ubuntu kernel: [  203.720600] User 0 is closing file descriptor: 12
+Feb  5 23:50:26 ubuntu kernel: [  207.531190] User 0 is closing file descriptor: 8
+Feb  5 23:50:26 ubuntu kernel: [  207.853594] User 0 is opening file: /etc/mtab
+Feb  5 23:50:26 ubuntu kernel: [  207.853636] User 0 is opening file: /proc/devices
+Feb  5 23:50:26 ubuntu kernel: [  207.853900] User 0 is closing file descriptor: 9
+Feb  5 23:50:26 ubuntu kernel: [  207.854351] User 0 is closing file descriptor: 8
+Feb  5 23:50:26 ubuntu kernel: [  207.855439] User 0 is opening file: /proc/net/dev
+Feb  5 23:50:26 ubuntu kernel: [  207.855678] User 0 is opening file: /proc/net/if_inet6
+Feb  5 23:50:26 ubuntu kernel: [  207.855781] User 0 is closing file descriptor: 10
+Feb  5 23:50:26 ubuntu kernel: [  207.855824] User 0 is opening file: /proc/net/if_inet6
+Feb  5 23:50:26 ubuntu kernel: [  207.855898] User 0 is closing file descriptor: 10
+Feb  5 23:50:26 ubuntu kernel: [  207.855940] User 0 is closing file descriptor: 9
+Feb  5 23:50:26 ubuntu kernel: [  207.855963] User 0 is closing file descriptor: 8
+Feb  5 23:50:26 ubuntu kernel: [  207.855983] User 0 is opening file: /etc/resolv.conf
+Feb  5 23:50:26 ubuntu kernel: [  207.856051] User 0 is closing file descriptor: 8
+Feb  5 23:50:26 ubuntu kernel: [  207.856103] User 0 is opening file: /proc/uptime
+Feb  5 23:50:26 ubuntu kernel: [  207.856161] User 0 is closing file descriptor: 8
+Feb  5 23:50:27 ubuntu kernel: [  208.743745] User 1000 is opening file: file.txt
+Feb  5 23:50:27 ubuntu kernel: [  208.743803] User 1000 is closing file descriptor: 3
+Feb  5 23:50:27 ubuntu kernel: [  208.743966] User 1000 is closing file descriptor: 10
+Feb  5 23:50:27 ubuntu kernel: [  208.744188] User 1000 read from file descriptor 14, but that read contained malicious code!
+Feb  5 23:50:27 ubuntu kernel: [  208.746186] User 101 is opening file: /var/run/utmp
+Feb  5 23:50:27 ubuntu kernel: [  208.746244] User 101 is opening file: /dev/:0
+Feb  5 23:50:27 ubuntu kernel: [  208.746254] User 101 is opening file: /dev/pts/8
+Feb  5 23:50:27 ubuntu kernel: [  208.746265] User 101 is opening file: /dev/pts/15
+Feb  5 23:50:27 ubuntu kernel: [  208.746271] User 101 is closing file descriptor: 5
+Feb  5 23:50:28 ubuntu kernel: [  209.338608] User 1000 read from file descriptor 14, but that read contained malicious code!
+Feb  5 23:50:28 ubuntu kernel: [  209.342103] User 101 is opening file: /var/run/utmp
+Feb  5 23:50:28 ubuntu kernel: [  209.342271] User 101 is opening file: /dev/:0
+Feb  5 23:50:28 ubuntu kernel: [  209.342302] User 101 is opening file: /dev/pts/8
+Feb  5 23:50:28 ubuntu kernel: [  209.342333] User 101 is opening file: /dev/pts/15
+Feb  5 23:50:28 ubuntu kernel: [  209.342351] User 101 is closing file descriptor: 5
+Feb  5 23:50:29 ubuntu kernel: [  210.193913] User 0 is opening file: /proc/interrupts
+Feb  5 23:50:29 ubuntu kernel: [  210.194413] User 0 is closing file descriptor: 3
+Feb  5 23:50:29 ubuntu kernel: [  210.194460] User 0 is opening file: /proc/stat
+Feb  5 23:50:29 ubuntu kernel: [  210.194667] User 0 is closing file descriptor: 3
+Feb  5 23:50:29 ubuntu kernel: [  210.194914] User 0 is opening file: /proc/irq/18/smp_affinity
+Feb  5 23:50:29 ubuntu kernel: [  210.194994] User 0 is closing file descriptor: 3
+Feb  5 23:50:30 ubuntu kernel: [  211.924550] User 1000 read from file descriptor 14, but that read contained malicious code!
+Feb  5 23:50:30 ubuntu kernel: [  211.928456] User 101 is opening file: /var/run/utmp
+Feb  5 23:50:30 ubuntu kernel: [  211.928630] User 101 is opening file: /dev/:0
+Feb  5 23:50:30 ubuntu kernel: [  211.928662] User 101 is opening file: /dev/pts/8
+Feb  5 23:50:30 ubuntu kernel: [  211.928692] User 101 is opening file: /dev/pts/15
+Feb  5 23:50:30 ubuntu kernel: [  211.928712] User 101 is closing file descriptor: 5
+Feb  5 23:50:31 ubuntu kernel: [  212.584932] User 1000 is closing file descriptor: 3
+Feb  5 23:50:31 ubuntu kernel: [  212.584936] User 1000 is closing file descriptor: 4
+Feb  5 23:50:31 ubuntu kernel: [  212.584943] User 1000 is closing file descriptor: 4
+Feb  5 23:50:31 ubuntu kernel: [  212.584956] User 1000 is closing file descriptor: 3
+Feb  5 23:50:31 ubuntu kernel: [  212.585420] User 1000 is opening file: /etc/ld.so.cache
+Feb  5 23:50:31 ubuntu kernel: [  212.585430] User 1000 is closing file descriptor: 3
+Feb  5 23:50:31 ubuntu kernel: [  212.585455] User 1000 is opening file: /lib/i386-linux-gnu/libc.so.6
+Feb  5 23:50:31 ubuntu kernel: [  212.585496] User 1000 is closing file descriptor: 3
+Feb  5 23:50:31 ubuntu kernel: [  212.585778] User 1000 is opening file: /usr/lib/locale/locale-archive
+Feb  5 23:50:31 ubuntu kernel: [  212.585806] User 1000 is closing file descriptor: 3
+Feb  5 23:50:31 ubuntu kernel: [  212.585843] User 1000 is opening file: file.txt
+Feb  5 23:50:31 ubuntu kernel: [  212.585952] User 1000 read from file descriptor 3, but that read contained malicious code!
+Feb  5 23:50:31 ubuntu kernel: [  212.585959] User 1000 is closing file descriptor: 3
+Feb  5 23:50:31 ubuntu kernel: [  212.585983] User 1000 is closing file descriptor: 1
+Feb  5 23:50:31 ubuntu kernel: [  212.585985] User 1000 is closing file descriptor: 2
+Feb  5 23:50:31 ubuntu kernel: [  212.589244] User 101 is opening file: /var/run/utmp
+Feb  5 23:50:31 ubuntu kernel: [  212.589302] User 101 is opening file: /dev/:0
+Feb  5 23:50:31 ubuntu kernel: [  212.589313] User 101 is opening file: /dev/pts/8
+Feb  5 23:50:31 ubuntu kernel: [  212.589323] User 101 is opening file: /dev/pts/15
+Feb  5 23:50:31 ubuntu kernel: [  212.589329] User 101 is closing file descriptor: 5
+Feb  5 23:50:32 ubuntu kernel: [  213.497392] User 1000 read from file descriptor 14, but that read contained malicious code!
+Feb  5 23:50:32 ubuntu kernel: [  213.501902] User 101 is opening file: /var/run/utmp
+Feb  5 23:50:32 ubuntu kernel: [  213.502070] User 101 is opening file: /dev/:0
+Feb  5 23:50:32 ubuntu kernel: [  213.502103] User 101 is opening file: /dev/pts/8
+Feb  5 23:50:32 ubuntu kernel: [  213.502133] User 101 is opening file: /dev/pts/15
+Feb  5 23:50:32 ubuntu kernel: [  213.502152] User 101 is closing file descriptor: 5
+Feb  5 23:50:32 ubuntu kernel: [  213.918076] User 1000 read from file descriptor 14, but that read contained malicious code!
+Feb  5 23:50:32 ubuntu kernel: [  213.922105] User 101 is opening file: /var/run/utmp
+Feb  5 23:50:32 ubuntu kernel: [  213.922278] User 101 is opening file: /dev/:0
+Feb  5 23:50:32 ubuntu kernel: [  213.922311] User 101 is opening file: /dev/pts/8
+Feb  5 23:50:32 ubuntu kernel: [  213.922342] User 101 is opening file: /dev/pts/15
+Feb  5 23:50:32 ubuntu kernel: [  213.922361] User 101 is closing file descriptor: 5
+Feb  5 23:50:34 ubuntu kernel: [  215.442004] User 1000 is closing file descriptor: 3
+Feb  5 23:50:34 ubuntu kernel: [  215.442007] User 1000 is closing file descriptor: 4
+Feb  5 23:50:34 ubuntu kernel: [  215.442010] User 1000 is closing file descriptor: 4
+Feb  5 23:50:34 ubuntu kernel: [  215.442015] User 1000 is closing file descriptor: 3
+Feb  5 23:50:34 ubuntu kernel: [  215.442487] User 1000 is opening file: /etc/ld.so.cache
+Feb  5 23:50:34 ubuntu kernel: [  215.442496] User 1000 is closing file descriptor: 3
+Feb  5 23:50:34 ubuntu kernel: [  215.442517] User 1000 is opening file: /lib/i386-linux-gnu/libselinux.so.1
+Feb  5 23:50:34 ubuntu kernel: [  215.442556] User 1000 is closing file descriptor: 3
+Feb  5 23:50:34 ubuntu kernel: [  215.442568] User 1000 is opening file: /lib/i386-linux-gnu/libutil.so.1
+Feb  5 23:50:34 ubuntu kernel: [  215.442591] User 1000 is closing file descriptor: 3
+Feb  5 23:50:34 ubuntu kernel: [  215.442605] User 1000 is opening file: /lib/i386-linux-gnu/libdl.so.2
+Feb  5 23:50:34 ubuntu kernel: [  215.442634] User 1000 is closing file descriptor: 3
+Feb  5 23:50:34 ubuntu kernel: [  215.442647] User 1000 is opening file: /lib/i386-linux-gnu/libc.so.6
+Feb  5 23:50:34 ubuntu kernel: [  215.442676] User 1000 is closing file descriptor: 3
+Feb  5 23:50:34 ubuntu kernel: [  215.442705] User 1000 is opening file: /lib/i386-linux-gnu/libpcre.so.3
+Feb  5 23:50:34 ubuntu kernel: [  215.442731] User 1000 is closing file descriptor: 3
+Feb  5 23:50:34 ubuntu kernel: [  215.443057] User 1000 is opening file: /proc/filesystems
+Feb  5 23:50:34 ubuntu kernel: [  215.443115] User 1000 is closing file descriptor: 3
+Feb  5 23:50:34 ubuntu kernel: [  215.443177] User 1000 is opening file: /usr/lib/locale/locale-archive
+Feb  5 23:50:34 ubuntu kernel: [  215.443197] User 1000 is closing file descriptor: 3
+Feb  5 23:50:34 ubuntu kernel: [  215.443234] User 1000 is opening file: /etc/localtime
+Feb  5 23:50:34 ubuntu kernel: [  215.443267] User 1000 is closing file descriptor: 3
+Feb  5 23:50:34 ubuntu kernel: [  215.443323] User 1000 is opening file: /dev/tty
+Feb  5 23:50:34 ubuntu kernel: [  215.443332] User 1000 is closing file descriptor: 3
+Feb  5 23:50:34 ubuntu kernel: [  215.443370] User 1000 is closing file descriptor: 3
+Feb  5 23:50:34 ubuntu kernel: [  215.443380] User 1000 is closing file descriptor: 3
+Feb  5 23:50:34 ubuntu kernel: [  215.443388] User 1000 is opening file: /etc/nsswitch.conf
+Feb  5 23:50:34 ubuntu kernel: [  215.443423] User 1000 is closing file descriptor: 3
+Feb  5 23:50:34 ubuntu kernel: [  215.443436] User 1000 is opening file: /etc/ld.so.cache
+Feb  5 23:50:34 ubuntu kernel: [  215.443441] User 1000 is closing file descriptor: 3
+Feb  5 23:50:34 ubuntu kernel: [  215.443462] User 1000 is opening file: /lib/i386-linux-gnu/libnss_compat.so.2
+Feb  5 23:50:34 ubuntu kernel: [  215.443490] User 1000 is closing file descriptor: 3
+Feb  5 23:50:34 ubuntu kernel: [  215.443497] User 1000 is opening file: /lib/i386-linux-gnu/libnsl.so.1
+Feb  5 23:50:34 ubuntu kernel: [  215.443527] User 1000 is closing file descriptor: 3
+Feb  5 23:50:34 ubuntu kernel: [  215.443578] User 1000 is opening file: /etc/ld.so.cache
+Feb  5 23:50:34 ubuntu kernel: [  215.443583] User 1000 is closing file descriptor: 3
+Feb  5 23:50:34 ubuntu kernel: [  215.443604] User 1000 is opening file: /lib/i386-linux-gnu/libnss_nis.so.2
+Feb  5 23:50:34 ubuntu kernel: [  215.443633] User 1000 is closing file descriptor: 3
+Feb  5 23:50:34 ubuntu kernel: [  215.443643] User 1000 is opening file: /lib/i386-linux-gnu/libnss_files.so.2
+Feb  5 23:50:34 ubuntu kernel: [  215.443670] User 1000 is closing file descriptor: 3
+Feb  5 23:50:34 ubuntu kernel: [  215.443719] User 1000 is opening file: /etc/passwd
+Feb  5 23:50:34 ubuntu kernel: [  215.443757] User 1000 is closing file descriptor: 3
+Feb  5 23:50:34 ubuntu kernel: [  215.443792] User 1000 is opening file: /proc/sys/kernel/ngroups_max
+Feb  5 23:50:34 ubuntu kernel: [  215.443800] User 1000 is closing file descriptor: 3
+Feb  5 23:50:34 ubuntu kernel: [  215.443820] User 1000 is opening file: /proc/2553/stat
+Feb  5 23:50:34 ubuntu kernel: [  215.443850] User 1000 is closing file descriptor: 3
+Feb  5 23:50:34 ubuntu kernel: [  215.443986] User 1000 is closing file descriptor: 3
+Feb  5 23:50:34 ubuntu kernel: [  215.444036] User 1000 is opening file: /usr/lib/sudo/sudoers.so
+Feb  5 23:50:34 ubuntu kernel: [  215.444066] User 1000 is closing file descriptor: 3
+Feb  5 23:50:34 ubuntu kernel: [  215.444074] User 1000 is opening file: /etc/ld.so.cache
+Feb  5 23:50:34 ubuntu kernel: [  215.444079] User 1000 is closing file descriptor: 3
+Feb  5 23:50:34 ubuntu kernel: [  215.444101] User 1000 is opening file: /lib/i386-linux-gnu/libpam.so.0
+Feb  5 23:50:34 ubuntu kernel: [  215.444126] User 1000 is closing file descriptor: 3
+Feb  5 23:50:34 ubuntu kernel: [  215.444144] User 1000 is opening file: /lib/i386-linux-gnu/libaudit.so.1
+Feb  5 23:50:34 ubuntu kernel: [  215.444171] User 1000 is closing file descriptor: 3
+Feb  5 23:50:34 ubuntu kernel: [  215.444269] User 1000 is opening file: /etc/passwd
+Feb  5 23:50:34 ubuntu kernel: [  215.444282] User 1000 is opening file: /etc/default/nss
+Feb  5 23:50:34 ubuntu kernel: [  215.444320] User 1000 is closing file descriptor: 4
+Feb  5 23:50:34 ubuntu kernel: [  215.444342] User 1000 is opening file: /etc/group
+Feb  5 23:50:34 ubuntu kernel: [  215.444384] User 1000 is opening file: /usr/share/locale/locale.alias
+Feb  5 23:50:34 ubuntu kernel: [  215.444420] User 1000 is closing file descriptor: 5
+Feb  5 23:50:34 ubuntu kernel: [  215.444437] User 1000 is opening file: /usr/share/locale/en_US/LC_MESSAGES/sudoers.mo
+Feb  5 23:50:34 ubuntu kernel: [  215.444440] User 1000 is opening file: /usr/share/locale/en/LC_MESSAGES/sudoers.mo
+Feb  5 23:50:34 ubuntu kernel: [  215.444443] User 1000 is opening file: /usr/share/locale-langpack/en_US/LC_MESSAGES/sudoers.mo
+Feb  5 23:50:34 ubuntu kernel: [  215.444446] User 1000 is opening file: /usr/share/locale-langpack/en/LC_MESSAGES/sudoers.mo
+Feb  5 23:50:34 ubuntu kernel: [  215.444515] User 1000 is opening file: /etc/passwd
+Feb  5 23:50:34 ubuntu kernel: [  215.444540] User 1000 is closing file descriptor: 5
+Feb  5 23:50:34 ubuntu kernel: [  215.444567] User 1000 is closing file descriptor: 5
+Feb  5 23:50:34 ubuntu kernel: [  215.444574] User 1000 is closing file descriptor: 5
+Feb  5 23:50:34 ubuntu kernel: [  215.444578] User 1000 is opening file: /etc/group
+Feb  5 23:50:34 ubuntu kernel: [  215.444605] User 1000 is closing file descriptor: 5
+Feb  5 23:50:34 ubuntu kernel: [  215.444612] User 1000 is opening file: /etc/group
+Feb  5 23:50:34 ubuntu kernel: [  215.444623] User 1000 is closing file descriptor: 5
+Feb  5 23:50:34 ubuntu kernel: [  215.444627] User 1000 is opening file: /etc/group
+Feb  5 23:50:34 ubuntu kernel: [  215.444639] User 1000 is closing file descriptor: 5
+Feb  5 23:50:34 ubuntu kernel: [  215.444642] User 1000 is opening file: /etc/group
+Feb  5 23:50:34 ubuntu kernel: [  215.444654] User 1000 is closing file descriptor: 5
+Feb  5 23:50:34 ubuntu kernel: [  215.444658] User 1000 is opening file: /etc/group
+Feb  5 23:50:34 ubuntu kernel: [  215.444670] User 1000 is closing file descriptor: 5
+Feb  5 23:50:34 ubuntu kernel: [  215.444673] User 1000 is opening file: /etc/group
+Feb  5 23:50:34 ubuntu kernel: [  215.444700] User 1000 is closing file descriptor: 5
+Feb  5 23:50:34 ubuntu kernel: [  215.444704] User 1000 is opening file: /etc/group
+Feb  5 23:50:34 ubuntu kernel: [  215.444721] User 1000 is closing file descriptor: 5
+Feb  5 23:50:34 ubuntu kernel: [  215.444724] User 1000 is opening file: /etc/group
+Feb  5 23:50:34 ubuntu kernel: [  215.444743] User 1000 is closing file descriptor: 5
+Feb  5 23:50:34 ubuntu kernel: [  215.444758] User 1000 is opening file: /etc/nsswitch.conf
+Feb  5 23:50:34 ubuntu kernel: [  215.444785] User 1000 is closing file descriptor: 5
+Feb  5 23:50:34 ubuntu kernel: [  215.444811] User 0 is opening file: /etc/sudoers
+Feb  5 23:50:34 ubuntu kernel: [  215.444949] User 0 is closing file descriptor: 6
+Feb  5 23:50:34 ubuntu kernel: [  215.444956] User 0 is opening file: /etc/sudoers.d/README
+Feb  5 23:50:34 ubuntu kernel: [  215.445012] User 0 is closing file descriptor: 6
+Feb  5 23:50:34 ubuntu kernel: [  215.445033] User 0 is opening file: /etc/passwd
+Feb  5 23:50:34 ubuntu kernel: [  215.445046] User 0 is closing file descriptor: 6
+Feb  5 23:50:34 ubuntu kernel: [  215.445070] User 0 is closing file descriptor: 6
+Feb  5 23:50:34 ubuntu kernel: [  215.445077] User 0 is closing file descriptor: 6
+Feb  5 23:50:34 ubuntu kernel: [  215.445083] User 0 is opening file: /etc/host.conf
+Feb  5 23:50:34 ubuntu kernel: [  215.445106] User 0 is closing file descriptor: 6
+Feb  5 23:50:34 ubuntu kernel: [  215.445117] User 0 is opening file: /etc/resolv.conf
+Feb  5 23:50:34 ubuntu kernel: [  215.445138] User 0 is closing file descriptor: 6
+Feb  5 23:50:34 ubuntu kernel: [  215.445158] User 0 is opening file: /etc/hosts
+Feb  5 23:50:34 ubuntu kernel: [  215.445185] User 0 is closing file descriptor: 6
+Feb  5 23:50:34 ubuntu kernel: [  215.445219] User 1000 is opening file: /proc/sys/kernel/ngroups_max
+Feb  5 23:50:34 ubuntu kernel: [  215.445225] User 1000 is closing file descriptor: 8
+Feb  5 23:50:34 ubuntu kernel: [  215.445247] User 1000 is opening file: /etc/group
+Feb  5 23:50:34 ubuntu kernel: [  215.445276] User 1000 is closing file descriptor: 8
+Feb  5 23:50:34 ubuntu kernel: [  215.445285] User 1000 is opening file: /etc/group
+Feb  5 23:50:34 ubuntu kernel: [  215.445295] User 1000 is closing file descriptor: 8
+Feb  5 23:50:34 ubuntu kernel: [  215.445403] User 1000 is opening file: /etc/pam.d/sudo
+Feb  5 23:50:34 ubuntu kernel: [  215.445433] User 1000 is opening file: /lib/i386-linux-gnu/security/pam_env.so
+Feb  5 23:50:34 ubuntu kernel: [  215.445460] User 1000 is closing file descriptor: 9
+Feb  5 23:50:34 ubuntu kernel: [  215.445501] User 1000 is opening file: /etc/pam.d/common-auth
+Feb  5 23:50:34 ubuntu kernel: [  215.445529] User 1000 is opening file: /lib/i386-linux-gnu/security/pam_unix.so
+Feb  5 23:50:34 ubuntu kernel: [  215.445558] User 1000 is closing file descriptor: 10
+Feb  5 23:50:34 ubuntu kernel: [  215.445565] User 1000 is opening file: /etc/ld.so.cache
+Feb  5 23:50:34 ubuntu kernel: [  215.445569] User 1000 is closing file descriptor: 10
+Feb  5 23:50:34 ubuntu kernel: [  215.445591] User 1000 is opening file: /lib/i386-linux-gnu/libcrypt.so.1
+Feb  5 23:50:34 ubuntu kernel: [  215.445619] User 1000 is closing file descriptor: 10
+Feb  5 23:50:34 ubuntu kernel: [  215.445725] User 1000 is opening file: /lib/i386-linux-gnu/security/pam_deny.so
+Feb  5 23:50:34 ubuntu kernel: [  215.445753] User 1000 is closing file descriptor: 10
+Feb  5 23:50:34 ubuntu kernel: [  215.445772] User 1000 is opening file: /lib/i386-linux-gnu/security/pam_permit.so
+Feb  5 23:50:34 ubuntu kernel: [  215.445795] User 1000 is closing file descriptor: 10
+Feb  5 23:50:34 ubuntu kernel: [  215.445816] User 1000 is opening file: /lib/i386-linux-gnu/security/pam_cap.so
+Feb  5 23:50:34 ubuntu kernel: [  215.445840] User 1000 is closing file descriptor: 10
+Feb  5 23:50:34 ubuntu kernel: [  215.445846] User 1000 is opening file: /etc/ld.so.cache
+Feb  5 23:50:34 ubuntu kernel: [  215.445851] User 1000 is closing file descriptor: 10
+Feb  5 23:50:34 ubuntu kernel: [  215.445873] User 1000 is opening file: /lib/i386-linux-gnu/libcap.so.2
+Feb  5 23:50:34 ubuntu kernel: [  215.445898] User 1000 is closing file descriptor: 10
+Feb  5 23:50:34 ubuntu kernel: [  215.445952] User 1000 is closing file descriptor: 9
+Feb  5 23:50:34 ubuntu kernel: [  215.445963] User 1000 is opening file: /etc/pam.d/common-account
+Feb  5 23:50:34 ubuntu kernel: [  215.445992] User 1000 is closing file descriptor: 9
+Feb  5 23:50:34 ubuntu kernel: [  215.446001] User 1000 is opening file: /etc/pam.d/common-session-noninteractive
+Feb  5 23:50:34 ubuntu kernel: [  215.446030] User 1000 is opening file: /lib/i386-linux-gnu/security/pam_umask.so
+Feb  5 23:50:34 ubuntu kernel: [  215.446053] User 1000 is closing file descriptor: 10
+Feb  5 23:50:34 ubuntu kernel: [  215.446084] User 1000 is closing file descriptor: 9
+Feb  5 23:50:34 ubuntu kernel: [  215.446094] User 1000 is closing file descriptor: 8
+Feb  5 23:50:34 ubuntu kernel: [  215.446099] User 1000 is opening file: /etc/pam.d/other
+Feb  5 23:50:34 ubuntu kernel: [  215.446118] User 1000 is opening file: /etc/pam.d/common-auth
+Feb  5 23:50:34 ubuntu kernel: [  215.446147] User 1000 is closing file descriptor: 9
+Feb  5 23:50:34 ubuntu kernel: [  215.446156] User 1000 is opening file: /etc/pam.d/common-account
+Feb  5 23:50:34 ubuntu kernel: [  215.446181] User 1000 is closing file descriptor: 9
+Feb  5 23:50:34 ubuntu kernel: [  215.446189] User 1000 is opening file: /etc/pam.d/common-password
+Feb  5 23:50:34 ubuntu kernel: [  215.446217] User 1000 is opening file: /lib/i386-linux-gnu/security/pam_gnome_keyring.so
+Feb  5 23:50:34 ubuntu kernel: [  215.446241] User 1000 is closing file descriptor: 10
+Feb  5 23:50:34 ubuntu kernel: [  215.446293] User 1000 is closing file descriptor: 9
+Feb  5 23:50:34 ubuntu kernel: [  215.446302] User 1000 is opening file: /etc/pam.d/common-session
+Feb  5 23:50:34 ubuntu kernel: [  215.446336] User 1000 is opening file: /lib/i386-linux-gnu/security/pam_systemd.so
+Feb  5 23:50:34 ubuntu kernel: [  215.446360] User 1000 is closing file descriptor: 10
+Feb  5 23:50:34 ubuntu kernel: [  215.446367] User 1000 is opening file: /etc/ld.so.cache
+Feb  5 23:50:34 ubuntu kernel: [  215.446372] User 1000 is closing file descriptor: 10
+Feb  5 23:50:34 ubuntu kernel: [  215.446393] User 1000 is opening file: /lib/i386-linux-gnu/libcgmanager.so.0
+Feb  5 23:50:34 ubuntu kernel: [  215.446422] User 1000 is closing file descriptor: 10
+Feb  5 23:50:34 ubuntu kernel: [  215.446442] User 1000 is opening file: /lib/i386-linux-gnu/libnih.so.1
+Feb  5 23:50:34 ubuntu kernel: [  215.446468] User 1000 is closing file descriptor: 10
+Feb  5 23:50:34 ubuntu kernel: [  215.446478] User 1000 is opening file: /lib/i386-linux-gnu/libnih-dbus.so.1
+Feb  5 23:50:34 ubuntu kernel: [  215.446507] User 1000 is closing file descriptor: 10
+Feb  5 23:50:34 ubuntu kernel: [  215.446517] User 1000 is opening file: /lib/i386-linux-gnu/libdbus-1.so.3
+Feb  5 23:50:34 ubuntu kernel: [  215.446544] User 1000 is closing file descriptor: 10
+Feb  5 23:50:34 ubuntu kernel: [  215.446554] User 1000 is opening file: /lib/i386-linux-gnu/libpam_misc.so.0
+Feb  5 23:50:34 ubuntu kernel: [  215.446577] User 1000 is closing file descriptor: 10
+Feb  5 23:50:34 ubuntu kernel: [  215.446587] User 1000 is opening file: /lib/i386-linux-gnu/librt.so.1
+Feb  5 23:50:34 ubuntu kernel: [  215.446613] User 1000 is closing file descriptor: 10
+Feb  5 23:50:34 ubuntu kernel: [  215.446630] User 1000 is opening file: /lib/i386-linux-gnu/libpthread.so.0
+Feb  5 23:50:34 ubuntu kernel: [  215.446661] User 1000 is closing file descriptor: 10
+
+
+#Don't shpw "Unloaded Module" message because of an unknown issue
+
+Forum topic:
+	[Project 2, Part 1] dmesg: unable to handle kernel paging request	Eli Skeggs	2016-01-30 17:23:28
