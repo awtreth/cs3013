@@ -1,0 +1,26 @@
+-----Recipe1------
+prep	3
+stove	4
+sink	2
+prep	2
+oven	5
+sink	10
+-----Recipe2------
+prep	5
+stove	3
+sink	15
+-----Recipe3------
+prep	10
+oven	5
+sink	5
+-----Recipe4------
+oven	15
+prep	5
+sink	4
+-----Recipe5------
+prep	2
+oven	3
+sink	2
+prep	2
+oven	3
+sink	4

@@ -1,14 +1,19 @@
 CFLAGS=-Wall -g
+LDLIBS+=-lpthread
 
-all: main
+all: main test
 
 queue.o:
 
 aux.o:
 
-main: auxfnc.o
+recipe.o:
+
+main: aux.o recipe.o
+
+test: aux.o recipe.o
 
 clean:
-	rm main *.o *~
+	rm main test *.o *~
 
 .PHONY: clean all
