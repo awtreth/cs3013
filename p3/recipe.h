@@ -61,6 +61,6 @@ void print_recipe(recipe_t recipe);
 //Print recipe queue content
 void print_recipe_queue(recipe_queue_t queue);
 
-void load_recipe(recipe_t * recipe, const char* filename);
+void load_recipes(recipe_t recipes[], unsigned int size, const char* filename);
 
 #endif

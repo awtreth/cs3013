@@ -99,17 +99,21 @@ station_t parse_station(char *name) {
 	return -1;
 }
 
-void load_recipe(recipe_t * recipe, const char* filename) {
+void load_recipes(recipe_t recipes[], unsigned int size, const char* filename) {
 
 	FILE *fd = fopen(filename, "r");
-	char str[20];
+	char station_str[10], duration_str[10];
 
-	while(fgets(str, 20, fd)!=NULL) {//not EOF
-		if(str[0]=='-')
+	int i = 0;
+
+	while(i <= size && fscanf(fd,"%s %s",station_str, duration_str)!=EOF) {//not EOF
+		if(station_str[0]=='-'){
+			recipes[i++] = recipe_init();
 			continue;
-		station_t station = parse_station(strtok (str," "));
-		unsigned int duration = atoi(strtok (NULL,"\n"));
-		recipe_add_step(recipe, recipe_step_init(station,duration));
+		}
+		station_t station = parse_station(station_str);
+		unsigned int duration = atoi(duration_str);
+		recipe_add_step(&recipes[i-1], recipe_step_init(station,duration));
 	}
 
 	fclose(fd);
