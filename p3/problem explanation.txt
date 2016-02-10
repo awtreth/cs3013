@@ -1,0 +1,7 @@
+QUESTIONS
+1) In what cases can a deadlock occur? Is there a reliable way to predict a deadlock in advance and avoid such scenarios?
+There are 2 possible deadlock configurations for this problem. Circular Conditions:
+  With 2 chefs: one wants to go to the station where the other is in.
+  With 3 chefs: chef1 wants to go chef2's station, chef2 wants to go to chef3's station and chef3 wants to go to chef1's station
+
+It's very hard to avoid such scenarios in advance.
