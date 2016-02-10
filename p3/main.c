@@ -9,12 +9,12 @@
 #include "aux.h"
 
 #define N_RECIPES	5
-#define MAX_ORDERS	30
+#define MAX_ORDERS	5
 #define N_CHEFS		3
 
 recipe_t recipes[N_RECIPES];
 
-recipe_queue_t order_queue;
+queue_recipe_t order_queue;
 
 sem_t available_orders; //increased by order and decreased by chefs
 sem_t remaining_orders; //decreased by chefs
@@ -22,8 +22,6 @@ sem_t order_queue_sem;  //order_queue control acces semaphore
 
 //Take care of order generation and queueing
 void* order(void* arg) {
-	
-	order_queue = recipe_queue_init(MAX_ORDERS);
 	
 	int order = 0;
 	
@@ -35,7 +33,7 @@ void* order(void* arg) {
 		
 		//Push the recipe to the order_queue
 		sem_wait(&order_queue_sem);
-		recipe_queue_push(&order_queue, recipes[recipe]);
+		queue_push(&order_queue, recipes[recipe]);
 		sem_post(&order_queue_sem);
 		
 		//Notify that there are available orders
@@ -60,7 +58,7 @@ void* chef(void* arg) {
 		sem_wait(&available_orders);
 		//Push the recipe to the order_queue
 		sem_wait(&order_queue_sem);
-		current_recipe = recipe_queue_pop(&order_queue);
+		current_recipe = queue_pop(&order_queue);
 		sem_post(&order_queue_sem);
 		printf("Chef %d received recipe\n", chef_number);
 		usleep(current_recipe.steps[0].duration*1000000);
@@ -81,6 +79,8 @@ int main (int argc, char **argv) {
 
 	//Load the recipes
 	load_recipes(recipes, N_RECIPES, "recipes.txt");
+	
+	queue_init(&order_queue, MAX_ORDERS);
 	
 	//Initialize global semaphores
 	sem_init(&available_orders, 0, 0);
@@ -103,7 +103,7 @@ int main (int argc, char **argv) {
 		pthread_join(chef_thread[i],NULL);
 	
 	//Free all dinamically allocated memory
-	recipe_queue_free(&order_queue);
+	queue_free(&order_queue);
 	for (i = 0; i < N_RECIPES; i++) {
 		recipe_free(&recipes[i]);
 	}

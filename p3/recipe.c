@@ -28,49 +28,6 @@ void recipe_free(recipe_t *recipe) {
 }
 
 
-//Initialize the queue with fixed capacity
-recipe_queue_t recipe_queue_init(unsigned int capacity) {
-	recipe_queue_t queue;
-	
-	queue.size = 0;
-	queue.init = 1;
-	queue.end =  0;
-	queue.capacity = capacity;
-	queue.array = (recipe_t*) malloc(sizeof(recipe_t)*capacity);
-	
-	return queue;
-}
-
-
-//Free queue content
-void recipe_queue_free(recipe_queue_t* queue) {
-	if(queue->array != NULL) free(queue->array);
-	queue->size = 0;
-	queue->init = 1;
-	queue->end =  0;
-	queue->capacity = 0;
-}
-
-//Push at the begining of the recipe queue
-void recipe_queue_push(recipe_queue_t* queue, recipe_t recipe) {
-	queue->init = (queue->init + queue->capacity - 1)%queue->capacity;
-	queue->array[queue->init] = recipe;
-	queue->size++;
-}
-
-//Pop the last element from the recipe queue
-recipe_t recipe_queue_pop(recipe_queue_t* queue) {
-	unsigned int old_end = queue->end;
-	queue->end = (queue->end + queue->capacity - 1)%queue->capacity;
-	queue->size--;
-	return queue->array[old_end];
-} 
-
-recipe_t recipe_queue_get(recipe_queue_t queue, unsigned int pos) {
-	return queue.array[(queue.init+pos)%queue.capacity];
-}
-
-
 void print_recipe(recipe_t recipe) {
 	int i = 0;
 	for(; i < recipe.nsteps; i++) {
@@ -79,15 +36,13 @@ void print_recipe(recipe_t recipe) {
 	printf("\n");
 }
 
-void print_recipe_queue(recipe_queue_t queue) {
+void print_recipe_queue(queue_recipe_t queue) {
 	int i = 0;
 	for(; i < queue.size; i++) {
 		printf("Recipe %d: ", i);
-		print_recipe(recipe_queue_get(queue,i));
+		print_recipe(queue_get(queue,i));
 	}
 }
-
-
 
 station_t parse_station(char *name) {
 	if(strcmp("prep", name)==0) return PREP;
