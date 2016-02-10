@@ -2,6 +2,7 @@
 #define QUEUE_H
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <semaphore.h>
 
 #define define_queue(TYPE)\
