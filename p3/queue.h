@@ -23,7 +23,6 @@
 		(queue)->sem = (sem_t*) malloc(sizeof(sem_t));\
 		sem_init((queue)->sem, 0, 1);\
 		(queue)->array = malloc(sizeof(typeof(*((queue)->array)))*CAPACITY);
-	
 
 //Free queue content
 #define queue_free(queue) {\

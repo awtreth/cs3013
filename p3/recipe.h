@@ -3,8 +3,7 @@
 
 #include "queue.h"
 
-//Station enumeration
-typedef enum {PREP, OVEN, STOVE, SINK, N_STATIONS} station_t;
+#include "station.h"
 
 //Recipe Step
 typedef struct {

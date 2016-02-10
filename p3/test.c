@@ -8,7 +8,6 @@
 
 #include "queue.h"
 
-define_queue(int);
 
 int main() {
 

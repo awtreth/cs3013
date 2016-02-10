@@ -7,15 +7,20 @@
 
 #include "recipe.h"
 #include "aux.h"
+#include "station.h"
 
 #define N_RECIPES	5
 #define MAX_ORDERS	5
 #define N_CHEFS		3
 
+//GLOBAL VARIABLES
 recipe_t recipes[N_RECIPES];
 
 queue_recipe_t order_queue;
 
+station_state_t state[N_STATIONS];
+
+//SEMAPHORES
 sem_t available_orders; //increased by order and decreased by chefs
 sem_t remaining_orders; //decreased by chefs
 //sem_t order_queue_sem;  //order_queue control acces semaphore
@@ -77,10 +82,13 @@ int main (int argc, char **argv) {
 	//Define random seed for all functions that use "rand" function
 	srand(10);
 
-	//Load the recipes
+	//Load Global variables
 	load_recipes(recipes, N_RECIPES, "recipes.txt");
 	
 	queue_init(&order_queue, MAX_ORDERS);
+	
+	init_station_array(state, N_CHEFS);
+	
 	
 	//Initialize global semaphores
 	sem_init(&available_orders, 0, 0);
@@ -111,6 +119,7 @@ int main (int argc, char **argv) {
 	sem_destroy(&remaining_orders);
 	//sem_destroy(&order_queue_sem);
 	
+	free_station_array(state);
 	
 	return 0;
 }
