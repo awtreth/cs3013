@@ -18,7 +18,7 @@ queue_recipe_t order_queue;
 
 sem_t available_orders; //increased by order and decreased by chefs
 sem_t remaining_orders; //decreased by chefs
-sem_t order_queue_sem;  //order_queue control acces semaphore
+//sem_t order_queue_sem;  //order_queue control acces semaphore
 
 //Take care of order generation and queueing
 void* order(void* arg) {
@@ -32,9 +32,9 @@ void* order(void* arg) {
 		int recipe = uniform_rand(0, N_RECIPES-1);//pick one recipe randomly
 		
 		//Push the recipe to the order_queue
-		sem_wait(&order_queue_sem);
+		//sem_wait(&order_queue_sem);
 		queue_push(&order_queue, recipes[recipe]);
-		sem_post(&order_queue_sem);
+		//sem_post(&order_queue_sem);
 		
 		//Notify that there are available orders
 		sem_post(&available_orders);
@@ -57,9 +57,9 @@ void* chef(void* arg) {
 	while(sem_trywait(&remaining_orders)!=-1) {
 		sem_wait(&available_orders);
 		//Push the recipe to the order_queue
-		sem_wait(&order_queue_sem);
+		//sem_wait(&order_queue_sem);
 		current_recipe = queue_pop(&order_queue);
-		sem_post(&order_queue_sem);
+		//sem_post(&order_queue_sem);
 		printf("Chef %d received recipe\n", chef_number);
 		usleep(current_recipe.steps[0].duration*1000000);
 		printf("Chef %d finished order\n", chef_number);
@@ -85,7 +85,7 @@ int main (int argc, char **argv) {
 	//Initialize global semaphores
 	sem_init(&available_orders, 0, 0);
 	sem_init(&remaining_orders, 0, MAX_ORDERS);
-	sem_init(&order_queue_sem, 0, 1);
+	//sem_init(&order_queue_sem, 0, 1);
 	
 	//Create threads
 	pthread_t order_thread;
@@ -109,7 +109,7 @@ int main (int argc, char **argv) {
 	}
 	sem_destroy(&available_orders);
 	sem_destroy(&remaining_orders);
-	sem_destroy(&order_queue_sem);
+	//sem_destroy(&order_queue_sem);
 	
 	
 	return 0;
