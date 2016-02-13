@@ -1,17 +1,26 @@
-#include "recipe.h"
+#include "kitchen.h"
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
+#include "order_sem.h"
+
 //Construct a Recipe Step
-recipe_step_t recipe_step_init(station_t station, unsigned int time) {
+recipe_step_t recipe_step_init(station_id station, unsigned int time) {
 	recipe_step_t ret = {station,time};
 	return ret;
 }
 
 //Initialize empty recipe_t
 recipe_t recipe_init() {
-	recipe_t recipe = {0,(recipe_step_t*)NULL};
+	recipe_t recipe = {0,0,(recipe_step_t*)NULL};
+	return recipe;
+}
+
+//Initialize empty recipe_t
+recipe_t recipe_init2(int id) {
+	recipe_t recipe = {id,0,(recipe_step_t*)NULL};
 	return recipe;
 }
 
@@ -30,21 +39,14 @@ void recipe_free(recipe_t *recipe) {
 
 void print_recipe(recipe_t recipe) {
 	int i = 0;
+	printf("Recipe %d: ", recipe.id);
 	for(; i < recipe.nsteps; i++) {
 		printf("(%d, %d) ", recipe.steps[i].station, recipe.steps[i].duration);
 	}
 	printf("\n");
 }
 
-void print_recipe_queue(queue_recipe_t queue) {
-	int i = 0;
-	for(; i < queue.size; i++) {
-		printf("Recipe %d: ", i);
-		print_recipe(queue_get(queue,i));
-	}
-}
-
-station_t parse_station(char *name) {
+station_id parse_station(char *name) {
 	if(strcmp("prep", name)==0) return PREP;
 	else if(strcmp("stove", name)==0) return STOVE;
 	else if(strcmp("oven", name)==0) return OVEN;
@@ -54,7 +56,7 @@ station_t parse_station(char *name) {
 	return -1;
 }
 
-void load_recipes(recipe_t recipes[], unsigned int size, const char* filename) {
+int load_recipes(recipe_t recipes[], unsigned int size, const char* filename) {
 
 	FILE *fd = fopen(filename, "r");
 	char station_str[10], duration_str[10];
@@ -63,14 +65,39 @@ void load_recipes(recipe_t recipes[], unsigned int size, const char* filename) {
 
 	while(i <= size && fscanf(fd,"%s %s",station_str, duration_str)!=EOF) {//not EOF
 		if(station_str[0]=='-'){
-			recipes[i++] = recipe_init();
+			recipes[i] = recipe_init2(i);
+			i++;
 			continue;
 		}
-		station_t station = parse_station(station_str);
+		station_id station = parse_station(station_str);
 		unsigned int duration = atoi(duration_str);
 		recipe_add_step(&recipes[i-1], recipe_step_init(station,duration));
 	}
 
 	fclose(fd);
 
+	return i;
 }
+
+void add_intention(intention_t* intention, station_id from, station_id to) {
+	intention->link[from][to]++;
+}
+
+void rem_intention(intention_t* intention, station_id from, station_id to) {
+	intention->link[from][to]--;
+}
+
+void init_kitchen(kitchen_t *kitchen) {
+	int i;
+	
+	for (i = 0; i < N_STATIONS; i++) 
+		order_sem_init(&kitchen->station_sem[i], 0, 1);
+}
+
+void free_kitchen(kitchen_t *kitchen) {
+	int i;
+	
+	for (i = 0; i < N_STATIONS; i++) 
+		order_sem_destroy(&kitchen->station_sem[i]);
+}
+

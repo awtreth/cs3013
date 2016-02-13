@@ -7,13 +7,13 @@ queue.o:
 
 aux.o:
 
-recipe.o:
+order_sem.o:
 
-station.o:
+kitchen.o:
 
-main: aux.o recipe.o station.o
+main: aux.o order_sem.o kitchen.o
 
-test: aux.o recipe.o
+test: aux.o order_sem.o kitchen.o
 
 clean:
 	rm main test *.o *~
