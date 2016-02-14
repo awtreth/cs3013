@@ -50,8 +50,8 @@ typedef struct{
 
 typedef struct {
 	int id;
-	order_t current_order;
-	station_id current_station;
+	order_t order;//current order
+	station_id station;//current station
 } chef_t;
 
 //one per chef
@@ -63,9 +63,12 @@ void add_intention(intention_t* intention, station_id from, station_id to);
 
 void rem_intention(intention_t* intention, station_id from, station_id to);
 
+void print_intention(intention_t intent, int chef);
+
 
 typedef struct  {
-	order_sem station_sem[N_STATIONS];
+	order_sem_t station_sem[N_STATIONS];
+	order_sem_t sleep_sem[N_STATIONS];
 	chef_t chef[N_STATIONS];
 } kitchen_t;
 

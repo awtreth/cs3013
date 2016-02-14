@@ -8,30 +8,74 @@
 
 #include "queue.h"
 
+#include "order_sem.h"
+#include <pthread.h>
+#include <unistd.h>
+
+#define N_THREADS 10
+
+order_sem_t sem;
+
+
+void* fnc(void* arg) {
+	int n = (int) arg;
+	
+	order_sem_wait(&sem);
+	printf("thread %d has passed\n", n);
+	
+	return NULL;
+}
+
+
 
 int main() {
 
+	int i, value;
 	
-	queue_int q;
-	queue_init(&q,3);
+	queue_int q1, q2;
 	
-	queue_push(&q, 1);
-	queue_push(&q, 3);
-	queue_push(&q, 4);
+	queue_init(&q1, 5);
+	queue_init(&q2, 5);
 	
-	printf("%d\n",queue_pop(&q));
+	queue_push(&q1, 10);
+	queue_push(&q1, 3);
+	queue_push(&q1, 5);
+	queue_push(&q1, 6);
+	queue_push(&q1, 1);
 	
-	int i = 0;
+	//printf("%d\n", queue_get(q1,2));
+	value = queue_find(q1,3);
+	printf("%d\n", value);
+	printf("%d\n", queue_rem(&q1, 0));
+	printf("%d\n", queue_find(q1,5));
 	
-	for(i=0; i < q.size; i++) {
-		printf("%d: %d\n", i, queue_get(q,i));
+	
+	
+	
+	/*pthread_t thread[N_THREADS];
+	
+	order_sem_init(&sem, 0, N_THREADS);
+	
+	order_sem_getvalue(&sem, &value);
+	printf("initial value = %d\n", value);
+	
+	for (i = 0; i < N_THREADS; i++)
+		pthread_create(&thread[i], NULL, fnc, (void*)i);
+	
+	sleep(1);
+	
+	for (i = 0; i < N_THREADS; i++){
+		order_sem_post(&sem);
+		order_sem_getvalue(&sem, &value);
+		printf("value = %d\n", value);
+		sleep(1);
 	}
 	
-	queue_free(&q);
-	//queue_int q;
 	
-	//queue_init(&q, 10, int);
+	for (i = 0; i < N_THREADS; i++)
+		pthread_join(thread[i], NULL);
 	
-	
+	order_sem_destroy(&sem);*/
+
 	return 0;
 }

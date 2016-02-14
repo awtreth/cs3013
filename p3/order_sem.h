@@ -16,16 +16,19 @@ typedef struct {
 	unsigned int size;
 	
 	sem_t *queue;
-} order_sem;
+} order_sem_t;
 
-int order_sem_init(order_sem *sem, unsigned int value, unsigned int max_threads);
+int order_sem_init(order_sem_t *sem, unsigned int value, unsigned int max_threads);
 
-int order_sem_wait(order_sem *sem);
+int order_sem_wait(order_sem_t *sem);
 
-int order_sem_post(order_sem *sem);
+int order_sem_post(order_sem_t *sem);
 
-int order_sem_destroy(order_sem *sem);
+int order_sem_destroy(order_sem_t *sem);
 
-int order_sem_trywait(order_sem *sem);
+int order_sem_trywait(order_sem_t *sem);
+
+int order_sem_getvalue(order_sem_t *sem, int *sval);
+
 
 #endif

@@ -87,17 +87,32 @@ void rem_intention(intention_t* intention, station_id from, station_id to) {
 	intention->link[from][to]--;
 }
 
+void print_intention(intention_t intent, int chef) {
+	int i, j;
+	printf("Intention of %d:\n", chef);
+	for(i = 0; i < N_STATIONS; i++) {
+		for (j = 0; j < N_STATIONS; j++) {
+			printf("%d ", intent.link[i][j]);
+		}
+		printf("\n");
+	}
+}
+
 void init_kitchen(kitchen_t *kitchen) {
 	int i;
 	
-	for (i = 0; i < N_STATIONS; i++) 
-		order_sem_init(&kitchen->station_sem[i], 0, 1);
+	for (i = 0; i < N_STATIONS; i++) {
+		order_sem_init(&kitchen->station_sem[i], 1, N_STATIONS);
+		order_sem_init(&kitchen->sleep_sem[i], 0, N_STATIONS);
+	}
 }
 
 void free_kitchen(kitchen_t *kitchen) {
 	int i;
 	
-	for (i = 0; i < N_STATIONS; i++) 
+	for (i = 0; i < N_STATIONS; i++) {
 		order_sem_destroy(&kitchen->station_sem[i]);
+		order_sem_destroy(&kitchen->sleep_sem[i]);
+	}
 }
 

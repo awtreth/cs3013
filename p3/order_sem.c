@@ -1,7 +1,7 @@
 
 #include "order_sem.h"
 
-int order_sem_init(order_sem *sem, unsigned int value, unsigned int max_threads){
+int order_sem_init(order_sem_t *sem, unsigned int value, unsigned int max_threads){
 	
 	//Initialize queue parameters
 	sem->size = 0;
@@ -19,7 +19,7 @@ int order_sem_init(order_sem *sem, unsigned int value, unsigned int max_threads)
 	return sem_init(&sem->main_sem, 0, value);
 }
 
-int order_sem_wait(order_sem *sem) {
+int order_sem_wait(order_sem_t *sem) {
 	
 	sem_wait(&sem->queue_sem);//queue access control
 	if(sem_trywait(&sem->main_sem) < 0){//if it would block
@@ -35,7 +35,7 @@ int order_sem_wait(order_sem *sem) {
 	return 0;
 }
 
-int order_sem_post(order_sem *sem){
+int order_sem_post(order_sem_t *sem){
 	
 	sem_wait(&sem->queue_sem);//queue access control
 	
@@ -52,7 +52,7 @@ int order_sem_post(order_sem *sem){
 	return 0;
 }
 
-int order_sem_destroy(order_sem *sem) {
+int order_sem_destroy(order_sem_t *sem) {
 	
 	int i;
 	
@@ -70,6 +70,13 @@ int order_sem_destroy(order_sem *sem) {
 	return sem_destroy(&sem->main_sem);
 }
 
-int order_sem_trywait(order_sem *sem) {
+inline int order_sem_trywait(order_sem_t *sem) {
 	return sem_trywait(&sem->main_sem);
 }
+
+int order_sem_getvalue(order_sem_t *sem, int *sval) {
+	int ret = sem_getvalue(&sem->main_sem, sval);
+	*sval = *sval - sem->size;
+	return ret;
+}
+
