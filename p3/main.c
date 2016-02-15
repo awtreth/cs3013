@@ -26,6 +26,7 @@ intention_t intention[N_CHEFS];//automatically initialized with zeros because it
 
 sem_t intention_sem[N_CHEFS];
 
+int sleepers_just_wokenup[N_STATIONS] =  {0};
 
 queue_int chef_queue;
 
@@ -138,7 +139,9 @@ void* chef(void* arg) {
 	printf("Initialized chef %d\n", chef.id);
 	
 	int i, j;
-	int value, target_station, next_station;
+	int target_station, next_station;
+	
+	int im_sleeper = 0;
 	
 	while(sem_trywait(&remaining_orders)!=-1) {
 		sem_wait(&available_orders);
@@ -168,6 +171,21 @@ void* chef(void* arg) {
 			
 			printf("Chef %d is waiting for station %d\n", chef.id, target_station);
 			order_sem_wait(&kitchen.station_sem[target_station]);//wait the station be free
+			
+			if(im_sleeper){
+				sleepers_just_wokenup[target_station]--;
+				if(sleepers_just_wokenup[target_station]>0)
+					order_sem_post(&kitchen.sleep_sem[target_station]);
+				im_sleeper=0;
+			}else if(sleepers_just_wokenup[target_station] > 0) {
+				sleepers_just_wokenup[target_station]++;
+				im_sleeper = 1;
+				order_sem_post(&kitchen.station_sem[target_station]);
+				order_sem_wait(&kitchen.sleep_sem[target_station]);
+				i--;
+				continue;
+			}
+				
 			//printf("Chef %d passed semaphore of station %d\n", chef.id, target_station);
 		
 			if(i < chef.order.recipe.nsteps) {//not last step
@@ -177,6 +195,7 @@ void* chef(void* arg) {
 					printf("Chef %d identified deadlock when it tried to enter station %d\n", chef.id, target_station);
 					
 					printf("Chef %d slept trying to enter station %d\n", chef.id, target_station);
+					im_sleeper = 1;
 					order_sem_post(&kitchen.station_sem[target_station]); //allow the next
 					order_sem_wait(&kitchen.sleep_sem[target_station]);
 					printf("Chef %d was awaken\n", chef.id);
@@ -197,8 +216,8 @@ void* chef(void* arg) {
 			
 			if(i > 1) {//not the first step
 				//free sleeping chefs
-				for(j = 0; j < kitchen.sleep_sem[chef.station].size; j++)
-					order_sem_post(&kitchen.sleep_sem[chef.station]);
+				sleepers_just_wokenup[chef.station] = kitchen.sleep_sem[chef.station].size;
+				if(sleepers_just_wokenup[chef.station])order_sem_post(&kitchen.sleep_sem[chef.station]);
 				order_sem_post(&kitchen.station_sem[chef.station]); //allow the next
 			}
 			chef.station = target_station;
@@ -230,7 +249,7 @@ int main (int argc, char **argv) {
 	int i = 0;
 	
 	//Define random seed for all functions that use "rand" function
-	srand(9);
+	srand(7);
 
 	//Load Global variables
 	load_recipes(recipes, N_RECIPES, "recipes.txt");
