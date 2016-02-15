@@ -6,6 +6,11 @@
 #include <semaphore.h>
 #include <string.h>
 
+//SET OF MACROS FOR GENERIC QUEUES
+
+/* Define the structure for an especific TYPE
+ * e.g.: define_queue(double) defines the queue_double struct (queue of doubles)
+ */
 #define define_queue(TYPE)\
 	typedef struct {\
 		unsigned int size;\
@@ -17,7 +22,10 @@
 
 define_queue(int);//Default int queue
 
-//Initialize the queue with fixed capacity
+/*Initialize the queue with fixed capacity
+ * queue: pointer to a queue
+ * CAPACITY: int
+ */
 #define queue_init(queue, CAPACITY) \
 		(queue)->size = 0;\
 		(queue)->init = 1;\
@@ -25,7 +33,9 @@ define_queue(int);//Default int queue
 		(queue)->capacity = CAPACITY;\
 		(queue)->array = malloc(sizeof(typeof(*((queue)->array)))*CAPACITY);
 
-//Free queue content
+/*Free queue content
+ * queue: pointer to a queue 
+ */
 #define queue_free(queue) {\
 	if((queue)->array != NULL) free((queue)->array);\
 	(queue)->size = 0;\
@@ -34,7 +44,11 @@ define_queue(int);//Default int queue
 	(queue)->capacity = 0;\
 }
 
-//Push at the begining of the recipe queue
+/*Push at the begining of the recipe queue
+ * queue: pointer to a queue
+ * value: input value of the type of the queue
+ * return the resulting size
+ */
 #define queue_push(queue, value)({\
 		int ret = 0;\
 		if((queue)->size >= (queue)->capacity) {\
@@ -47,13 +61,19 @@ define_queue(int);//Default int queue
 		}\
 		ret;\
 	})
-	
+
+/*return !0 if the queue is empty. 0 if not
+ * queue: struct "object" (not pointer)
+*/
 #define queue_is_empty(queue) ({\
 	int ret = (queue).size<=0;\
 	ret;\
 	})
 
-//Push at the begining of the recipe queue
+/*pop from the end of the queue
+ * queue: pointer to the queue
+ * return the popped object
+*/
 #define queue_pop(queue)({\
 		if((queue)->size<=0){\
 			printf("Someone tried to pop from an empty queue\n");\
@@ -65,14 +85,16 @@ define_queue(int);//Default int queue
 		ret;\
 	})
 
-
+/* get the value of "queue" (not pointer) in the position "pos"
+ */
 #define queue_get(queue, pos) ({\
 		if(pos >= (queue).size || pos < 0) {printf("Someone tried to get a value of an invalid position in a queue\n");exit(-1);}\
 		typeof(*((queue).array)) ret =(queue).array[((queue).end+(queue).capacity-pos)%(queue).capacity];\
 		ret;\
 	})
 
-
+/* remove element (return value) from "queue"(pointer) of the position "pos"
+ */
 #define queue_rem(queue, pos) ({\
 		typeof(*((queue)->array)) tmp = queue_get(*(queue), pos);\
 		int kkk=((queue)->end+(queue)->capacity-pos)%(queue)->capacity;\
@@ -84,7 +106,9 @@ define_queue(int);//Default int queue
 		(queue)->size = (queue)->size-1;\
 		tmp;})
 		
-		
+/*Copy queue from "from" to "to" (both arguments are pointers
+ * the function assumes that "to" is properly allocated
+*/
 #define queue_copy(from, to) {\
 	if((from)->capacity != (to)->capacity) {printf("In queue_copy: queues' capacities don't match\n");}\
 	else{\
@@ -93,7 +117,7 @@ define_queue(int);//Default int queue
 	(to)->end = (from)->end;\
 	memcpy((to)->array, (from)->array, (from)->capacity*sizeof(typeof(*((from)->array))));}}
 
-
+//check if "queue" (not pointer) has the element "elem"
 #define queue_find(queue, elem) ({\
 	int kkk = 0;\
 	for (kkk = 0; kkk < (queue).size; kkk++) {\
