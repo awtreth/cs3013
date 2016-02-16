@@ -116,3 +116,22 @@ void free_kitchen(kitchen_t *kitchen) {
 	}
 }
 
+void init_kitchen2(kitchen2_t *kitchen) {
+	int i;
+	
+	for (i = 0; i < N_STATIONS; i++) {
+		pthread_mutex_init(&kitchen->station_mtx[i], NULL);
+		pthread_mutex_init(&kitchen->sleep_mtx[i], NULL);
+		pthread_cond_init(&kitchen->sleep_cv[i], NULL);
+	}
+}
+
+void free_kitchen2(kitchen2_t *kitchen) {
+	int i;
+	
+	for (i = 0; i < N_STATIONS; i++) {
+		pthread_mutex_destroy(&kitchen->station_mtx[i]);
+		pthread_mutex_destroy(&kitchen->sleep_mtx[i]);
+		pthread_cond_destroy(&kitchen->sleep_cv[i]);
+	}
+}

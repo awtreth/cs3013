@@ -13,10 +13,10 @@
 
 //PROBLEM PARAMETERS
 #define N_RECIPES	5
-#define MAX_ORDERS	30
+#define MAX_ORDERS	5
 #define N_CHEFS		3
-#define MIN_ORDER_TIME 5
-#define MAX_ORDER_TIME 20
+#define MIN_ORDER_TIME 1
+#define MAX_ORDER_TIME 3
 
 
 #define TIME_UNIT 1 //in milliseconds 
@@ -32,7 +32,7 @@ queue_order_t order_queue;
 queue_int chef_queue;//the first element has the oldest order
 
 //has information about the stations (include synchronization tools)
-kitchen_t kitchen;
+kitchen2_t kitchen;
 
 //Store the intention of movement for each chef
 intention_t intention[N_CHEFS];//automatically initialized with zeros because it's global
@@ -95,7 +95,7 @@ int main (int argc, char **argv) {
 	load_recipes(recipes, N_RECIPES, "recipes.txt");
 	queue_init(&order_queue, MAX_ORDERS);
 	queue_init(&chef_queue, N_CHEFS);
-	init_kitchen(&kitchen);
+	init_kitchen2(&kitchen);
 
 	//Initialize global semaphores
 	pthread_mutex_init(&available_orders_mtx, NULL);
@@ -126,7 +126,7 @@ int main (int argc, char **argv) {
 	//Free all dinamically allocated memory
 	queue_free(&order_queue);
 	queue_free(&chef_queue);
-	free_kitchen(&kitchen);
+	free_kitchen2(&kitchen);
 	for (i = 0; i < N_RECIPES; i++)
 		recipe_free(&recipes[i]);
 	
@@ -189,7 +189,7 @@ void* chef(void* arg) {
 	printf("Initialized chef %d\n", chef.id);
 	
 	//auxiliar variables
-	int i, j;
+	int i;
 	int target_station, next_station;
 	
 	//while there are orders to be received
@@ -229,7 +229,11 @@ print_recipe(chef.order.recipe);
 			target_station = chef.order.recipe.steps[i-1].station;//the station I want to go in the current step
 			
 printf("Chef %d is waiting for station %d\n", chef.id, target_station);
-			order_sem_wait(&kitchen.station_sem[target_station]);//wait the station to be freed
+			pthread_mutex_lock(&kitchen.sleep_mtx[target_station]);
+			if(kitchen.sleepers[target_station])
+				pthread_cond_wait(&kitchen.sleep_cv[target_station], &kitchen.sleep_mtx[target_station]);
+			
+			//order_sem_wait(&kitchen.station_sem[target_station]);//wait the station to be freed
 //printf("Chef %d passed semaphore of station %d\n", chef.id, target_station);
 		
 			if(i < chef.order.recipe.nsteps) {//not last step
@@ -239,8 +243,8 @@ printf("Chef %d is waiting for station %d\n", chef.id, target_station);
 				if(check_dead_lock(chef.id, target_station, next_station)){//==TRUE
 //printf("Chef %d identified deadlock when it tried to enter station %d\n", chef.id, target_station);
 printf("Chef %d slept trying to enter station %d\n", chef.id, target_station);
-					order_sem_post(&kitchen.station_sem[target_station]); //allow the next
-					order_sem_wait(&kitchen.sleep_sem[target_station]);//go to sleep (it is awaken when a chef leaves the station)
+					pthread_cond_wait(&kitchen.sleep_cv[target_station], &kitchen.sleep_mtx[target_station]);
+					pthread_mutex_unlock(&kitchen.sleep_mtx[target_station]);
 printf("Chef %d was awaken\n", chef.id);
 					i--;//to repeat the loop on the same step
 					continue;
@@ -262,9 +266,9 @@ printf("Chef %d is safe to enter to enter station %d\n", chef.id, target_station
 			
 			if(i > 1) {//not the first step
 				//free sleeping chefs
-				for(j = 0; j < kitchen.sleep_sem[chef.station].size; j++)
-					order_sem_post(&kitchen.sleep_sem[chef.station]);
-				order_sem_post(&kitchen.station_sem[chef.station]); //allow the next
+				kitchen.sleepers[chef.station]=0;
+				pthread_cond_broadcast(&kitchen.sleep_cv[chef.station]);
+				pthread_mutex_unlock(&kitchen.sleep_mtx[chef.station]); //allow the next
 			}
 			chef.station = target_station;//update chef station
 			
@@ -283,9 +287,9 @@ printf("Chef %d has just finished to use station %d\n", chef.id, target_station)
 		pthread_mutex_unlock(&chef_queue_mtx);
 		
 		//free sleeping chefs of the last station
-		for(j = 0; j < kitchen.sleep_sem[chef.station].size; j++)
-			order_sem_post(&kitchen.sleep_sem[chef.station]);
-		order_sem_post(&kitchen.station_sem[chef.station]); //allow the next
+		kitchen.sleepers[chef.station]=0;
+		pthread_cond_broadcast(&kitchen.sleep_cv[chef.station]);
+		pthread_mutex_unlock(&kitchen.sleep_mtx[chef.station]); //allow the next
 		
 printf("Chef %d finished order %d\n", chef.id, chef.order.number);
 	}
