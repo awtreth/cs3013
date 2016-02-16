@@ -13,7 +13,7 @@
 
 //PROBLEM PARAMETERS
 #define N_RECIPES	5
-#define MAX_ORDERS	10
+#define MAX_ORDERS	30
 #define N_CHEFS		3
 #define MIN_ORDER_TIME 5
 #define MAX_ORDER_TIME 20
@@ -305,7 +305,7 @@ int check_dead_lock(int chef_id, station_id target, station_id next) {
 	
 printf("check_dead_lock chef %d\n", chef_id);
 	
-	int i = 0, ret;
+	int i = 0, j, ret;
 	
 	queue_int remaining_chefs;//chefs with orders that are older than the caller chef order
 	queue_init(&remaining_chefs, N_CHEFS);
@@ -325,6 +325,20 @@ printf("check_dead_lock chef %d\n", chef_id);
 	
 	//check deadlock
 	ret = check_dead_lock_aux(target, next, remaining_chefs);
+	
+	int n_chefs_in = 0;
+	if(ret == 0) {
+		for (i = 0; i < remaining_chefs.size; i++) {//for each chef with older orders
+			for (j = 0; j < N_STATIONS; j++) {//for all station
+				if(intention[queue_get(remaining_chefs, i)].link[j][target])
+					n_chefs_in++;
+			}
+		}
+		if(n_chefs_in >= N_CHEFS-1){
+			printf("Special dead-lock for chef %d\n", chef_id);
+			ret = 1;
+		}
+	}
 	
 	//post intention semaphores
 	for(i = 0; i < remaining_chefs.size; i++)
