@@ -83,7 +83,7 @@ int main (int argc, char **argv) {
 	int i = 0;//auxiliar variable
 	
 	//Define random seed for all functions that use "rand" function
-	srand(1232);
+	srand(time(NULL));
 
 	//Load Global variables
 	load_recipes(recipes, N_RECIPES, "recipes.txt");
@@ -259,7 +259,7 @@ printf("Chef %d has just finished to use station %d\n", chef.id, target_station)
 			order_sem_post(&kitchen.sleep_sem[chef.station]);
 		order_sem_post(&kitchen.station_sem[chef.station]); //allow the next
 		
-printf("Chef %d finished order\n", chef.id);
+printf("Chef %d finished order %d\n", chef.id, chef.order.number);
 	}
 	
 printf("Chef %d noticed that there is not more remaining orders. Then, he went back to his home\n", chef.id);/**/
