@@ -78,9 +78,9 @@ void init_kitchen(kitchen_t *kitchen);
 void free_kitchen(kitchen_t *kitchen);
 
 typedef struct  {
-	pthread_mutex_t station_mtx[N_STATIONS];
+	//pthread_mutex_t station_mtx[N_STATIONS];
 	pthread_mutex_t sleep_mtx[N_STATIONS];
-	int sleepers[N_STATIONS];
+	//int sleepers[N_STATIONS];
 	pthread_cond_t sleep_cv[N_STATIONS];
 	chef_t chef[N_STATIONS];
 } kitchen2_t;

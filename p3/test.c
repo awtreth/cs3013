@@ -30,7 +30,7 @@ void* fnc(void* arg) {
 
 int main() {
 
-	int i, value;
+	int value;
 	
 	queue_int q1, q2;
 	

@@ -13,7 +13,7 @@
 
 //PROBLEM PARAMETERS
 #define N_RECIPES	5
-#define MAX_ORDERS	5
+#define MAX_ORDERS	100
 #define N_CHEFS		3
 #define MIN_ORDER_TIME 1
 #define MAX_ORDER_TIME 3
@@ -89,7 +89,8 @@ int main (int argc, char **argv) {
 	int i = 0;//auxiliar variable
 	
 	//Define random seed for all functions that use "rand" function
-	srand(time(NULL));
+	if(argc>1) srand(atoi(argv[1]));
+	else srand(time(NULL));
 
 	//Load Global variables
 	load_recipes(recipes, N_RECIPES, "recipes.txt");
@@ -230,8 +231,8 @@ print_recipe(chef.order.recipe);
 			
 printf("Chef %d is waiting for station %d\n", chef.id, target_station);
 			pthread_mutex_lock(&kitchen.sleep_mtx[target_station]);
-			if(kitchen.sleepers[target_station])
-				pthread_cond_wait(&kitchen.sleep_cv[target_station], &kitchen.sleep_mtx[target_station]);
+			//if(kitchen.sleepers[target_station])
+				//pthread_cond_wait(&kitchen.sleep_cv[target_station], &kitchen.sleep_mtx[target_station]);
 			
 			//order_sem_wait(&kitchen.station_sem[target_station]);//wait the station to be freed
 //printf("Chef %d passed semaphore of station %d\n", chef.id, target_station);
@@ -266,7 +267,7 @@ printf("Chef %d is safe to enter to enter station %d\n", chef.id, target_station
 			
 			if(i > 1) {//not the first step
 				//free sleeping chefs
-				kitchen.sleepers[chef.station]=0;
+				//kitchen.sleepers[chef.station]=0;
 				pthread_cond_broadcast(&kitchen.sleep_cv[chef.station]);
 				pthread_mutex_unlock(&kitchen.sleep_mtx[chef.station]); //allow the next
 			}
@@ -287,7 +288,7 @@ printf("Chef %d has just finished to use station %d\n", chef.id, target_station)
 		pthread_mutex_unlock(&chef_queue_mtx);
 		
 		//free sleeping chefs of the last station
-		kitchen.sleepers[chef.station]=0;
+		//kitchen.sleepers[chef.station]=0;
 		pthread_cond_broadcast(&kitchen.sleep_cv[chef.station]);
 		pthread_mutex_unlock(&kitchen.sleep_mtx[chef.station]); //allow the next
 		

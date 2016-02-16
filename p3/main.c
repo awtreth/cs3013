@@ -83,8 +83,9 @@ int main (int argc, char **argv) {
 	int i = 0;//auxiliar variable
 	
 	//Define random seed for all functions that use "rand" function
-	srand(time(NULL));
-
+	if(argc>1) srand(atoi(argv[1]));
+	else srand(time(NULL));
+	
 	//Load Global variables
 	load_recipes(recipes, N_RECIPES, "recipes.txt");
 	queue_init(&order_queue, MAX_ORDERS);
@@ -234,7 +235,8 @@ printf("Chef %d is safe to enter to enter station %d\n", chef.id, target_station
 			
 			if(i > 1) {//not the first step
 				//free sleeping chefs
-				for(j = 0; j < kitchen.sleep_sem[chef.station].size; j++)
+				int n_sleepers = kitchen.sleep_sem[chef.station].size;
+				for(j = 0; j < n_sleepers; j++)
 					order_sem_post(&kitchen.sleep_sem[chef.station]);
 				order_sem_post(&kitchen.station_sem[chef.station]); //allow the next
 			}
@@ -255,7 +257,8 @@ printf("Chef %d has just finished to use station %d\n", chef.id, target_station)
 		sem_post(&chef_queue_sem);
 		
 		//free sleeping chefs of the last station
-		for(j = 0; j < kitchen.sleep_sem[chef.station].size; j++)
+		int n_sleepers = kitchen.sleep_sem[chef.station].size;
+		for(j = 0; j < n_sleepers; j++)
 			order_sem_post(&kitchen.sleep_sem[chef.station]);
 		order_sem_post(&kitchen.station_sem[chef.station]); //allow the next
 		
