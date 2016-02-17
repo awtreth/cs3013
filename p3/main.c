@@ -17,6 +17,7 @@
 #define MIN_ORDER_TIME 5
 #define MAX_ORDER_TIME 15
 
+//IMPLEMENTED WITH SEMAPHORES
 
 #define TIME_UNIT 1 //in milliseconds 
 

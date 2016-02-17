@@ -19,6 +19,9 @@
 
 #define TIME_UNIT 1 //in milliseconds 
 
+//IMPLEMENTED WITH MUTEXES/CONDITION VARIABLES
+
+
 //GLOBAL VARIABLES
 //store the constant recipes
 recipe_t recipes[N_RECIPES];//it will be constant along all the program
@@ -100,7 +103,7 @@ int main (int argc, char **argv) {
 	queue_init(&chef_queue, N_CHEFS);
 	init_kitchen2(&kitchen);
 
-	//Initialize global semaphores
+	//Initialize global mutexes and condition variables
 	pthread_mutex_init(&available_orders_mtx, NULL);
 	pthread_mutex_init(&remaining_orders_mtx, NULL);
 	pthread_cond_init(&available_orders_cv, NULL);
@@ -133,7 +136,7 @@ int main (int argc, char **argv) {
 	for (i = 0; i < N_RECIPES; i++)
 		recipe_free(&recipes[i]);
 	
-	//Destroy all semaphores
+	//Destroy all condition variables and condition variables
 	pthread_mutex_destroy(&available_orders_mtx);
 	pthread_mutex_destroy(&remaining_orders_mtx);
 	
@@ -198,7 +201,7 @@ void* chef(void* arg) {
 	//while there are orders to be received
 	while(1) {
 		pthread_mutex_lock(&remaining_orders_mtx);
-		if(remaining_orders == 0) {
+		if(remaining_orders == 0) {//no more orders will arrive
 			pthread_mutex_unlock(&remaining_orders_mtx);
 			break;
 		}
@@ -206,7 +209,7 @@ void* chef(void* arg) {
 		pthread_mutex_unlock(&remaining_orders_mtx);
 		
 		pthread_mutex_lock(&available_orders_mtx);
-		if(available_orders==0)
+		if(available_orders==0)//no order to be consumed
 			pthread_cond_wait(&available_orders_cv, &available_orders_mtx);
 		available_orders--;
 		pthread_mutex_unlock(&available_orders_mtx);
@@ -233,30 +236,25 @@ print_recipe(recipes[chef.order.recipe_id]);
 			
 printf("Chef %d is waiting for station %d\n", chef.id, target_station);
 			pthread_mutex_lock(&kitchen.sleep_mtx[target_station]);
-			//if(kitchen.sleepers[target_station])
-				//pthread_cond_wait(&kitchen.sleep_cv[target_station], &kitchen.sleep_mtx[target_station]);
 			
-			//order_sem_wait(&kitchen.station_sem[target_station]);//wait the station to be freed
-//printf("Chef %d passed semaphore of station %d\n", chef.id, target_station);
-		
 			if(i < recipes[chef.order.recipe_id].nsteps) {//not last step
 				next_station = recipes[chef.order.recipe_id].steps[i].station;//the station of the next step
 			
 				//Check if the next movevement of a certain chef will generate a deadlock
 				if(check_dead_lock(chef.id, target_station, next_station, i-1)){//==TRUE
-//printf("Chef %d identified deadlock when it tried to enter station %d\n", chef.id, target_station);
 printf("Chef %d slept trying to enter station %d\n", chef.id, target_station);
 					pthread_cond_wait(&kitchen.sleep_cv[target_station], &kitchen.sleep_mtx[target_station]);
 					pthread_mutex_unlock(&kitchen.sleep_mtx[target_station]);
 printf("Chef %d was woken up\n", chef.id);
 					i--;//to repeat the loop on the same step
 					continue;
-				}//ELSE
-			}
+				}
+			}//ELSE
+			
 			//NOW, the chef has aquired the desired station
 			
 			if(i >= 2) {//not the first step
-				//remove the intention from the old station to the new one
+				//remove the intention of the old station to the new one
 				pthread_mutex_lock(&intention_mtx[chef.id]);
 				rem_intention(&intention[chef.id], recipes[chef.order.recipe_id].steps[i-2].station, target_station);
 				pthread_mutex_unlock(&intention_mtx[chef.id]);
@@ -264,7 +262,6 @@ printf("Chef %d was woken up\n", chef.id);
 printf("Chef %d is safe to enter to enter station %d\n", chef.id, target_station);
 			
 			//update kitchen
-			
 			int chef_station = chef.station;
 			chef.station = target_station;//update chef station
 			kitchen.chef[target_station] = chef;//update the new station
@@ -272,8 +269,7 @@ printf("Chef %d is safe to enter to enter station %d\n", chef.id, target_station
 			if(i > 1) {//not the first step
 				kitchen.chef[chef_station].id = -1;//the old station is now free
 				print_kitchen2(kitchen);
-				//free sleeping chefs
-				//kitchen.sleepers[chef.station]=0;
+				//release sleeping chefs
 				pthread_cond_broadcast(&kitchen.sleep_cv[chef_station]);
 				pthread_mutex_unlock(&kitchen.sleep_mtx[chef_station]); //allow the next
 			}else
@@ -293,13 +289,13 @@ printf("Chef %d has just finished to use station %d\n", chef.id, target_station)
 		queue_rem(&chef_queue, idx);
 		pthread_mutex_unlock(&chef_queue_mtx);
 		
+		//update kitchen
 		int chef_station = chef.station;
 		chef.station = -1;//update chef station
 		kitchen.chef[chef_station].id = -1;
 		print_kitchen2(kitchen);
 		
-		//free sleeping chefs of the last station
-		//kitchen.sleepers[chef.station]=0;
+		//release sleeping chefs of the last station
 		pthread_cond_broadcast(&kitchen.sleep_cv[chef_station]);
 		pthread_mutex_unlock(&kitchen.sleep_mtx[chef_station]); //allow the next
 		
@@ -362,18 +358,20 @@ printf("check_dead_lock chef %d\n", chef_id);
 		queue_push(&remaining_chefs, chef);
 	}while(1);
 	
+	//Special case detection (if it's the third chef, check if the other 2 intend to go to the target station
 	if(remaining_chefs.size==2 && step == 0) {
 		for (i = 0; i < remaining_chefs.size; i++) {//for each chef with older orders
 			for (j = 0; j < N_STATIONS; j++) {//for all station
 				if(intention[queue_get(remaining_chefs, i)].link[j][target]){
-					ret++;
+					ret++;//count incoming chef
 					//break;
 				}
 			}
 			//if(ret)break;
 		}
 	}//else {
-	if(ret<2){
+	
+	if(ret<2){//not special case
 		//aquire access to the intentions
 		for(i = 0; i < remaining_chefs.size; i++)
 			pthread_mutex_lock(&intention_mtx[queue_get(remaining_chefs, i)]);
