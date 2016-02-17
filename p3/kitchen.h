@@ -43,7 +43,7 @@ void print_recipe(recipe_t recipe);
 int load_recipes(recipe_t recipes[], unsigned int size, const char* filename);
 
 typedef struct{
-	recipe_t recipe;
+	int recipe_id;
 	int number;
 } order_t;
 define_queue(order_t);//queue_order_t
@@ -76,6 +76,8 @@ typedef struct  {
 void init_kitchen(kitchen_t *kitchen);
 
 void free_kitchen(kitchen_t *kitchen);
+
+void print_kitchen(kitchen_t kitchen);
 
 typedef struct  {
 	//pthread_mutex_t station_mtx[N_STATIONS];

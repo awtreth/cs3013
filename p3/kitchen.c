@@ -103,7 +103,7 @@ void init_kitchen(kitchen_t *kitchen) {
 	
 	for (i = 0; i < N_STATIONS; i++) {
 		order_sem_init(&kitchen->station_sem[i], 1, N_STATIONS);
-		order_sem_init(&kitchen->sleep_sem[i], 0, N_STATIONS);
+		order_sem_init(&kitchen->sleep_sem[i], 0, 3);
 	}
 }
 
@@ -115,6 +115,16 @@ void free_kitchen(kitchen_t *kitchen) {
 		order_sem_destroy(&kitchen->sleep_sem[i]);
 	}
 }
+
+void print_kitchen(kitchen_t kitchen){
+	int i;
+	printf("KITCHEN\n");
+	for (i = 0; i < N_STATIONS; i++) {
+		printf("Station %d; chef %d\n", i, kitchen.chef[i].id);
+	}
+}
+
+
 
 void init_kitchen2(kitchen2_t *kitchen) {
 	int i;

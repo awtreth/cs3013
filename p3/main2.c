@@ -13,7 +13,7 @@
 
 //PROBLEM PARAMETERS
 #define N_RECIPES	5
-#define MAX_ORDERS	100
+#define MAX_ORDERS	30
 #define N_CHEFS		3
 #define MIN_ORDER_TIME 1
 #define MAX_ORDER_TIME 3
@@ -72,7 +72,7 @@ int check_dead_lock_aux(station_id target, station_id from, queue_int remaining_
  * 
  * @return 1-TRUE; 0-FALSE
  */
-int check_dead_lock(int chef_id, station_id target, station_id next);
+int check_dead_lock(int chef_id, station_id target, station_id next, int step);
 
 
 //OrderThread: Take care of order generation and queueing
@@ -162,7 +162,7 @@ void* order(void* arg) {
 		
 		recipe_number = uniform_rand(0, N_RECIPES-1);//pick one recipe randomly
 		
-		current_order.recipe = recipes[recipe_number];
+		current_order.recipe_id = recipe_number;
 		
 		//Push the recipe to the order_queue
 		pthread_mutex_lock(&order_queue_mtx);
@@ -213,12 +213,12 @@ void* chef(void* arg) {
 		pthread_mutex_lock(&order_queue_mtx);
 		chef.order = queue_pop(&order_queue);
 		pthread_mutex_unlock(&order_queue_mtx);
-printf("Chef %d received order %d (recipe %d)\n", chef.id, chef.order.number, chef.order.recipe.id);
-print_recipe(chef.order.recipe);
+printf("Chef %d received order %d (recipe %d)\n", chef.id, chef.order.number, chef.order.recipe_id);
+print_recipe(recipes[chef.order.recipe_id]);
 		
 		//update the movement intentions
-		for(i = 1; i < chef.order.recipe.nsteps; i++) 
-			add_intention(&intention[chef.id], chef.order.recipe.steps[i-1].station, chef.order.recipe.steps[i].station);
+		for(i = 1; i < recipes[chef.order.recipe_id].nsteps; i++) 
+			add_intention(&intention[chef.id], recipes[chef.order.recipe_id].steps[i-1].station, recipes[chef.order.recipe_id].steps[i].station);
 		
 		//Put yourself at the end of the queue of the chefs with assigned orders
 		pthread_mutex_lock(&chef_queue_mtx);
@@ -226,8 +226,8 @@ print_recipe(chef.order.recipe);
 		pthread_mutex_unlock(&chef_queue_mtx);
 		
 		//ALREADY SET, NOW IT WILL PREPARE FOR MOVES
-		for (i = 1; i <= chef.order.recipe.nsteps; i++) {
-			target_station = chef.order.recipe.steps[i-1].station;//the station I want to go in the current step
+		for (i = 1; i <= recipes[chef.order.recipe_id].nsteps; i++) {
+			target_station = recipes[chef.order.recipe_id].steps[i-1].station;//the station I want to go in the current step
 			
 printf("Chef %d is waiting for station %d\n", chef.id, target_station);
 			pthread_mutex_lock(&kitchen.sleep_mtx[target_station]);
@@ -237,11 +237,11 @@ printf("Chef %d is waiting for station %d\n", chef.id, target_station);
 			//order_sem_wait(&kitchen.station_sem[target_station]);//wait the station to be freed
 //printf("Chef %d passed semaphore of station %d\n", chef.id, target_station);
 		
-			if(i < chef.order.recipe.nsteps) {//not last step
-				next_station = chef.order.recipe.steps[i].station;//the station of the next step
+			if(i < recipes[chef.order.recipe_id].nsteps) {//not last step
+				next_station = recipes[chef.order.recipe_id].steps[i].station;//the station of the next step
 			
 				//Check if the next movevement of a certain chef will generate a deadlock
-				if(check_dead_lock(chef.id, target_station, next_station)){//==TRUE
+				if(check_dead_lock(chef.id, target_station, next_station, i-1)){//==TRUE
 //printf("Chef %d identified deadlock when it tried to enter station %d\n", chef.id, target_station);
 printf("Chef %d slept trying to enter station %d\n", chef.id, target_station);
 					pthread_cond_wait(&kitchen.sleep_cv[target_station], &kitchen.sleep_mtx[target_station]);
@@ -256,7 +256,7 @@ printf("Chef %d was awaken\n", chef.id);
 			if(i >= 2) {//not the first step
 				//remove the intention from the old station to the new one
 				pthread_mutex_lock(&intention_mtx[chef.id]);
-				rem_intention(&intention[chef.id], chef.order.recipe.steps[i-2].station, target_station);
+				rem_intention(&intention[chef.id], recipes[chef.order.recipe_id].steps[i-2].station, target_station);
 				pthread_mutex_unlock(&intention_mtx[chef.id]);
 			}
 printf("Chef %d is safe to enter to enter station %d\n", chef.id, target_station);
@@ -274,7 +274,7 @@ printf("Chef %d is safe to enter to enter station %d\n", chef.id, target_station
 			chef.station = target_station;//update chef station
 			
 			//Use the station
-			usleep(TIME_UNIT*chef.order.recipe.steps[i-1].duration*1000);
+			usleep(TIME_UNIT*recipes[chef.order.recipe_id].steps[i-1].duration*1000);
 printf("Chef %d has just finished to use station %d\n", chef.id, target_station);
 			
 		}
@@ -334,11 +334,11 @@ printf("found deadlock with chef %d, from %d to %d\n", i, from, j);
 } 
 
 //Check if the next movevement of a certain chef will generate a deadlock
-int check_dead_lock(int chef_id, station_id target, station_id next) {
+int check_dead_lock(int chef_id, station_id target, station_id next, int step) {
 	
 printf("check_dead_lock chef %d\n", chef_id);
 	
-	int i = 0, j, ret;
+	int i = 0, j, ret = 0;
 	
 	queue_int remaining_chefs;//chefs with orders that are older than the caller chef order
 	queue_init(&remaining_chefs, N_CHEFS);
@@ -350,33 +350,33 @@ printf("check_dead_lock chef %d\n", chef_id);
 		if(chef==chef_id) break;//we just want the chefs with older orders then chef_id's chef
 		queue_push(&remaining_chefs, chef);
 	}while(1);
-	pthread_mutex_unlock(&chef_queue_mtx);
 	
-	//aquire access to the intentions
-	for(i = 0; i < remaining_chefs.size; i++)
-		pthread_mutex_lock(&intention_mtx[queue_get(remaining_chefs, i)]);
-	
-	//check deadlock
-	ret = check_dead_lock_aux(target, next, remaining_chefs);
-	
-	int n_chefs_in = 0;
-	if(ret == 0) {
+	if(remaining_chefs.size==2 && step == 0) {
 		for (i = 0; i < remaining_chefs.size; i++) {//for each chef with older orders
 			for (j = 0; j < N_STATIONS; j++) {//for all station
-				if(intention[queue_get(remaining_chefs, i)].link[j][target])
-					n_chefs_in++;
+				if(intention[queue_get(remaining_chefs, i)].link[j][target]){
+					printf("Chef %d found special deadlock\n", chef_id);
+					ret=1;
+					break;
+				}
 			}
+			if(ret)break;
 		}
-		if(n_chefs_in >= N_CHEFS-1){
-			printf("Special dead-lock for chef %d\n", chef_id);
-			ret = 1;
-		}
+	}else {
+	
+		//aquire access to the intentions
+		for(i = 0; i < remaining_chefs.size; i++)
+			pthread_mutex_lock(&intention_mtx[queue_get(remaining_chefs, i)]);
+		
+		//check deadlock
+		ret = check_dead_lock_aux(target, next, remaining_chefs);
+	
+		//post intention semaphores
+		for(i = 0; i < remaining_chefs.size; i++)
+			pthread_mutex_unlock(&intention_mtx[queue_get(remaining_chefs, i)]);
 	}
 	
-	//post intention semaphores
-	for(i = 0; i < remaining_chefs.size; i++)
-		pthread_mutex_unlock(&intention_mtx[queue_get(remaining_chefs, i)]);
-	
+	pthread_mutex_unlock(&chef_queue_mtx);
 	queue_free(&remaining_chefs);
 	
 	return ret;
