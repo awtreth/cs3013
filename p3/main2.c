@@ -9,15 +9,13 @@
 #include "kitchen.h"
 #include "order_sem.h"
 #include "queue.h"
-#include "aux.h"
 
 //PROBLEM PARAMETERS
 #define N_RECIPES	5
 #define MAX_ORDERS	30
 #define N_CHEFS		3
-#define MIN_ORDER_TIME 1
-#define MAX_ORDER_TIME 3
-
+#define MIN_ORDER_TIME 5
+#define MAX_ORDER_TIME 15
 
 #define TIME_UNIT 1 //in milliseconds 
 
@@ -37,18 +35,22 @@ kitchen2_t kitchen;
 //Store the intention of movement for each chef
 intention_t intention[N_CHEFS];//automatically initialized with zeros because it's global
 
-//SEMAPHORES
-//sem_t available_orders; //increased by order and decreased by chefs
-//sem_t remaining_orders; //decreased by chefs
+//MUTEXES AND CONDITION VARIABLES
 int available_orders = 0;
 int remaining_orders = MAX_ORDERS;
-pthread_mutex_t available_orders_mtx;  //order_queue control acces semaphore
+pthread_mutex_t available_orders_mtx;  //order_queue control acces mtx
 pthread_cond_t available_orders_cv;
 pthread_mutex_t remaining_orders_mtx; //mutual exclusion of chef_queue
 
-pthread_mutex_t order_queue_mtx;  //order_queue control acces semaphore
+pthread_mutex_t order_queue_mtx;  //order_queue control acces mtx
 pthread_mutex_t chef_queue_mtx; //mutual exclusion of chef_queue
 pthread_mutex_t intention_mtx[N_CHEFS]; //mutual exclusion of intention (for each chef)
+
+
+//Auxiliar function (return a random number between low and high)
+int uniform_rand(int low, int high) {
+	return rand()%(abs(high-low)+1)+low;
+}
 
 
 /* Auxiliar function for check_dead_lock
@@ -246,7 +248,7 @@ printf("Chef %d is waiting for station %d\n", chef.id, target_station);
 printf("Chef %d slept trying to enter station %d\n", chef.id, target_station);
 					pthread_cond_wait(&kitchen.sleep_cv[target_station], &kitchen.sleep_mtx[target_station]);
 					pthread_mutex_unlock(&kitchen.sleep_mtx[target_station]);
-printf("Chef %d was awaken\n", chef.id);
+printf("Chef %d was woken up\n", chef.id);
 					i--;//to repeat the loop on the same step
 					continue;
 				}//ELSE
@@ -318,7 +320,7 @@ int check_dead_lock_aux(station_id target, station_id from, queue_int remaining_
 		for (j = 0; j < N_STATIONS; j++) {//for all station
 			if(intention[queue_get(remaining_chefs, i)].link[from][j]){//if someone wants to go from the "from" station to somewhere
 				if(j == target) {//if this "somewhere" station is the target
-printf("found deadlock with chef %d, from %d to %d\n", i, from, j);
+printf("found deadlock with chef %d, from %d to %d\n", queue_get(remaining_chefs, i), from, j);
 					return 1;//it's a deadlock
 				}else{
 					//maybe there is a multi-level dead-lock
@@ -364,7 +366,6 @@ printf("check_dead_lock chef %d\n", chef_id);
 		for (i = 0; i < remaining_chefs.size; i++) {//for each chef with older orders
 			for (j = 0; j < N_STATIONS; j++) {//for all station
 				if(intention[queue_get(remaining_chefs, i)].link[j][target]){
-					printf("Chef %d found special deadlock\n", chef_id);
 					ret++;
 					//break;
 				}
@@ -383,7 +384,8 @@ printf("check_dead_lock chef %d\n", chef_id);
 		//post intention semaphores
 		for(i = 0; i < remaining_chefs.size; i++)
 			pthread_mutex_unlock(&intention_mtx[queue_get(remaining_chefs, i)]);
-	}
+	}else
+		printf("Chef %d found special deadlock\n", chef_id);
 	
 	pthread_mutex_unlock(&chef_queue_mtx);
 	queue_free(&remaining_chefs);

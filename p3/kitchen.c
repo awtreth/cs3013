@@ -104,6 +104,7 @@ void init_kitchen(kitchen_t *kitchen) {
 	for (i = 0; i < N_STATIONS; i++) {
 		order_sem_init(&kitchen->station_sem[i], 1, N_STATIONS);
 		order_sem_init(&kitchen->sleep_sem[i], 0, 3);
+		kitchen->chef[i].id = -1;
 	}
 }
 
@@ -134,6 +135,7 @@ void init_kitchen2(kitchen2_t *kitchen) {
 		//pthread_mutex_init(&kitchen->station_mtx[i], NULL);
 		pthread_mutex_init(&kitchen->sleep_mtx[i], NULL);
 		pthread_cond_init(&kitchen->sleep_cv[i], NULL);
+		kitchen->chef[i].id = -1;
 	}
 }
 
