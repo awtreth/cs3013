@@ -262,16 +262,20 @@ printf("Chef %d was awaken\n", chef.id);
 printf("Chef %d is safe to enter to enter station %d\n", chef.id, target_station);
 			
 			//update kitchen
-			kitchen.chef[chef.station].id = -1;//the old station is now free
+			
+			int chef_station = chef.station;
+			chef.station = target_station;//update chef station
 			kitchen.chef[target_station] = chef;//update the new station
 			
 			if(i > 1) {//not the first step
+				kitchen.chef[chef_station].id = -1;//the old station is now free
+				print_kitchen2(kitchen);
 				//free sleeping chefs
 				//kitchen.sleepers[chef.station]=0;
-				pthread_cond_broadcast(&kitchen.sleep_cv[chef.station]);
-				pthread_mutex_unlock(&kitchen.sleep_mtx[chef.station]); //allow the next
-			}
-			chef.station = target_station;//update chef station
+				pthread_cond_broadcast(&kitchen.sleep_cv[chef_station]);
+				pthread_mutex_unlock(&kitchen.sleep_mtx[chef_station]); //allow the next
+			}else
+				print_kitchen2(kitchen);
 			
 			//Use the station
 			usleep(TIME_UNIT*recipes[chef.order.recipe_id].steps[i-1].duration*1000);
@@ -287,10 +291,15 @@ printf("Chef %d has just finished to use station %d\n", chef.id, target_station)
 		queue_rem(&chef_queue, idx);
 		pthread_mutex_unlock(&chef_queue_mtx);
 		
+		int chef_station = chef.station;
+		chef.station = -1;//update chef station
+		kitchen.chef[chef_station].id = -1;
+		print_kitchen2(kitchen);
+		
 		//free sleeping chefs of the last station
 		//kitchen.sleepers[chef.station]=0;
-		pthread_cond_broadcast(&kitchen.sleep_cv[chef.station]);
-		pthread_mutex_unlock(&kitchen.sleep_mtx[chef.station]); //allow the next
+		pthread_cond_broadcast(&kitchen.sleep_cv[chef_station]);
+		pthread_mutex_unlock(&kitchen.sleep_mtx[chef_station]); //allow the next
 		
 printf("Chef %d finished order %d\n", chef.id, chef.order.number);
 	}
@@ -356,14 +365,14 @@ printf("check_dead_lock chef %d\n", chef_id);
 			for (j = 0; j < N_STATIONS; j++) {//for all station
 				if(intention[queue_get(remaining_chefs, i)].link[j][target]){
 					printf("Chef %d found special deadlock\n", chef_id);
-					ret=1;
-					break;
+					ret++;
+					//break;
 				}
 			}
-			if(ret)break;
+			//if(ret)break;
 		}
-	}else {
-	
+	}//else {
+	if(ret<2){
 		//aquire access to the intentions
 		for(i = 0; i < remaining_chefs.size; i++)
 			pthread_mutex_lock(&intention_mtx[queue_get(remaining_chefs, i)]);

@@ -91,4 +91,6 @@ void init_kitchen2(kitchen2_t *kitchen);
 
 void free_kitchen2(kitchen2_t *kitchen);
 
+void print_kitchen2(kitchen2_t kitchen);
+
 #endif

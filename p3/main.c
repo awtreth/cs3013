@@ -44,7 +44,6 @@ sem_t order_queue_sem;  //order_queue control acces semaphore
 sem_t chef_queue_sem; //mutual exclusion of chef_queue
 sem_t intention_sem[N_CHEFS]; //mutual exclusion of intention (for each chef)
 
-
 /* Auxiliar function for check_dead_lock
  * 
  * It basically recursively checks if the there is another chef that is going to
@@ -230,19 +229,21 @@ printf("Chef %d was awaken\n", chef.id);
 printf("Chef %d is safe to enter to enter station %d\n", chef.id, target_station);
 			
 			//update kitchen
-			kitchen.chef[chef.station].id = -1;//the old station is now free
+			int chef_station = chef.station;
+			chef.station = target_station;//update chef station
 			kitchen.chef[target_station] = chef;//update the new station
 			
 			if(i > 1) {//not the first step
+				kitchen.chef[chef_station].id = -1;//the old station is now free
+				print_kitchen(kitchen);
 				//free sleeping chefs
-				int n_sleepers = kitchen.sleep_sem[chef.station].size;
+				int n_sleepers = kitchen.sleep_sem[chef_station].size;
 				for(j = 0; j < n_sleepers; j++)
-					order_sem_post(&kitchen.sleep_sem[chef.station]);
-				order_sem_post(&kitchen.station_sem[chef.station]); //allow the next
-			}
-			chef.station = target_station;//update chef station
+					order_sem_post(&kitchen.sleep_sem[chef_station]);
+				order_sem_post(&kitchen.station_sem[chef_station]); //allow the next
+			}else
+				print_kitchen(kitchen);
 			
-			print_kitchen(kitchen);
 			
 			//Use the station
 			usleep(TIME_UNIT*recipes[chef.order.recipe_id].steps[i-1].duration*1000);
@@ -258,11 +259,17 @@ printf("Chef %d has just finished to use station %d\n", chef.id, target_station)
 		queue_rem(&chef_queue, idx);
 		sem_post(&chef_queue_sem);
 		
+		
+		int chef_station = chef.station;
+		chef.station = -1;//update chef station
+		kitchen.chef[chef_station].id = -1;
+		print_kitchen(kitchen);
+		
 		//free sleeping chefs of the last station
-		int n_sleepers = kitchen.sleep_sem[chef.station].size;
+		int n_sleepers = kitchen.sleep_sem[chef_station].size;
 		for(j = 0; j < n_sleepers; j++)
-			order_sem_post(&kitchen.sleep_sem[chef.station]);
-		order_sem_post(&kitchen.station_sem[chef.station]); //allow the next
+			order_sem_post(&kitchen.sleep_sem[chef_station]);
+		order_sem_post(&kitchen.station_sem[chef_station]); //allow the next
 		
 printf("Chef %d finished order %d\n", chef.id, chef.order.number);
 	}
@@ -331,13 +338,14 @@ printf("check_dead_lock chef %d\n", chef_id);
 			for (j = 0; j < N_STATIONS; j++) {//for all station
 				if(intention[queue_get(remaining_chefs, i)].link[j][target]){
 					printf("Chef %d found special deadlock\n", chef_id);
-					ret=1;
-					break;
+					ret++;
+					//break;
 				}
 			}
-			if(ret)break;
+			//if(ret)break;
 		}
-	}else {
+	}
+	if (ret < 2){
 		//aquire access to the intentions
 		for(i = 0; i < remaining_chefs.size; i++)
 			sem_wait(&intention_sem[queue_get(remaining_chefs, i)]);

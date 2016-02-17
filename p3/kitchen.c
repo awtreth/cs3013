@@ -118,10 +118,11 @@ void free_kitchen(kitchen_t *kitchen) {
 
 void print_kitchen(kitchen_t kitchen){
 	int i;
-	printf("KITCHEN\n");
+	printf("KITCHEN: ");
 	for (i = 0; i < N_STATIONS; i++) {
-		printf("Station %d; chef %d\n", i, kitchen.chef[i].id);
+		printf("%d ", kitchen.chef[i].id);
 	}
+	printf("\n");
 }
 
 
@@ -144,4 +145,13 @@ void free_kitchen2(kitchen2_t *kitchen) {
 		pthread_mutex_destroy(&kitchen->sleep_mtx[i]);
 		pthread_cond_destroy(&kitchen->sleep_cv[i]);
 	}
+}
+
+void print_kitchen2(kitchen2_t kitchen){
+	int i;
+	printf("KITCHEN: ");
+	for (i = 0; i < N_STATIONS; i++) {
+		printf("%d ", kitchen.chef[i].id);
+	}
+	printf("\n");
 }
