@@ -24,15 +24,38 @@ typedef struct {
 	uint8_t where;//R-S-H bits
 	uint8_t ram_addr;
 	uint8_t ssd_addr;
+	//we don't need for hdd
 } page_entry_t;
 
-void set_bit(int* number, int pos, int bit_value) {
-	if(bit_value) *number |= (1 << pos);
-	else *number &= ~(1 << pos);
+uint32_t ram_bitmap;//32 bits (use the first 25)
+uint32_t ssd_bitmap[4];//128 bits (use the first 100)
+//we don't need for hhd
+
+
+//GENERIC BIT OPERATIONS
+//bitmap can be a sigle integer or an array
+int find_empty(uint32_t* bitmap, int from, int size){
+	
+	int i = from;
+	
+	do {
+		if( !(bitmap[i/size] & (1 << i%size)) ){
+			//manage page table and allocate memory
+			return i;
+		}
+		i = (i+1)%size;
+	}while(i!=from);
+	
+	return -1;
 }
 
-int get_bit(int* number, int pos){
-	return *number & (1 << pos);
+void set_bit(uint32_t* number, int pos, int bit_value, int size) {
+	if(bit_value) number[pos/size] |= (1 << pos%size);
+	else number[pos/size] &= ~(1 << pos%size);
+}
+
+int get_bit(uint32_t* number, int pos, int size){
+	return number[pos/size] & (1 << pos%size);
 }
 
 page_entry_t page_table[PAGE_TABLE_SIZE];
