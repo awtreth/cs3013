@@ -13,10 +13,11 @@ void memoryMaxer(int n) {
 	for (i = 0; i < n; ++i) {
 		indexes[i] = create_page();
 		uint32_t value = get_value(indexes[i], &valid);
+		printf("valid=%d value=%d\n", valid, value);
 		value = (i * 3);
 		store_value(indexes[i], &value);
 		print_page_table();
-		print_bitmaps();
+		print_mem_maps();
 		print_memory_all();
 	}
 	
@@ -25,12 +26,11 @@ void memoryMaxer(int n) {
 	}
 	
 	print_page_table();
-	print_bitmaps();
+	print_mem_maps();
 	print_memory_all();
 }
 
 int main() {
-	
 	
 	memoryMaxer(20);
 	

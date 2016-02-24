@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <time.h>
 
 //CONSTANTS
 
@@ -13,13 +14,6 @@
 
 #define PAGE_TABLE_SIZE HDD_SIZE
 
-#define M_BIT 0
-#define R_BIT 1
-
-#define RAM_BIT 0
-#define SSD_BIT 1
-#define HDD_BIT 2
-
 //Access time (in seconds)
 #define TIME_FACTOR 100
 #define RAM_TIME .01/TIME_FACTOR
@@ -28,19 +22,34 @@
 
 
 //STRUCTURE
+#define RAM_BIT 0
+#define SSD_BIT 1
+#define HDD_BIT 2
+
+#define NULL_VADDR -1
 
 typedef struct {
-	uint8_t flags;//Modified-Referenced
-	uint8_t where;//R-S-H bits
+	uint8_t flags;
 	uint8_t ram_addr;
 	uint8_t ssd_addr;
 	//we don't need for hdd (vAddr directly maps to hdd_m)
 } page_entry_t;
 
-page_entry_t page_table[PAGE_TABLE_SIZE];//indexed by vAddr
-vAddr ram_map[RAM_SIZE];
-vAddr ssd_map[SSD_SIZE];
+typedef struct{
+	uint8_t cursor;//Track the current position for FIFO and second chance eviction algorithm implementation
+	uint8_t size;
+	vAddr *map;
+} mem_map_t;
 
+vAddr ram_map_[] = {[0 ... RAM_SIZE]=NULL_VADDR};
+vAddr ssd_map_[] = {[0 ... SSD_SIZE]=NULL_VADDR};
+
+mem_map_t ram_map = {0, RAM_SIZE, ram_map_ };
+mem_map_t ssd_map = {0, SSD_SIZE, ssd_map_ };
+//we don't need for hhd (vAddr directly maps to hdd_m)
+
+
+page_entry_t page_table[PAGE_TABLE_SIZE];//indexed by vAddr
 
 //Memory contents
 uint32_t ram_m[RAM_SIZE];
@@ -48,158 +57,113 @@ uint32_t ssd_m[SSD_SIZE];
 uint32_t hdd_m[HDD_SIZE];
 
 
-
-uint32_t ram_bitmap;//32 bits (use the first 25)
-uint32_t ssd_bitmap[4];//128 bits (use the first 100)
-//we don't need for hhd (vAddr directly maps to hdd_m)
-
-//Track the current position for FIFO and second chance eviction algorithm implementation
-int  ptable_cursor = 0;//cursor along page_table for create_page_table
-int  ram_cursor = 0;//cursor along ram_bitmap
-int  ssd_cursor = 0;//cursor along ssd_bitmap
-
-//GENERIC BIT OPERATIONS
-//bitmap can be a sigle integer or an array
-int find_empty(uint32_t* bitmap, int* cursor, int size){
+int find_slot(mem_map_t* mem_map){
 	
-	int i = *cursor;//get the current value of the cursor
+	int i = mem_map->cursor;//get the current value of the cursor
 	
 	do {
-		if( !(bitmap[i/size] & (1 << i%size)) ){//if it's zero
-			*cursor = (i+1)%size;//update cursor
+		if( mem_map->map[i] == NULL_VADDR){//not addressed
+			mem_map->cursor = (i+1)%mem_map->size;//update cursor
 			return i;//return the memory position
 		}
-		i = (i+1)%size;//increment iterator (circular way)
-	}while(i != *cursor);//checked all the memory
+		i = (i+1)%mem_map->size;//increment iterator (circular way)
+	}while(i != mem_map->cursor);//checked all the memory
 	
-	return -1;
+	//select vAddress to be evicted: TODO
+	
+	//FIFO
+	mem_map->cursor = (i+1)%mem_map->size;
+	return i;
 }
 
 //Generic bitset function
 /*
- * @param number: pointer to the number (or array) - start point
- * @param pos: bit position from the start point
+ * @param number: pointer to the number
+ * @param pos: bit position
  * @param bit_value: 0 or !0
- * @param size: size of the provided bitmap (number)
  */
-void set_bit(uint32_t* number, int pos, int bit_value, int size) {
-	if(bit_value) number[pos/size] |= (1 << pos%size);
-	else number[pos/size] &= ~(1 << pos%size);
+void set_bit(uint8_t* number, int pos, int bit_value) {
+	if(bit_value) *number |= (1 << pos);
+	else *number &= ~(1 << pos);
 }
 
 //Generic bitget function
 /*
- * @param number: pointer to the number (or array) - start point
- * @param pos: bit position from the start point
- * @param size: size of the provided bitmap (number)  in bits
+ * @param number: pointer to the number
+ * @param pos: bit position
  * 
  * @return bit value (1 or 0)
  */
-int get_bit(uint32_t* number, int pos, int size){
-	return (number[pos/size] & (1 << pos%size))&&1;
+int get_bit(uint8_t number, int pos){
+	return (number & (1 << pos)) && 1;
 }
 
 //Auxiliar function (return a random number between low and high)
 int uniform_rand(int low, int high) {
+	static int flag=1;
+	if(flag) {srand(time(NULL)); flag = 0;}
 	return rand()%(abs(high-low)+1)+low;
 }
 
-
-
-//AUXILIAR MEMORY MANAGEMENT FUNCTIONS
-
-/* Find a page to be evicted using FIFO algorithm
- * 
- * @param mem_bit:  where you want to evict from (RAM_BIT or SSD_BIT)
- * @param mem_size: RAM_SIZE or SSD_SIZE (based on mem_bit)
- * 
- * @return the evicted vAddr (page table is properly updated)
- */
-vAddr find_evict_first(int mem_bit, int mem_size) {
-	int i = ptable_cursor;
+//Evict the page in ram_addr position in RAM memory
+int evict(int ram_addr) {
 	
-	do {
-		if( get_bit((uint32_t*) &page_table[i].where, mem_bit, 3) ){
-			//ptable_cursor = (i+1)%PAGE_TABLE_SIZE;
-			return i;
-		}
-		i = (i+1)%PAGE_TABLE_SIZE;
-	}while(i!=ptable_cursor);
+	int ssd_addr;
 	
-	return -1;//not supposed to reach this position
-}
-
-
-int evict() {
-	int ssd_maddr;
-	vAddr ram_evicted_address, ssd_evicted_address;
+	ssd_addr = find_slot(&ssd_map);//find a place in ssd to put the evicted page
 	
-	//Virtual address of the process to be evicted from ram
-	ram_evicted_address = find_evict_first(RAM_BIT, RAM_SIZE); 
-	
-	printf("evicted %d from ram\n", ram_evicted_address);
-	
-	//vAddr in ssd. Potencially can be evicted from ssd
-	ssd_maddr = find_empty(&ssd_bitmap[0], &ssd_cursor, SSD_SIZE);
-	
-	if(ssd_maddr < 0) {//full
-		ssd_evicted_address = find_evict_first(SSD_BIT, SSD_SIZE);
-		ssd_maddr =  page_table[ssd_evicted_address].ssd_addr;
-		
-		printf("evicted %d from ssd\n", ssd_evicted_address);
-		//Copy from SSD to HDD
-		
-		//set bits in page table
-		set_bit((uint32_t*) &page_table[ssd_evicted_address].where, SSD_BIT, 0, 3);//take out from ssd
-		set_bit((uint32_t*) &page_table[ssd_evicted_address].where, HDD_BIT, 1, 3);//put into hdd
-		
-		//access time
-		usleep(HDD_TIME*1e6 + SSD_TIME*1e6);
-		
-		//copy the values
-		hdd_m[ssd_evicted_address] = ssd_m[ssd_maddr];
-	}else {
-		set_bit(&ssd_bitmap[0], ssd_maddr, 1, SSD_SIZE);
+	if (ssd_map.map[ssd_addr] != NULL_VADDR) {//if this address is not free
+		//EVICT FROM SSD TO HDD
+		//update page table
+		set_bit(&page_table[ssd_map.map[ssd_addr]].flags, SSD_BIT, 0);
+		set_bit(&page_table[ssd_map.map[ssd_addr]].flags, HDD_BIT, 1);
+		//update the memories itself
+		usleep(HDD_TIME*1e6 + SSD_TIME*1e6);//access time
+		hdd_m[ssd_map.map[ssd_addr]] = ssd_m[ssd_addr];
 	}
-	//print_bitmap(&ssd_bitmap[0], SSD_SIZE);
-	//printf("\n");
-	//Copy from RAM to SSD
 	
-	//set bits in page table
-	set_bit((uint32_t*) &page_table[ram_evicted_address].where, RAM_BIT, 0, 3);
-	set_bit((uint32_t*) &page_table[ram_evicted_address].where, SSD_BIT, 1, 3);
+	//EVICT FROM RAM TO SSD
+	//update page table
+	set_bit(&page_table[ram_map.map[ram_addr]].flags, RAM_BIT, 0);//unset RAM_BIT
+	set_bit(&page_table[ram_map.map[ram_addr]].flags, SSD_BIT, 1);//set SSD_BIT
+	page_table[ram_map.map[ram_addr]].ssd_addr = ssd_addr;//update ssd_addr in page_table
 	
-	//access time
-	usleep(RAM_TIME*1e6 + SSD_TIME*1e6);
+	//update mem_maps
+	ssd_map.map[ssd_addr] = ram_map.map[ram_addr];//copy vAddr
+	ram_map.map[ram_addr] = NULL_VADDR;//clean ram vAddr (not necessary, because it will be filled later)
 	
-	//copy the values
-	page_table[ram_evicted_address].ssd_addr = ssd_maddr;
-	ssd_m[ssd_maddr] = ram_m[page_table[ram_evicted_address].ram_addr];
+	//update the memories itself
+	usleep(RAM_TIME*1e6 + SSD_TIME*1e6);//access time
+	ssd_m[ssd_addr] = ram_m[ram_addr];
 
-	return page_table[ram_evicted_address].ram_addr;//return evicted ram_addr
+	return 0;
 }
 
-int page_fault(vAddr address){
-	int ram_addr = find_empty(&ram_bitmap, &ram_cursor, RAM_SIZE);
-	if(ram_addr<0)
-		ram_addr = evict();
-	else
-		set_bit(&ram_bitmap, ram_addr, 1, RAM_SIZE);
+int page_fault(vAddr address){//assume the specified page is not in RAM
+	int ram_addr = find_slot(&ram_map);//find a place in ssd to put the evicted page;
 	
-	page_table[address].ram_addr = ram_addr;
+	if(ram_map.map[ram_addr] != NULL_VADDR)
+		evict(ram_addr);
+	//ram_addr is free
 	
-	set_bit((uint32_t*) &page_table[address].where, RAM_BIT, 1, 3);
-	
-	if(get_bit((uint32_t*) &page_table[address].where, SSD_BIT, 3)) {
-		//set bits in page table
-		set_bit((uint32_t*) &page_table[address].where, SSD_BIT, 0, 3);
-		set_bit(&ssd_bitmap[0], page_table[address].ssd_addr, 0, SSD_SIZE);
+	if(get_bit(page_table[address].flags, SSD_BIT)){//if it is on SSD
+		
+		set_bit(&page_table[address].flags, SSD_BIT, 0);//unset page_table SSD_BIT
+		ssd_map.map[page_table[address].ssd_addr] = NULL_VADDR;//update ssd_map 
+		
 		usleep( (RAM_TIME+SSD_TIME)*1e6 );
 		ram_m[ram_addr] = ssd_m[page_table[address].ssd_addr];
-	}else {//assume HHD_BIT = 1
+	}else { //assume HDD_BIT is set
 		usleep( (RAM_TIME+HDD_TIME)*1e6 );
+		set_bit(&page_table[address].flags, HDD_BIT, 0);//unset page_table HDD_BIT
 		ram_m[ram_addr] = hdd_m[address];
 	}
+	
+	ram_map.map[ram_addr] = address;//update ram_map
+	
+	//update page table
+	page_table[address].ram_addr = ram_addr;//update ram_addr in page_table
+	set_bit(&page_table[address].flags, RAM_BIT, 1);//set RAM_BIT in page_table
 	
 	return ram_addr;
 }
@@ -208,24 +172,25 @@ int page_fault(vAddr address){
 //API functions
 
 vAddr create_page() {
+	static int ptable_cursor = 0;
+	
 	int i = ptable_cursor;
 	
 	do{
-		if(!page_table[i].where){//not used page-table
+		if(!(page_table[i].flags & (0b111)) ){//not used page-table
 			//update page table
-			ptable_cursor = (i+1)%PAGE_TABLE_SIZE;
 			
-			set_bit((uint32_t*) &page_table[i].where, RAM_BIT, 1, 3);			
+			int ram_addr = find_slot(&ram_map);
 			
-			int ram_addr = find_empty(&ram_bitmap, &ram_cursor, RAM_SIZE);
+			if (ram_map.map[ram_addr] != NULL_VADDR)
+				evict(ram_addr);
 			
-			if (ram_addr < 0)
-				ram_addr = evict();
-			else
-				set_bit(&ram_bitmap, ram_addr, 1, RAM_SIZE); 
-				
+			//update page table
+			set_bit(&page_table[i].flags, RAM_BIT, 1);			
+			ram_map.map[ram_addr] = i; 
 			page_table[i].ram_addr = ram_addr;
 			
+			ptable_cursor = (i+1)%PAGE_TABLE_SIZE;
 			return i;
 		}
 		i = (i+1)%PAGE_TABLE_SIZE;
@@ -236,13 +201,16 @@ vAddr create_page() {
 }
 
 
-
-
-
 uint32_t get_value(vAddr address, int* valid) {
+	if(address < 0 || address >= PAGE_TABLE_SIZE){
+		*valid = 0;
+		return 0 ;
+	}
+	
 	int ram_addr;
-	if(page_table[address].where) {
-		if(get_bit((uint32_t*) &page_table[address].where, RAM_BIT, 3)){
+	
+	if(page_table[address].flags & (0b111)) {//it's somewhere
+		if(get_bit(page_table[address].flags, RAM_BIT)){
 			ram_addr = page_table[address].ram_addr;
 		}else{
 			ram_addr = page_fault(address);
@@ -258,9 +226,12 @@ uint32_t get_value(vAddr address, int* valid) {
 }
 
 void store_value(vAddr address, uint32_t *value) {
+	if(address < 0 || address >= PAGE_TABLE_SIZE)
+		return;
+	
 	int ram_addr;
-	if(page_table[address].where) {
-		if(get_bit((uint32_t*) &page_table[address].where, RAM_BIT, 3)){
+	if(page_table[address].flags & (0b111)) {
+		if(get_bit(page_table[address].flags, RAM_BIT)){
 			ram_addr = page_table[address].ram_addr;
 		}else{
 			ram_addr = page_fault(address);
@@ -273,49 +244,47 @@ void store_value(vAddr address, uint32_t *value) {
 
 void free_page(vAddr address) {
 	
-	if(get_bit((uint32_t*) &page_table[address].where, RAM_BIT, 3))
-		set_bit(&ram_bitmap, page_table[address].ram_addr, 0, RAM_SIZE);
-	
-	if(get_bit((uint32_t*) &page_table[address].where, SSD_BIT, 3))
-		set_bit(&ssd_bitmap[0], page_table[address].ssd_addr, 0, SSD_SIZE);
-	
-	page_table[address].flags = 0;
-	page_table[address].where = 0;
-	page_table[address].ram_addr = 0;
-	page_table[address].ssd_addr = 0;
-}
+	if(0 <= address && address < PAGE_TABLE_SIZE) {
+		if(get_bit(page_table[address].flags, RAM_BIT))
+			ram_map.map[page_table[address].ram_addr] = NULL_VADDR;
 
-
-//PRINTING FUNCTIONS
-//size of the provided bitmap (number)  in bits
-void print_bitmap(uint32_t* bitmap, int size) {
-	int i;
-	for (i = 0; i < size; i++)
-		printf("%d", get_bit(bitmap, i, size));
+		if(get_bit(page_table[address].flags, SSD_BIT))
+			ssd_map.map[page_table[address].ssd_addr] = NULL_VADDR;
+			
+			page_table[address].flags = 0;
+			page_table[address].ram_addr = 0;
+			page_table[address].ssd_addr = 0;
+	}
 }
 
 void print_page_entry(page_entry_t entry) {
-	print_bitmap((uint32_t*)&entry.flags, 2);
-	printf(" | ");
-	print_bitmap((uint32_t*)&entry.where, 3);
+	int i;
+	for (i = 0; i < 3; i++)
+		printf("%d", get_bit(entry.flags, i));
 	printf(" | %d | %d\n", entry.ram_addr, entry.ssd_addr);
 }
 
 void print_page_table() {
 	int j;
 			
-	for (j = 0; j < PAGE_TABLE_SIZE; j++)
+	for (j = 0; j < PAGE_TABLE_SIZE; j++){
+		printf("%d) ", j);
 		print_page_entry(page_table[j]);
+	}
 }
 
-void print_bitmaps() {
-	print_bitmap(&ram_bitmap, RAM_SIZE);
-	printf("\n");
-	print_bitmap(&ssd_bitmap[0], SSD_SIZE);
+void print_mem_map(mem_map_t mem_map) {
+	int i;
+	printf("%d | ", mem_map.cursor);
+	for (i = 0; i < mem_map.size; i++)
+		printf("%d ", mem_map.map[i]);
 	printf("\n");
 }
 
-
+void print_mem_maps() {
+	print_mem_map(ram_map);
+	print_mem_map(ssd_map);
+}
 
 //print memory content (specify which memory: ram_m, ssd_m or hdd_m)
 void print_memory(uint32_t* mem, int size){

@@ -19,6 +19,6 @@ void print_memory_all();
 
 void print_page_table();
 
-void print_bitmaps();
+void print_mem_maps();
 
 #endif
