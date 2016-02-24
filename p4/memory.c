@@ -28,6 +28,15 @@
 
 #define NULL_VADDR -1
 
+#define RANDOM_STRATEGY			0
+#define FIFO_STRATEGY			1
+#define SECOND_CHANCE_STRATEGY	2
+
+
+#define STRATEGY RANDOM_STRATEGY
+
+
+
 typedef struct {
 	uint8_t flags;
 	uint8_t ram_addr;
@@ -56,6 +65,14 @@ uint32_t ram_m[RAM_SIZE];
 uint32_t ssd_m[SSD_SIZE];
 uint32_t hdd_m[HDD_SIZE];
 
+#if STRATEGY == RANDOM_STRATEGY
+//Auxiliar function (return a random number between low and high)
+int uniform_rand(int low, int high) {
+	static int flag=1;
+	if(flag) {srand(time(NULL)); flag = 0;}
+	return rand()%(abs(high-low))+low;
+}
+#endif
 
 int find_slot(mem_map_t* mem_map){
 	
@@ -69,11 +86,19 @@ int find_slot(mem_map_t* mem_map){
 		i = (i+1)%mem_map->size;//increment iterator (circular way)
 	}while(i != mem_map->cursor);//checked all the memory
 	
-	//select vAddress to be evicted: TODO
-	
-	//FIFO
+	//select vAddress to be evicted
 	mem_map->cursor = (i+1)%mem_map->size;
+
+#if STRATEGY == RANDOM_STRATEGY
+	return uniform_rand(0, mem_map->size);	
+	
+#elif STRATEGY == FIFO_STRATEGY
+	//FIFO
 	return i;
+#elif STRATEGY == SECOND_CHANCE_STRATEGY
+
+#endif
+
 }
 
 //Generic bitset function
@@ -98,12 +123,7 @@ int get_bit(uint8_t number, int pos){
 	return (number & (1 << pos)) && 1;
 }
 
-//Auxiliar function (return a random number between low and high)
-int uniform_rand(int low, int high) {
-	static int flag=1;
-	if(flag) {srand(time(NULL)); flag = 0;}
-	return rand()%(abs(high-low)+1)+low;
-}
+
 
 //Evict the page in ram_addr position in RAM memory
 int evict(int ram_addr) {
@@ -111,8 +131,10 @@ int evict(int ram_addr) {
 	int ssd_addr;
 	
 	ssd_addr = find_slot(&ssd_map);//find a place in ssd to put the evicted page
+	printf("evicted from ram_addr %d to ssd_addr %d\n", ram_addr, ssd_addr);
 	
 	if (ssd_map.map[ssd_addr] != NULL_VADDR) {//if this address is not free
+		printf("evicted from ssd_addr %d to hdd_addr %d\n", ssd_addr, ssd_map.map[ssd_addr]);
 		//EVICT FROM SSD TO HDD
 		//update page table
 		set_bit(&page_table[ssd_map.map[ssd_addr]].flags, SSD_BIT, 0);
@@ -130,7 +152,7 @@ int evict(int ram_addr) {
 	
 	//update mem_maps
 	ssd_map.map[ssd_addr] = ram_map.map[ram_addr];//copy vAddr
-	ram_map.map[ram_addr] = NULL_VADDR;//clean ram vAddr (not necessary, because it will be filled later)
+	ram_map.map[ram_addr] = NULL_VADDR;//clean ram vAddr
 	
 	//update the memories itself
 	usleep(RAM_TIME*1e6 + SSD_TIME*1e6);//access time
