@@ -32,9 +32,38 @@ void memoryMaxer(int n) {
 
 int main() {
 	
-	memoryMaxer(20);
+	//memoryMaxer(20);
 	
+	vAddr address[15];
+	int i, valid;
+	uint32_t value;
 	
+	for (i = 0; i < 15; i++){
+		address[i] = create_page();
+		value = (i+1)*2;
+		store_value(address[i], &value);
+		print_page_table();
+		print_mem_maps();
+		print_memory_all();
+	}
+	/*print_page_table();
+	print_mem_maps();
+	print_memory_all();/**/
+	
+	//value = 789;
+	printf("got %d\n",get_value(address[10], &valid));
+	print_page_table();
+	print_mem_maps();
+	print_memory_all();
+	printf("got %d\n",get_value(address[0], &valid));
+	print_page_table();
+	print_mem_maps();
+	print_memory_all();
+	printf("got %d\n",get_value(address[6], &valid));
+	print_page_table();
+	print_mem_maps();
+	print_memory_all();
+
 	
 	return 0;
 }
