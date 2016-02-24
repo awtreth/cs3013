@@ -3,30 +3,38 @@
 
 #include "memory.h"
 
-void memoryMaxer() {
+void memoryMaxer(int n) {
 	
 	int i;
+	int valid;
 	
-	vAddr indexes[1000];
+	vAddr indexes[n];
 	
-	for (i = 0; i < 1000; ++i) {
+	for (i = 0; i < n; ++i) {
 		indexes[i] = create_page();
-		uint32_t *value = get_value(indexes[i]);
-		*value = (i * 3);
-		store_value(indexes[i], value);
+		uint32_t value = get_value(indexes[i], &valid);
+		value = (i * 3);
+		store_value(indexes[i], &value);
+		print_page_table();
+		print_bitmaps();
+		print_memory_all();
 	}
 	
-	for (i = 0; i < 1000; ++i) {
+	for (i = 0; i < n; ++i) {
 		free_page(indexes[i]);
 	}
+	
+	print_page_table();
+	print_bitmaps();
+	print_memory_all();
 }
 
 int main() {
 	
-	int i;
 	
-	for (i = 0; i < 15; i++)
-		create_page();
+	memoryMaxer(20);
+	
+	
 	
 	return 0;
 }
