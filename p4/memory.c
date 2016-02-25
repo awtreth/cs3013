@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <time.h>
+#include <pthread.h>
 
 //CONSTANTS
 
@@ -36,7 +37,6 @@
 
 #define STRATEGY SECOND_CHANCE_STRATEGY
 
-
 typedef struct {
 	uint8_t flags;
 	uint8_t ram_addr;
@@ -48,31 +48,32 @@ typedef struct{
 	uint8_t cursor;//Track the current position for FIFO and second chance eviction algorithm implementation
 	uint8_t size;
 	vAddr *map;
+	pthread_mutex_t *mtx;
 } mem_map_t;
 
+pthread_mutex_t ptable_mtx[PAGE_TABLE_SIZE];
+pthread_mutex_t ram_mtx[RAM_SIZE];
+pthread_mutex_t ssd_mtx[SSD_SIZE];
 vAddr ram_map_[] = {[0 ... RAM_SIZE]=NULL_VADDR};
 vAddr ssd_map_[] = {[0 ... SSD_SIZE]=NULL_VADDR};
 
-mem_map_t ram_map = {0, RAM_SIZE, ram_map_ };
-mem_map_t ssd_map = {0, SSD_SIZE, ssd_map_ };
+mem_map_t ram_map = {0, RAM_SIZE, ram_map_, ram_mtx};
+mem_map_t ssd_map = {0, SSD_SIZE, ssd_map_, ssd_mtx};
 //we don't need for hhd (vAddr directly maps to hdd_m)
 
-
 page_entry_t page_table[PAGE_TABLE_SIZE];//indexed by vAddr
+
+
 
 //Memory contents
 uint32_t ram_m[RAM_SIZE];
 uint32_t ssd_m[SSD_SIZE];
 uint32_t hdd_m[HDD_SIZE];
 
-#if STRATEGY == RANDOM_STRATEGY
 //Auxiliar function (return a random number between low and high)
 int uniform_rand(int low, int high) {
-	static int flag=1;
-	if(flag) {srand(time(NULL)); flag = 0;}
 	return rand()%(abs(high-low))+low;
 }
-#endif
 
 
 //Generic bitset function
@@ -97,28 +98,16 @@ int get_bit(uint8_t number, int pos){
 	return (number & (1 << pos)) && 1;
 }
 
-int find_slot(mem_map_t* mem_map){
-	
-	int i = mem_map->cursor;//get the current value of the cursor
-	
-	do {
-		if( mem_map->map[i] == NULL_VADDR){//not addressed
-			mem_map->cursor = (i+1)%mem_map->size;//update cursor
-			return i;//return the memory position
-		}
-		i = (i+1)%mem_map->size;//increment iterator (circular way)
-	}while(i != mem_map->cursor);//checked all the memory
-	
-
-#if STRATEGY == RANDOM_STRATEGY
-	return uniform_rand(0, mem_map->size);	
-	
-#elif STRATEGY == FIFO_STRATEGY
-	//FIFO
-	//select vAddress to be evicted
+int evict_select_random(mem_map_t* mem_map){
+	return uniform_rand(0, mem_map->size);
+}
+int evict_select_clock(mem_map_t* mem_map) {
+	int i = mem_map->cursor;
 	mem_map->cursor = (i+1)%mem_map->size;
 	return i;
-#elif STRATEGY == SECOND_CHANCE_STRATEGY
+}
+int evict_select_clock2(mem_map_t* mem_map) {
+	int i = mem_map->cursor;
 	do {
 		if(get_bit(page_table[mem_map->map[i]].flags, R_BIT)){//referenced
 			set_bit(&page_table[mem_map->map[i]].flags, R_BIT, 0);
@@ -134,8 +123,57 @@ int find_slot(mem_map_t* mem_map){
 	set_bit(&page_table[mem_map->map[i]].flags, R_BIT, 1);//set to one to mark it as a new page in ssd
 	mem_map->cursor = (i+1)%mem_map->size;
 	return i;
-#endif
+}
 
+int (*evict_select)(mem_map_t*);
+
+void init_memory(int eviction_method, int seed) {
+	
+	switch (eviction_method) {
+		case RANDOM_EVICT: evict_select = evict_select_random; break;
+		case CLOCK_EVICT: evict_select = evict_select_clock;   break;
+		case CLOCK2_EVICT: evict_select = evict_select_clock2; break;
+		default: break;
+	}
+	
+	int i;
+	for (i = 0; i < ram_map.size; i++)
+		pthread_mutex_init(&ram_map.mtx[i], NULL);
+		
+	for (i = 0; i < ssd_map.size; i++)
+		pthread_mutex_init(&ssd_map.mtx[i], NULL);
+		
+	for (i = 0; i < PAGE_TABLE_SIZE; i++)
+		pthread_mutex_init(&ptable_mtx[i], NULL);
+	
+	srand(seed);
+}
+
+void destroy_memory(){
+	int i;
+	for (i = 0; i < ram_map.size; i++)
+		pthread_mutex_destroy(&ram_map.mtx[i]);
+		
+	for (i = 0; i < ssd_map.size; i++)
+		pthread_mutex_destroy(&ssd_map.mtx[i]);
+		
+	for (i = 0; i < PAGE_TABLE_SIZE; i++)
+		pthread_mutex_destroy(&ptable_mtx[i]);
+}
+
+int find_slot(mem_map_t* mem_map){
+	
+	int i = mem_map->cursor;//get the current value of the cursor
+	
+	do {
+		if( mem_map->map[i] == NULL_VADDR){//not addressed
+			mem_map->cursor = (i+1)%mem_map->size;//update cursor
+			return i;//return the memory position
+		}
+		i = (i+1)%mem_map->size;//increment iterator (circular way)
+	}while(i != mem_map->cursor);//checked all the memory
+	
+	return (*evict_select)(mem_map);
 }
 
 void move_ram2ssd(int ram_addr, int ssd_addr) {
@@ -243,7 +281,6 @@ vAddr create_page() {
 			return i;
 		}
 		i = (i+1)%PAGE_TABLE_SIZE;
-	
 	}while(i != ptable_cursor);
 	
 	return -1;//memory is full
