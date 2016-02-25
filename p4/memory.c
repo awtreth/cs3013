@@ -31,12 +31,6 @@
 
 #define NULL_VADDR -1
 
-#define RANDOM_STRATEGY			0
-#define FIFO_STRATEGY			1
-#define SECOND_CHANCE_STRATEGY	2
-
-#define STRATEGY SECOND_CHANCE_STRATEGY
-
 typedef struct {
 	uint8_t flags;
 	uint8_t ram_addr;
@@ -44,10 +38,13 @@ typedef struct {
 	//we don't need for hdd (vAddr directly maps to hdd_m)
 } page_entry_t;
 
+//auxiliar struct
 typedef struct{
-	uint8_t cursor;//Track the current position for FIFO and second chance eviction algorithm implementation
+	uint8_t cursor;//Track the current position for clock and clock with 2nd chance eviction algorithms implementation
 	uint8_t size;
-	vAddr *map;
+	vAddr *map;//inverted real addres->vAddr (allow finding empty slots on memory and make it simpler to look at the pages of an specific memory. It's like a filter)
+		//It could be a bitmask. However, the evict a page from ram, for example, we would need to search through the entire page table, filtering the pages that are inside an specific memory.
+		//It could be a linked-list. However it would demand linked-list implementation
 	pthread_mutex_t *mtx;
 } mem_map_t;
 
