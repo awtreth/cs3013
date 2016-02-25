@@ -138,7 +138,19 @@ int find_slot(mem_map_t* mem_map){
 
 }
 
-
+void move_ram2ssd(int ram_addr, int ssd_addr) {
+	set_bit(&page_table[ram_map.map[ram_addr]].flags, RAM_BIT, 0);//unset RAM_BIT
+	set_bit(&page_table[ram_map.map[ram_addr]].flags, SSD_BIT, 1);//set SSD_BIT
+	page_table[ram_map.map[ram_addr]].ssd_addr = ssd_addr;//update ssd_addr in page_table
+	
+	//update mem_maps
+	ssd_map.map[ssd_addr] = ram_map.map[ram_addr];//copy vAddr
+	ram_map.map[ram_addr] = NULL_VADDR;//clean ram vAddr
+	
+	//update the memories itself
+	usleep(RAM_TIME*1e6 + SSD_TIME*1e6);//access time
+	ssd_m[ssd_addr] = ram_m[ram_addr];
+}
 
 //Evict the page in ram_addr position in RAM memory
 int evict(int ram_addr) {
@@ -160,25 +172,13 @@ int evict(int ram_addr) {
 	}
 	
 	//EVICT FROM RAM TO SSD
-	//update page table
-	set_bit(&page_table[ram_map.map[ram_addr]].flags, RAM_BIT, 0);//unset RAM_BIT
-	set_bit(&page_table[ram_map.map[ram_addr]].flags, SSD_BIT, 1);//set SSD_BIT
-	page_table[ram_map.map[ram_addr]].ssd_addr = ssd_addr;//update ssd_addr in page_table
-	
-	//update mem_maps
-	ssd_map.map[ssd_addr] = ram_map.map[ram_addr];//copy vAddr
-	ram_map.map[ram_addr] = NULL_VADDR;//clean ram vAddr
-	
-	//update the memories itself
-	usleep(RAM_TIME*1e6 + SSD_TIME*1e6);//access time
-	ssd_m[ssd_addr] = ram_m[ram_addr];
+	move_ram2ssd(ram_addr, ssd_addr);
 
 	return 0;
 }
 
 int page_fault(vAddr address){//assume the specified page is not in RAM
 	int ram_addr;
-	
 	
 	if(get_bit(page_table[address].flags, SSD_BIT)){//if it is on SSD
 		
@@ -190,8 +190,7 @@ int page_fault(vAddr address){//assume the specified page is not in RAM
 		
 		//evict after freeing ssd
 		ram_addr = find_slot(&ram_map);//find a place in RAM
-		if(ram_map.map[ram_addr] != NULL_VADDR)//not necesasry
-			evict(ram_addr);
+		move_ram2ssd(ram_addr, page_table[address].ssd_addr);
 		
 		printf("page_fault of page %d from ssd_addr %d to ram_addr %d\n", address, page_table[address].ssd_addr, ram_addr);
 		usleep( RAM_TIME*1e6 );
