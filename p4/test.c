@@ -32,7 +32,7 @@ void memoryMaxer(int n) {
 
 int main() {
 	
-	init_memory(RANDOM_EVICT, 1);
+	init_memory(CLOCK2_EVICT, 1);
 	
 	//memoryMaxer(20);
 	

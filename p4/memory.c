@@ -33,8 +33,7 @@
 
 typedef struct {
 	uint8_t flags;
-	uint8_t ram_addr;
-	uint8_t ssd_addr;
+	uint8_t addr;
 	//we don't need for hdd (vAddr directly maps to hdd_m)
 } page_entry_t;
 
@@ -176,7 +175,7 @@ int find_slot(mem_map_t* mem_map){
 void move_ram2ssd(int ram_addr, int ssd_addr) {
 	set_bit(&page_table[ram_map.map[ram_addr]].flags, RAM_BIT, 0);//unset RAM_BIT
 	set_bit(&page_table[ram_map.map[ram_addr]].flags, SSD_BIT, 1);//set SSD_BIT
-	page_table[ram_map.map[ram_addr]].ssd_addr = ssd_addr;//update ssd_addr in page_table
+	page_table[ram_map.map[ram_addr]].addr = ssd_addr;//update ssd_addr in page_table
 	
 	//update mem_maps
 	ssd_map.map[ssd_addr] = ram_map.map[ram_addr];//copy vAddr
@@ -218,16 +217,16 @@ int page_fault(vAddr address){//assume the specified page is not in RAM
 	if(get_bit(page_table[address].flags, SSD_BIT)){//if it is on SSD
 		
 		set_bit(&page_table[address].flags, SSD_BIT, 0);//unset page_table SSD_BIT
-		ssd_map.map[page_table[address].ssd_addr] = NULL_VADDR;//update ssd_map 
+		ssd_map.map[page_table[address].addr] = NULL_VADDR;//update ssd_map 
 		
 		usleep( SSD_TIME*1e6 );
-		uint32_t tmp = ssd_m[page_table[address].ssd_addr];
+		uint32_t tmp = ssd_m[page_table[address].addr];
 		
 		//evict after freeing ssd
 		ram_addr = find_slot(&ram_map);//find a place in RAM
-		move_ram2ssd(ram_addr, page_table[address].ssd_addr);
+		move_ram2ssd(ram_addr, page_table[address].addr);
 		
-		printf("page_fault of page %d from ssd_addr %d to ram_addr %d\n", address, page_table[address].ssd_addr, ram_addr);
+		printf("page_fault of page %d from ssd_addr %d to ram_addr %d\n", address, page_table[address].addr, ram_addr);
 		usleep( RAM_TIME*1e6 );
 		ram_m[ram_addr] = tmp;
 	}else { //assume HDD_BIT is set
@@ -246,7 +245,7 @@ int page_fault(vAddr address){//assume the specified page is not in RAM
 	ram_map.map[ram_addr] = address;//update ram_map
 	
 	//update page table
-	page_table[address].ram_addr = ram_addr;//update ram_addr in page_table
+	page_table[address].addr = ram_addr;//update ram_addr in page_table
 	set_bit(&page_table[address].flags, RAM_BIT, 1);//set RAM_BIT in page_table
 	
 	return ram_addr;
@@ -272,7 +271,7 @@ vAddr create_page() {
 			//update page table
 			set_bit(&page_table[i].flags, RAM_BIT, 1);			
 			ram_map.map[ram_addr] = i; 
-			page_table[i].ram_addr = ram_addr;
+			page_table[i].addr = ram_addr;
 			
 			ptable_cursor = (i+1)%PAGE_TABLE_SIZE;
 			return i;
@@ -294,7 +293,7 @@ uint32_t get_value(vAddr address, int* valid) {
 	
 	if(page_table[address].flags & (0b111)) {//it's somewhere
 		if(get_bit(page_table[address].flags, RAM_BIT)){
-			ram_addr = page_table[address].ram_addr;
+			ram_addr = page_table[address].addr;
 		}else{
 			ram_addr = page_fault(address);
 		}
@@ -316,7 +315,7 @@ void store_value(vAddr address, uint32_t *value) {
 	int ram_addr;
 	if(page_table[address].flags & (0b111)) {
 		if(get_bit(page_table[address].flags, RAM_BIT)){
-			ram_addr = page_table[address].ram_addr;
+			ram_addr = page_table[address].addr;
 		}else{
 			ram_addr = page_fault(address);
 		}
@@ -331,14 +330,13 @@ void free_page(vAddr address) {
 	
 	if(0 <= address && address < PAGE_TABLE_SIZE) {
 		if(get_bit(page_table[address].flags, RAM_BIT))
-			ram_map.map[page_table[address].ram_addr] = NULL_VADDR;
+			ram_map.map[page_table[address].addr] = NULL_VADDR;
 
 		if(get_bit(page_table[address].flags, SSD_BIT))
-			ssd_map.map[page_table[address].ssd_addr] = NULL_VADDR;
+			ssd_map.map[page_table[address].addr] = NULL_VADDR;
 			
 			page_table[address].flags = 0;
-			page_table[address].ram_addr = 0;
-			page_table[address].ssd_addr = 0;
+			page_table[address].addr = 0;
 	}
 }
 
@@ -346,7 +344,7 @@ void print_page_entry(page_entry_t entry) {
 	int i;
 	for (i = 0; i < N_FLAGS; i++)
 		printf("%d", get_bit(entry.flags, i));
-	printf(" | %d | %d\n", entry.ram_addr, entry.ssd_addr);
+	printf(" | %d\n", entry.addr);
 }
 
 void print_page_table() {
