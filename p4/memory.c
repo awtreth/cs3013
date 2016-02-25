@@ -260,21 +260,26 @@ vAddr create_page() {
 	int i = ptable_cursor;
 	
 	do{
-		if(!(page_table[i].flags & (0b111)) ){//not used page-table
-			//update page table
-			
-			int ram_addr = find_slot(&ram_map);
-			
-			if (ram_map.map[ram_addr] != NULL_VADDR)
-				evict(ram_addr);
-			
-			//update page table
-			set_bit(&page_table[i].flags, RAM_BIT, 1);			
-			ram_map.map[ram_addr] = i; 
-			page_table[i].addr = ram_addr;
-			
-			ptable_cursor = (i+1)%PAGE_TABLE_SIZE;
-			return i;
+		if(!pthread_mutex_trylock(&ptable_mtx[i])) {
+			if(!(page_table[i].flags & (0b111)) ){//not used page-table
+				//update page table
+				
+				int ram_addr = find_slot(&ram_map);
+				
+				if (ram_map.map[ram_addr] != NULL_VADDR)
+					evict(ram_addr);
+				
+				//update page table
+				set_bit(&page_table[i].flags, RAM_BIT, 1);			
+				ram_map.map[ram_addr] = i; 
+				page_table[i].addr = ram_addr;
+				
+				pthread_mutex_unlock(&ptable_mtx[i]);
+				
+				ptable_cursor = (i+1)%PAGE_TABLE_SIZE;
+				return i;
+			}//else
+			pthread_mutex_unlock(&ptable_mtx[i]);
 		}
 		i = (i+1)%PAGE_TABLE_SIZE;
 	}while(i != ptable_cursor);

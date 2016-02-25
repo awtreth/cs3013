@@ -40,7 +40,7 @@ int main() {
 	int i, valid;
 	uint32_t value;
 	
-	for (i = 0; i < 15; i++){
+	for (i = 0; i < 16; i++){
 		address[i] = create_page();
 		value = (i+1)*2;
 		store_value(address[i], &value);
