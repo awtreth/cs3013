@@ -91,15 +91,21 @@ int get_bit(uint8_t* number, int pos){
 /* Select the vAddr placed in mem_bit (RAM or SSD) memory
  */
 vAddr evict_select_random(int mem_bit){//assume memory is full
-	int i;
+	int i=0;
 	int mem_addr = uniform_rand(0, mem_map[mem_bit].size);//select a memory position
-	for (i = 0; i < PAGE_TABLE_SIZE; i++) {//go through all pages looking for the selected mem_addr
+	
+	while(i<PAGE_TABLE_SIZE) {//go through all pages looking for the selected mem_addr
+	
 		//TODO: ptable_mutex_lock
-		if(get_bit(&page_table[i].flags, mem_bit)) {//if it's in the specified memory
-			if(page_table[i].addr == (uint8_t)mem_addr) {//if addr matches
-				return i;//return the vAddr
+		if(get_bit(&page_table[i].flags, mem_bit) && page_table[i].addr == (uint8_t)mem_addr) {//if it's in the specified memory
+			pthread_mutex_lock(&ptable_mtx[i]);
+			if(!(get_bit(&page_table[i].flags, mem_bit) && page_table[i].addr == (uint8_t)mem_addr) ){
+				pthread_mutex_unlock(&ptable_mtx[i]);
+				continue;
 			}
+				return i;//return the vAddr
 		}
+		i++;
 	}
 	printf("Not supposed to be here. evict_select_random\n");
 	return mem_map[mem_bit].cursor;//not supposed to reach this position
@@ -204,7 +210,6 @@ int find_empty(int mem_bit){
 	static int last_empty[2] = {0,0};
 	int i = last_empty[mem_bit];
 	
-	printf("mem_bit = %d\n", mem_bit);
 	do {//TODO: mutual exclusion
 		if(!get_bit(mem_map[mem_bit].bitmap, i)) {//if it's zero
 			set_bit(mem_map[mem_bit].bitmap, i, 1);//set it to one
@@ -324,7 +329,9 @@ vAddr create_page() {
 				int ram_addr = find_empty(RAM_BIT);
 				
 				if (ram_addr < 0){
+					printf("before\n");
 					vAddr ram_evicted = evict_select(RAM_BIT);
+					printf("selected\n");
 					ram_addr = page_table[ram_evicted].addr;
 					evict(ram_evicted);
 				}
