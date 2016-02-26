@@ -39,7 +39,7 @@ int main() {
 	
 	int i;
 	
-	init_memory(CLOCK2_EVICT, 2);
+	init_memory(RANDOM_EVICT, 2);
 	memoryMaxer(PAGE_TABLE_SIZE);
 	
 	print_page_table();
