@@ -93,12 +93,10 @@ int get_bit(uint8_t* number, int pos){
 vAddr evict_select_random(int mem_bit){//assume memory is full
 	int i;
 	int mem_addr = uniform_rand(0, mem_map[mem_bit].size);//select a memory position
-	printf("random %d\n", mem_addr);
 	for (i = 0; i < PAGE_TABLE_SIZE; i++) {//go through all pages looking for the selected mem_addr
 		//TODO: ptable_mutex_lock
 		if(get_bit(&page_table[i].flags, mem_bit)) {//if it's in the specified memory
 			if(page_table[i].addr == (uint8_t)mem_addr) {//if addr matches
-				printf("random returned %d\n", i);
 				return i;//return the vAddr
 			}
 		}
@@ -153,11 +151,10 @@ vAddr evict_select_clock2(int mem_bit) {
 	
 	//not supposed to reach this position
 	//this page will potentially go to ssd
-	mem_map[mem_bit].cursor = (i+1)%PAGE_TABLE_SIZE;//update cursor
 	
 	i = evict_select_clock(mem_bit);//second loop
 	
-	set_bit(&page_table[i].flags, R_BIT, 1);
+	set_bit(&page_table[i].flags, R_BIT, 1);//this page will potentially go to ssd
 	return i;
 }
 
@@ -320,6 +317,7 @@ vAddr create_page() {
 				
 				//update page table
 				set_bit(&page_table[i].flags, RAM_BIT, 1);			
+				//set_bit(&page_table[i].flags, R_BIT, 1);			
 				page_table[i].addr = ram_addr;
 				
 				//pthread_mutex_unlock(&ptable_mtx[i]);

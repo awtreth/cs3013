@@ -32,7 +32,7 @@ void memoryMaxer(int n) {
 
 int main() {
 	
-	init_memory(CLOCK_EVICT, 2);
+	init_memory(CLOCK2_EVICT, 2);
 	//memoryMaxer(20);
 	
 	vAddr address[15];
