@@ -208,17 +208,20 @@ void destroy_memory(){
 int find_empty(int mem_bit){
 	
 	static int last_empty[2] = {0,0};
+	pthread_mutex_lock(&mem_map[mem_bit].mtx);
 	int i = last_empty[mem_bit];
 	
 	do {//TODO: mutual exclusion
 		if(!get_bit(mem_map[mem_bit].bitmap, i)) {//if it's zero
 			set_bit(mem_map[mem_bit].bitmap, i, 1);//set it to one
 			last_empty[mem_bit] = (i+1)%mem_map[mem_bit].size;//update cursor
+			pthread_mutex_unlock(&mem_map[mem_bit].mtx);
 			return i;//return the memory position
 		}
 		i = (i+1)%mem_map[mem_bit].size;//increment iterator (circular way)
 	}while(i != last_empty[mem_bit]);//checked all the memory
 	
+	pthread_mutex_unlock(&mem_map[mem_bit].mtx);
 	return -1;//didn't find
 }
 
@@ -285,7 +288,9 @@ int page_fault(vAddr address){//assume the specified page is not in RAM
 			ssd_m[ssd_addr] = ram_m[ram_addr];
 		}else{
 			ssd_m[ssd_addr] = 0;//not necessary (here just for visibility)
+			pthread_mutex_lock(&mem_map[SSD_BIT].mtx);
 			set_bit(ssd_bitmap, ssd_addr, 0);
+			pthread_mutex_unlock(&mem_map[SSD_BIT].mtx);
 		}
 		
 		printf("page_fault of page %d from ssd_addr %d to ram_addr %d\n", address, ssd_addr, ram_addr);
@@ -408,16 +413,20 @@ void free_page(vAddr address) {
 	
 	if(0 <= address && address < PAGE_TABLE_SIZE) {
 		pthread_mutex_lock(&ptable_mtx[address]);
+			
 		if(get_bit(&page_table[address].flags, RAM_BIT)){
-			set_bit(mem_map[RAM_BIT].bitmap, page_table[address].addr, 0);
 			ram_m[page_table[address].addr] = 0;
+			pthread_mutex_lock(&mem_map[RAM_BIT].mtx);
+			set_bit(mem_map[RAM_BIT].bitmap, page_table[address].addr, 0);
+			pthread_mutex_unlock(&mem_map[RAM_BIT].mtx);
 		}else if(get_bit(&page_table[address].flags, SSD_BIT)){
-			set_bit(mem_map[SSD_BIT].bitmap, page_table[address].addr, 0);
 			ssd_m[page_table[address].addr] = 0;
+			pthread_mutex_lock(&mem_map[SSD_BIT].mtx);
+			set_bit(mem_map[SSD_BIT].bitmap, page_table[address].addr, 0);
+			pthread_mutex_unlock(&mem_map[SSD_BIT].mtx);
 		}else{
 			hdd_m[address] = 0;
 		}
-			
 			page_table[address].flags = 0;
 			page_table[address].addr = 0;
 		pthread_mutex_unlock(&ptable_mtx[address]);
