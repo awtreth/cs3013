@@ -19,6 +19,7 @@ typedef signed short vAddr;
 
 void init_memory(int eviction_method_, int seed) ;
 void destroy_memory();
+int uniform_rand(int low, int high);
 
 vAddr create_page();
 
