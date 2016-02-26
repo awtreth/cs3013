@@ -115,11 +115,14 @@ vAddr evict_select_clock(int mem_bit) {
 	
 	do {
 		//TODO: ptable_mutex_lock
-		if(get_bit(&page_table[i].flags, mem_bit))
+		if(get_bit(&page_table[i].flags, mem_bit)){
+			mem_map[mem_bit].cursor = (i+1)%PAGE_TABLE_SIZE;
 			return i;
+		}
 		i = (i+1)%PAGE_TABLE_SIZE;//increment iterator (circular)
 	}while(i != mem_map[mem_bit].cursor);//checked all the memory
 	
+	printf("Not supposed to be here. evict_select_clock\n");
 	//not supposed to reach this line
 	mem_map[mem_bit].cursor = (i+1)%PAGE_TABLE_SIZE;
 	return i;
@@ -195,11 +198,13 @@ void destroy_memory(){
 
 /* Find empty spot
  */
+ 
 int find_empty(int mem_bit){
 	
 	static int last_empty[2] = {0,0};
 	int i = last_empty[mem_bit];
 	
+	printf("mem_bit = %d\n", mem_bit);
 	do {//TODO: mutual exclusion
 		if(!get_bit(mem_map[mem_bit].bitmap, i)) {//if it's zero
 			set_bit(mem_map[mem_bit].bitmap, i, 1);//set it to one
@@ -207,7 +212,7 @@ int find_empty(int mem_bit){
 			return i;//return the memory position
 		}
 		i = (i+1)%mem_map[mem_bit].size;//increment iterator (circular way)
-	}while(i != mem_map[mem_bit].cursor);//checked all the memory
+	}while(i != last_empty[mem_bit]);//checked all the memory
 	
 	return -1;//didn't find
 }
