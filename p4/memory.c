@@ -262,6 +262,7 @@ int page_fault(vAddr address){//assume the specified page is not in RAM
 		ssd_addr = page_table[address].addr;
 		usleep( SSD_TIME*1e6 );
 		uint32_t tmp = ssd_m[ssd_addr];
+		ssd_m[ssd_addr] = 0;//not necessary (here just for visibility)
 		//evict after freeing ssd
 		
 		if(ram_evicted!=NULL_VADDR) {//it needs to be evicted
@@ -285,6 +286,7 @@ int page_fault(vAddr address){//assume the specified page is not in RAM
 		usleep( (RAM_TIME+HDD_TIME)*1e6 );
 		set_bit(&page_table[address].flags, HDD_BIT, 0);//unset page_table HDD_BIT
 		ram_m[ram_addr] = hdd_m[hdd_addr];
+		hdd_m[hdd_addr] = 0;//not necessary (here just for visibility)
 	}
 		
 	//update page table
@@ -303,7 +305,7 @@ vAddr create_page() {
 	int i = ptable_cursor;
 	
 	do{
-		//if(!pthread_mutex_trylock(&ptable_mtx[i])) {
+		if(!pthread_mutex_trylock(&ptable_mtx[i])) {
 			if(!(page_table[i].flags & (0b111)) ){//not used page-table
 				//update page table
 				
@@ -326,7 +328,7 @@ vAddr create_page() {
 				return i;
 			}//else
 			//pthread_mutex_unlock(&ptable_mtx[i]);
-		//}
+		}
 		i = (i+1)%PAGE_TABLE_SIZE;
 	}while(i != ptable_cursor);
 	
@@ -380,11 +382,15 @@ void store_value(vAddr address, uint32_t *value) {
 void free_page(vAddr address) {
 	
 	if(0 <= address && address < PAGE_TABLE_SIZE) {
-		if(get_bit(&page_table[address].flags, RAM_BIT))
-			set_bit(mem_map[RAM_BIT].bitmap, address, 0);
-
-		if(get_bit(&page_table[address].flags, SSD_BIT))
-			set_bit(mem_map[SSD_BIT].bitmap, address, 0);
+		if(get_bit(&page_table[address].flags, RAM_BIT)){
+			set_bit(mem_map[RAM_BIT].bitmap, page_table[address].addr, 0);
+			ram_m[page_table[address].addr] = 0;
+		}else if(get_bit(&page_table[address].flags, SSD_BIT)){
+			set_bit(mem_map[SSD_BIT].bitmap, page_table[address].addr, 0);
+			ssd_m[page_table[address].addr] = 0;
+		}else{
+			hdd_m[address] = 0;
+		}
 			
 			page_table[address].flags = 0;
 			page_table[address].addr = 0;

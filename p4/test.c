@@ -47,10 +47,13 @@ int main() {
 		print_mem_maps();
 		print_memory_all();
 	}
-	getchar();
-	/*print_page_table();
+	free_page(2);
+	free_page(14);
+	free_page(7);
+	print_page_table();
 	print_mem_maps();
-	print_memory_all();/**/
+	print_memory_all();/* */
+	getchar();
 	
 	//value = 789;
 	printf("got %d\n",get_value(address[10], &valid));
