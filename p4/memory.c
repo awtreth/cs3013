@@ -9,11 +9,6 @@
 
 //CONSTANTS
 
-#define RAM_SIZE 3
-#define SSD_SIZE 6
-#define HDD_SIZE 15
-
-#define PAGE_TABLE_SIZE HDD_SIZE
 
 //Access time (in seconds)
 #define TIME_FACTOR 100
