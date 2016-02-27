@@ -1,0 +1,688 @@
+evicting vAddr 0 from ram_addr 0 to ssd_addr 0
+evicting vAddr 1 from ram_addr 1 to ssd_addr 1
+evicting vAddr 2 from ram_addr 2 to ssd_addr 2
+evicting vAddr 3 from ram_addr 0 to ssd_addr 3
+evicting vAddr 4 from ram_addr 1 to ssd_addr 4
+evicting vAddr 5 from ram_addr 2 to ssd_addr 5
+evicting vAddr 6 from ram_addr 0 to ssd_addr 6
+evicting vAddr 7 from ram_addr 1 to ssd_addr 7
+evicting vAddr 8 from ram_addr 2 to ssd_addr 8
+evicting vAddr 9 from ram_addr 0 to ssd_addr 9
+evicting vAddr 10 from ram_addr 1 to ssd_addr 10
+evicting vAddr 11 from ram_addr 2 to ssd_addr 11
+evicting vAddr 0 from ssd_addr 0 to hdd_addr 0
+evicting vAddr 12 from ram_addr 0 to ssd_addr 0
+evicting vAddr 1 from ssd_addr 1 to hdd_addr 1
+evicting vAddr 13 from ram_addr 1 to ssd_addr 1
+evicting vAddr 2 from ssd_addr 2 to hdd_addr 2
+evicting vAddr 14 from ram_addr 2 to ssd_addr 2
+evicting vAddr 3 from ssd_addr 3 to hdd_addr 3
+evicting vAddr 15 from ram_addr 0 to ssd_addr 3
+evicting vAddr 4 from ssd_addr 4 to hdd_addr 4
+evicting vAddr 16 from ram_addr 1 to ssd_addr 4
+evicting vAddr 5 from ssd_addr 5 to hdd_addr 5
+evicting vAddr 17 from ram_addr 2 to ssd_addr 5
+evicting vAddr 6 from ssd_addr 6 to hdd_addr 6
+evicting vAddr 18 from ram_addr 0 to ssd_addr 6
+evicting vAddr 7 from ssd_addr 7 to hdd_addr 7
+evicting vAddr 19 from ram_addr 1 to ssd_addr 7
+evicting vAddr 8 from ssd_addr 8 to hdd_addr 8
+evicting vAddr 20 from ram_addr 2 to ssd_addr 8
+evicting vAddr 9 from ssd_addr 9 to hdd_addr 9
+evicting vAddr 21 from ram_addr 0 to ssd_addr 9
+evicting vAddr 10 from ssd_addr 10 to hdd_addr 10
+evicting vAddr 22 from ram_addr 1 to ssd_addr 10
+evicting vAddr 11 from ssd_addr 11 to hdd_addr 11
+evicting vAddr 23 from ram_addr 2 to ssd_addr 11
+evicting vAddr 12 from ssd_addr 0 to hdd_addr 12
+evicting vAddr 24 from ram_addr 0 to ssd_addr 0
+evicting vAddr 13 from ssd_addr 1 to hdd_addr 13
+evicting vAddr 25 from ram_addr 1 to ssd_addr 1
+evicting vAddr 14 from ssd_addr 2 to hdd_addr 14
+evicting vAddr 26 from ram_addr 2 to ssd_addr 2
+evicting vAddr 15 from ssd_addr 3 to hdd_addr 15
+evicting vAddr 27 from ram_addr 0 to ssd_addr 3
+evicting vAddr 16 from ssd_addr 4 to hdd_addr 16
+evicting vAddr 28 from ram_addr 1 to ssd_addr 4
+evicting vAddr 17 from ssd_addr 5 to hdd_addr 17
+evicting vAddr 29 from ram_addr 2 to ssd_addr 5
+evicting vAddr 18 from ssd_addr 6 to hdd_addr 18
+evicting vAddr 30 from ram_addr 0 to ssd_addr 6
+evicting vAddr 19 from ssd_addr 7 to hdd_addr 19
+evicting vAddr 31 from ram_addr 1 to ssd_addr 7
+evicting vAddr 20 from ssd_addr 8 to hdd_addr 20
+evicting vAddr 32 from ram_addr 2 to ssd_addr 8
+evicting vAddr 21 from ssd_addr 9 to hdd_addr 21
+evicting vAddr 33 from ram_addr 0 to ssd_addr 9
+evicting vAddr 22 from ssd_addr 10 to hdd_addr 22
+evicting vAddr 34 from ram_addr 1 to ssd_addr 10
+evicting vAddr 23 from ssd_addr 11 to hdd_addr 23
+evicting vAddr 35 from ram_addr 2 to ssd_addr 11
+evicting vAddr 24 from ssd_addr 0 to hdd_addr 24
+evicting vAddr 36 from ram_addr 0 to ssd_addr 0
+evicting vAddr 25 from ssd_addr 1 to hdd_addr 25
+evicting vAddr 37 from ram_addr 1 to ssd_addr 1
+evicting vAddr 26 from ssd_addr 2 to hdd_addr 26
+evicting vAddr 38 from ram_addr 2 to ssd_addr 2
+evicting vAddr 27 from ssd_addr 3 to hdd_addr 27
+evicting vAddr 39 from ram_addr 0 to ssd_addr 3
+evicting vAddr 28 from ssd_addr 4 to hdd_addr 28
+evicting vAddr 40 from ram_addr 1 to ssd_addr 4
+evicting vAddr 29 from ssd_addr 5 to hdd_addr 29
+evicting vAddr 41 from ram_addr 2 to ssd_addr 5
+evicting vAddr 30 from ssd_addr 6 to hdd_addr 30
+evicting vAddr 42 from ram_addr 0 to ssd_addr 6
+evicting vAddr 31 from ssd_addr 7 to hdd_addr 31
+evicting vAddr 43 from ram_addr 1 to ssd_addr 7
+evicting vAddr 32 from ssd_addr 8 to hdd_addr 32
+evicting vAddr 44 from ram_addr 2 to ssd_addr 8
+evicting vAddr 33 from ssd_addr 9 to hdd_addr 33
+evicting vAddr 45 from ram_addr 0 to ssd_addr 9
+evicting vAddr 34 from ssd_addr 10 to hdd_addr 34
+evicting vAddr 46 from ram_addr 1 to ssd_addr 10
+PAGE_TABLE (vAddr | ram-ssd-hdd-ref | addr | content)
+0) 0011 | 0 | 1
+1) 0011 | 1 | 2
+2) 0011 | 2 | 3
+3) 0011 | 3 | 4
+4) 0011 | 4 | 5
+5) 0011 | 5 | 6
+6) 0011 | 6 | 7
+7) 0011 | 7 | 8
+8) 0011 | 8 | 9
+9) 0011 | 9 | 10
+10) 0011 | 10 | 11
+11) 0011 | 11 | 12
+12) 0011 | 12 | 13
+13) 0011 | 13 | 14
+14) 0011 | 14 | 15
+15) 0011 | 15 | 16
+16) 0011 | 16 | 17
+17) 0011 | 17 | 18
+18) 0011 | 18 | 19
+19) 0011 | 19 | 20
+20) 0011 | 20 | 21
+21) 0011 | 21 | 22
+22) 0011 | 22 | 23
+23) 0011 | 23 | 24
+24) 0011 | 24 | 25
+25) 0011 | 25 | 26
+26) 0011 | 26 | 27
+27) 0011 | 27 | 28
+28) 0011 | 28 | 29
+29) 0011 | 29 | 30
+30) 0011 | 30 | 31
+31) 0011 | 31 | 32
+32) 0011 | 32 | 33
+33) 0011 | 33 | 34
+34) 0011 | 34 | 35
+35) 0101 | 11 | 36
+36) 0101 | 0 | 37
+37) 0101 | 1 | 38
+38) 0101 | 2 | 39
+39) 0101 | 3 | 40
+40) 0101 | 4 | 41
+41) 0101 | 5 | 42
+42) 0101 | 6 | 43
+43) 0101 | 7 | 44
+44) 0101 | 8 | 45
+45) 0101 | 9 | 46
+46) 0101 | 10 | 47
+47) 1001 | 2 | 48
+48) 1001 | 0 | 49
+49) 1001 | 1 | 50
+MEM_MAP (RAM/SSD)
+47 | 1 1 1 
+35 | 1 1 1 1 1 1 1 1 1 1 1 1 
+MEMORY CONTENT (ram, ssd, hdd):
+49 50 48 
+37 38 39 40 41 42 43 44 45 46 47 36 
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+thread 0 is trying to read vAddr 0
+thread 1 is trying to read vAddr 0
+evicting vAddr 35 from ssd_addr 11 to hdd_addr 35
+thread 2 is trying to read vAddr 0
+evicting vAddr 36 from ssd_addr 0 to hdd_addr 36
+thread 3 is trying to read vAddr 0
+thread 4 is trying to read vAddr 0
+page_fault of page 45 from ssd_addr 9 to ram_addr 2
+thread 0 is trying to read vAddr 1
+evicting vAddr 37 from ssd_addr 1 to hdd_addr 37
+evicting vAddr 48 from ram_addr 0 to ssd_addr 11
+evicting vAddr 49 from ram_addr 1 to ssd_addr 0
+page_fault of page 8 from hhd_addr 8 to ram_addr 0
+page_fault of page 28 from hhd_addr 28 to ram_addr 1
+evicting vAddr 45 from ram_addr 2 to ssd_addr 1
+page_fault of page 25 from hhd_addr 25 to ram_addr 2
+thread 1 is trying to read vAddr 1
+thread 2 is trying to read vAddr 1
+evicting vAddr 38 from ssd_addr 2 to hdd_addr 38
+evicting vAddr 39 from ssd_addr 3 to hdd_addr 39
+evicting vAddr 40 from ssd_addr 4 to hdd_addr 40
+thread 3 is trying to read vAddr 1
+evicting vAddr 8 from ram_addr 0 to ssd_addr 2
+evicting vAddr 28 from ram_addr 1 to ssd_addr 3
+page_fault of page 21 from hhd_addr 21 to ram_addr 1
+page_fault of page 18 from hhd_addr 18 to ram_addr 0
+evicting vAddr 25 from ram_addr 2 to ssd_addr 4
+page_fault of page 27 from hhd_addr 27 to ram_addr 2
+thread 4 is trying to read vAddr 1
+evicting vAddr 41 from ssd_addr 5 to hdd_addr 41
+thread 2 is trying to read vAddr 2
+page_fault of page 47 from ssd_addr 9 to ram_addr 1
+thread 3 is trying to read vAddr 2
+evicting vAddr 42 from ssd_addr 6 to hdd_addr 42
+thread 0 is trying to read vAddr 2
+page_fault of page 28 from ssd_addr 3 to ram_addr 2
+thread 0 is trying to read vAddr 3
+page_fault of page 25 from ssd_addr 4 to ram_addr 2
+thread 1 is trying to read vAddr 2
+page_fault of page 44 from ssd_addr 8 to ram_addr 2
+thread 1 is trying to read vAddr 3
+evicting vAddr 43 from ssd_addr 7 to hdd_addr 43
+evicting vAddr 18 from ram_addr 0 to ssd_addr 5
+page_fault of page 7 from hhd_addr 7 to ram_addr 0
+evicting vAddr 47 from ram_addr 1 to ssd_addr 6
+page_fault of page 23 from hhd_addr 23 to ram_addr 1
+evicting vAddr 44 from ram_addr 2 to ssd_addr 7
+page_fault of page 31 from hhd_addr 31 to ram_addr 2
+thread 4 is trying to read vAddr 2
+evicting vAddr 45 from ssd_addr 1 to hdd_addr 45
+thread 2 is trying to read vAddr 3
+evicting vAddr 46 from ssd_addr 10 to hdd_addr 46
+thread 1 is trying to read vAddr 4
+page_fault of page 21 from ssd_addr 9 to ram_addr 2
+thread 1 is trying to read vAddr 5
+evicting vAddr 7 from ram_addr 0 to ssd_addr 1
+page_fault of page 18 from ssd_addr 5 to ram_addr 2
+thread 1 is trying to read vAddr 6
+thread 1 is trying to read vAddr 7
+page_fault of page 20 from hhd_addr 20 to ram_addr 0
+evicting vAddr 23 from ram_addr 1 to ssd_addr 10
+page_fault of page 44 from ssd_addr 7 to ram_addr 2
+thread 1 is trying to read vAddr 8
+evicting vAddr 47 from ssd_addr 6 to hdd_addr 47
+page_fault of page 38 from hhd_addr 38 to ram_addr 1
+thread 4 is trying to read vAddr 3
+page_fault of page 31 from ssd_addr 9 to ram_addr 0
+thread 2 is trying to read vAddr 4
+thread 4 is trying to read vAddr 4
+evicting vAddr 48 from ssd_addr 11 to hdd_addr 48
+evicting vAddr 44 from ram_addr 2 to ssd_addr 6
+page_fault of page 5 from hhd_addr 5 to ram_addr 2
+page_fault of page 23 from ssd_addr 10 to ram_addr 1
+thread 0 is trying to read vAddr 4
+page_fault of page 28 from ssd_addr 4 to ram_addr 1
+thread 4 is trying to read vAddr 5
+page_fault of page 23 from ssd_addr 4 to ram_addr 1
+thread 3 is trying to read vAddr 3
+page_fault of page 38 from ssd_addr 10 to ram_addr 1
+thread 3 is trying to read vAddr 4
+page_fault of page 23 from ssd_addr 10 to ram_addr 1
+thread 4 is trying to read vAddr 6
+evicting vAddr 49 from ssd_addr 0 to hdd_addr 49
+evicting vAddr 31 from ram_addr 0 to ssd_addr 11
+thread 1 is trying to read vAddr 9
+page_fault of page 12 from hhd_addr 12 to ram_addr 0
+page_fault of page 7 from ssd_addr 1 to ram_addr 2
+thread 4 is trying to read vAddr 7
+evicting vAddr 5 from ssd_addr 1 to hdd_addr 5
+evicting vAddr 23 from ram_addr 1 to ssd_addr 0
+page_fault of page 16 from hhd_addr 16 to ram_addr 1
+thread 2 is trying to read vAddr 5
+page_fault of page 27 from ssd_addr 3 to ram_addr 0
+thread 4 is trying to read vAddr 8
+evicting vAddr 7 from ram_addr 2 to ssd_addr 1
+page_fault of page 33 from hhd_addr 33 to ram_addr 2
+page_fault of page 12 from ssd_addr 3 to ram_addr 0
+thread 0 is trying to read vAddr 5
+evicting vAddr 8 from ssd_addr 2 to hdd_addr 8
+thread 3 is trying to read vAddr 5
+evicting vAddr 18 from ssd_addr 7 to hdd_addr 18
+thread 1 is trying to read vAddr 10
+evicting vAddr 20 from ssd_addr 9 to hdd_addr 20
+evicting vAddr 12 from ram_addr 0 to ssd_addr 2
+page_fault of page 10 from hhd_addr 10 to ram_addr 0
+evicting vAddr 16 from ram_addr 1 to ssd_addr 7
+page_fault of page 45 from hhd_addr 45 to ram_addr 1
+evicting vAddr 33 from ram_addr 2 to ssd_addr 9
+page_fault of page 15 from hhd_addr 15 to ram_addr 2
+thread 4 is trying to read vAddr 9
+page_fault of page 38 from ssd_addr 10 to ram_addr 0
+thread 2 is trying to read vAddr 6
+evicting vAddr 21 from ssd_addr 5 to hdd_addr 21
+thread 0 is trying to read vAddr 6
+page_fault of page 12 from ssd_addr 2 to ram_addr 1
+thread 2 is trying to read vAddr 7
+evicting vAddr 23 from ssd_addr 0 to hdd_addr 23
+thread 3 is trying to read vAddr 6
+evicting vAddr 27 from ssd_addr 3 to hdd_addr 27
+evicting vAddr 38 from ram_addr 0 to ssd_addr 5
+page_fault of page 19 from hhd_addr 19 to ram_addr 0
+evicting vAddr 12 from ram_addr 1 to ssd_addr 0
+page_fault of page 43 from hhd_addr 43 to ram_addr 1
+evicting vAddr 15 from ram_addr 2 to ssd_addr 3
+page_fault of page 35 from hhd_addr 35 to ram_addr 2
+thread 4 is trying to read vAddr 10
+evicting vAddr 28 from ssd_addr 4 to hdd_addr 28
+thread 0 is trying to read vAddr 7
+evicting vAddr 31 from ssd_addr 11 to hdd_addr 31
+evicting vAddr 33 from ssd_addr 9 to hdd_addr 33
+thread 1 is trying to read vAddr 11
+evicting vAddr 19 from ram_addr 0 to ssd_addr 4
+page_fault of page 42 from hhd_addr 42 to ram_addr 0
+evicting vAddr 43 from ram_addr 1 to ssd_addr 11
+page_fault of page 17 from hhd_addr 17 to ram_addr 1
+evicting vAddr 35 from ram_addr 2 to ssd_addr 9
+page_fault of page 23 from hhd_addr 23 to ram_addr 2
+thread 2 is trying to read vAddr 8
+evicting vAddr 38 from ssd_addr 5 to hdd_addr 38
+thread 0 is trying to read vAddr 8
+evicting vAddr 43 from ssd_addr 11 to hdd_addr 43
+thread 4 is trying to read vAddr 11
+page_fault of page 35 from ssd_addr 9 to ram_addr 2
+thread 3 is trying to read vAddr 7
+evicting vAddr 44 from ssd_addr 6 to hdd_addr 44
+evicting vAddr 42 from ram_addr 0 to ssd_addr 5
+page_fault of page 31 from hhd_addr 31 to ram_addr 0
+evicting vAddr 17 from ram_addr 1 to ssd_addr 11
+page_fault of page 6 from hhd_addr 6 to ram_addr 1
+evicting vAddr 35 from ram_addr 2 to ssd_addr 6
+page_fault of page 20 from hhd_addr 20 to ram_addr 2
+thread 1 is trying to read vAddr 12
+evicting vAddr 45 from ssd_addr 2 to hdd_addr 45
+thread 2 is trying to read vAddr 9
+evicting vAddr 7 from ssd_addr 1 to hdd_addr 7
+thread 4 is trying to read vAddr 12
+evicting vAddr 10 from ssd_addr 10 to hdd_addr 10
+evicting vAddr 31 from ram_addr 0 to ssd_addr 2
+page_fault of page 27 from hhd_addr 27 to ram_addr 0
+evicting vAddr 6 from ram_addr 1 to ssd_addr 1
+page_fault of page 38 from hhd_addr 38 to ram_addr 1
+evicting vAddr 20 from ram_addr 2 to ssd_addr 10
+page_fault of page 8 from hhd_addr 8 to ram_addr 2
+thread 3 is trying to read vAddr 8
+page_fault of page 23 from ssd_addr 9 to ram_addr 0
+thread 4 is trying to read vAddr 13
+thread 0 is trying to read vAddr 9
+evicting vAddr 12 from ssd_addr 0 to hdd_addr 12
+page_fault of page 15 from ssd_addr 3 to ram_addr 0
+thread 3 is trying to read vAddr 9
+evicting vAddr 16 from ssd_addr 7 to hdd_addr 16
+thread 1 is trying to read vAddr 13
+evicting vAddr 17 from ssd_addr 11 to hdd_addr 17
+evicting vAddr 38 from ram_addr 1 to ssd_addr 0
+page_fault of page 37 from hhd_addr 37 to ram_addr 1
+evicting vAddr 15 from ram_addr 0 to ssd_addr 7
+page_fault of page 21 from hhd_addr 21 to ram_addr 0
+evicting vAddr 8 from ram_addr 2 to ssd_addr 11
+page_fault of page 43 from hhd_addr 43 to ram_addr 2
+thread 0 is trying to read vAddr 10
+page_fault of page 38 from ssd_addr 0 to ram_addr 1
+thread 4 is trying to read vAddr 14
+evicting vAddr 19 from ssd_addr 4 to hdd_addr 19
+thread 2 is trying to read vAddr 10
+evicting vAddr 20 from ssd_addr 10 to hdd_addr 20
+thread 3 is trying to read vAddr 10
+evicting vAddr 23 from ssd_addr 3 to hdd_addr 23
+evicting vAddr 21 from ram_addr 0 to ssd_addr 4
+evicting vAddr 38 from ram_addr 1 to ssd_addr 10
+page_fault of page 33 from hhd_addr 33 to ram_addr 0
+page_fault of page 32 from hhd_addr 32 to ram_addr 1
+evicting vAddr 43 from ram_addr 2 to ssd_addr 3
+page_fault of page 10 from hhd_addr 10 to ram_addr 2
+thread 1 is trying to read vAddr 14
+evicting vAddr 25 from ssd_addr 8 to hdd_addr 25
+thread 4 is trying to read vAddr 15
+evicting vAddr 27 from ssd_addr 9 to hdd_addr 27
+thread 0 is trying to read vAddr 11
+evicting vAddr 31 from ssd_addr 2 to hdd_addr 31
+evicting vAddr 33 from ram_addr 0 to ssd_addr 8
+page_fault of page 20 from hhd_addr 20 to ram_addr 0
+evicting vAddr 32 from ram_addr 1 to ssd_addr 9
+page_fault of page 17 from hhd_addr 17 to ram_addr 1
+evicting vAddr 10 from ram_addr 2 to ssd_addr 2
+page_fault of page 0 from hhd_addr 0 to ram_addr 2
+thread 3 is trying to read vAddr 11
+thread 1 is trying to read vAddr 15
+evicting vAddr 32 from ssd_addr 9 to hdd_addr 32
+page_fault of page 8 from ssd_addr 11 to ram_addr 0
+thread 0 is trying to read vAddr 12
+evicting vAddr 33 from ssd_addr 8 to hdd_addr 33
+thread 2 is trying to read vAddr 11
+evicting vAddr 35 from ssd_addr 6 to hdd_addr 35
+evicting vAddr 17 from ram_addr 1 to ssd_addr 9
+page_fault of page 24 from hhd_addr 24 to ram_addr 1
+evicting vAddr 8 from ram_addr 0 to ssd_addr 8
+page_fault of page 28 from hhd_addr 28 to ram_addr 0
+evicting vAddr 0 from ram_addr 2 to ssd_addr 6
+page_fault of page 27 from hhd_addr 27 to ram_addr 2
+thread 1 is trying to read vAddr 16
+thread 3 is trying to read vAddr 12
+evicting vAddr 37 from ssd_addr 0 to hdd_addr 37
+page_fault of page 15 from ssd_addr 7 to ram_addr 1
+thread 2 is trying to read vAddr 12
+evicting vAddr 38 from ssd_addr 10 to hdd_addr 38
+thread 4 is trying to read vAddr 16
+page_fault of page 10 from ssd_addr 2 to ram_addr 2
+thread 2 is trying to read vAddr 13
+evicting vAddr 42 from ssd_addr 5 to hdd_addr 42
+evicting vAddr 28 from ram_addr 0 to ssd_addr 0
+page_fault of page 45 from hhd_addr 45 to ram_addr 0
+evicting vAddr 15 from ram_addr 1 to ssd_addr 10
+page_fault of page 23 from hhd_addr 23 to ram_addr 1
+evicting vAddr 10 from ram_addr 2 to ssd_addr 5
+page_fault of page 22 from hhd_addr 22 to ram_addr 2
+thread 1 is trying to read vAddr 17
+evicting vAddr 43 from ssd_addr 3 to hdd_addr 43
+thread 0 is trying to read vAddr 13
+evicting vAddr 0 from ssd_addr 6 to hdd_addr 0
+thread 2 is trying to read vAddr 14
+evicting vAddr 6 from ssd_addr 1 to hdd_addr 6
+evicting vAddr 45 from ram_addr 0 to ssd_addr 3
+evicting vAddr 23 from ram_addr 1 to ssd_addr 6
+page_fault of page 37 from hhd_addr 37 to ram_addr 0
+page_fault of page 35 from hhd_addr 35 to ram_addr 1
+evicting vAddr 22 from ram_addr 2 to ssd_addr 1
+page_fault of page 7 from hhd_addr 7 to ram_addr 2
+evicting vAddr 8 from ssd_addr 8 to hdd_addr 8
+thread 3 is trying to read vAddr 13
+thread 1 is trying to read vAddr 18
+evicting vAddr 10 from ssd_addr 5 to hdd_addr 10
+thread 0 is trying to read vAddr 14
+page_fault of page 45 from ssd_addr 3 to ram_addr 2
+thread 1 is trying to read vAddr 19
+evicting vAddr 15 from ssd_addr 10 to hdd_addr 15
+evicting vAddr 37 from ram_addr 0 to ssd_addr 8
+page_fault of page 4 from hhd_addr 4 to ram_addr 0
+evicting vAddr 35 from ram_addr 1 to ssd_addr 5
+page_fault of page 42 from hhd_addr 42 to ram_addr 1
+evicting vAddr 45 from ram_addr 2 to ssd_addr 10
+page_fault of page 26 from hhd_addr 26 to ram_addr 2
+thread 2 is trying to read vAddr 15
+thread 3 is trying to read vAddr 14
+evicting vAddr 17 from ssd_addr 9 to hdd_addr 17
+page_fault of page 37 from ssd_addr 8 to ram_addr 0
+thread 4 is trying to read vAddr 17
+evicting vAddr 20 from ssd_addr 11 to hdd_addr 20
+thread 0 is trying to read vAddr 15
+evicting vAddr 22 from ssd_addr 1 to hdd_addr 22
+evicting vAddr 42 from ram_addr 1 to ssd_addr 9
+page_fault of page 3 from hhd_addr 3 to ram_addr 1
+evicting vAddr 37 from ram_addr 0 to ssd_addr 11
+page_fault of page 14 from hhd_addr 14 to ram_addr 0
+evicting vAddr 26 from ram_addr 2 to ssd_addr 1
+page_fault of page 47 from hhd_addr 47 to ram_addr 2
+thread 2 is trying to read vAddr 16
+evicting vAddr 23 from ssd_addr 6 to hdd_addr 23
+thread 3 is trying to read vAddr 15
+page_fault of page 37 from ssd_addr 11 to ram_addr 0
+thread 2 is trying to read vAddr 17
+page_fault of page 21 from ssd_addr 4 to ram_addr 0
+thread 1 is trying to read vAddr 20
+thread 4 is trying to read vAddr 18
+evicting vAddr 24 from ssd_addr 7 to hdd_addr 24
+thread 1 is trying to read vAddr 21
+evicting vAddr 26 from ssd_addr 1 to hdd_addr 26
+evicting vAddr 3 from ram_addr 1 to ssd_addr 6
+page_fault of page 20 from hhd_addr 20 to ram_addr 1
+evicting vAddr 47 from ram_addr 2 to ssd_addr 7
+evicting vAddr 21 from ram_addr 0 to ssd_addr 1
+page_fault of page 34 from hhd_addr 34 to ram_addr 2
+page_fault of page 13 from hhd_addr 13 to ram_addr 0
+thread 0 is trying to read vAddr 16
+thread 2 is trying to read vAddr 18
+evicting vAddr 27 from ssd_addr 2 to hdd_addr 27
+thread 3 is trying to read vAddr 16
+page_fault of page 47 from ssd_addr 7 to ram_addr 1
+page_fault of page 21 from ssd_addr 1 to ram_addr 0
+thread 4 is trying to read vAddr 19
+evicting vAddr 28 from ssd_addr 0 to hdd_addr 28
+thread 0 is trying to read vAddr 17
+evicting vAddr 34 from ram_addr 2 to ssd_addr 2
+evicting vAddr 35 from ssd_addr 5 to hdd_addr 35
+page_fault of page 17 from hhd_addr 17 to ram_addr 2
+evicting vAddr 47 from ram_addr 1 to ssd_addr 0
+page_fault of page 0 from hhd_addr 0 to ram_addr 1
+evicting vAddr 21 from ram_addr 0 to ssd_addr 5
+page_fault of page 27 from hhd_addr 27 to ram_addr 0
+thread 2 is trying to read vAddr 19
+thread 4 is trying to read vAddr 20
+page_fault of page 45 from ssd_addr 10 to ram_addr 2
+thread 2 is trying to read vAddr 20
+page_fault of page 47 from ssd_addr 0 to ram_addr 1
+page_fault of page 17 from ssd_addr 10 to ram_addr 2
+thread 1 is trying to read vAddr 22
+evicting vAddr 37 from ssd_addr 4 to hdd_addr 37
+evicting vAddr 42 from ssd_addr 9 to hdd_addr 42
+thread 3 is trying to read vAddr 17
+thread 0 is trying to read vAddr 18
+evicting vAddr 45 from ssd_addr 10 to hdd_addr 45
+evicting vAddr 47 from ram_addr 1 to ssd_addr 4
+evicting vAddr 17 from ram_addr 2 to ssd_addr 9
+page_fault of page 2 from hhd_addr 2 to ram_addr 1
+page_fault of page 12 from hhd_addr 12 to ram_addr 2
+evicting vAddr 27 from ram_addr 0 to ssd_addr 10
+page_fault of page 22 from hhd_addr 22 to ram_addr 0
+thread 2 is trying to read vAddr 21
+evicting vAddr 47 from ssd_addr 4 to hdd_addr 47
+evicting vAddr 0 from ssd_addr 0 to hdd_addr 0
+thread 1 is trying to read vAddr 23
+thread 3 is trying to read vAddr 18
+evicting vAddr 3 from ssd_addr 6 to hdd_addr 3
+evicting vAddr 2 from ram_addr 1 to ssd_addr 4
+evicting vAddr 12 from ram_addr 2 to ssd_addr 0
+page_fault of page 39 from hhd_addr 39 to ram_addr 1
+page_fault of page 23 from hhd_addr 23 to ram_addr 2
+evicting vAddr 22 from ram_addr 0 to ssd_addr 6
+page_fault of page 26 from hhd_addr 26 to ram_addr 0
+thread 0 is trying to read vAddr 19
+evicting vAddr 4 from ssd_addr 8 to hdd_addr 4
+thread 2 is trying to read vAddr 22
+evicting vAddr 7 from ssd_addr 3 to hdd_addr 7
+thread 4 is trying to read vAddr 21
+evicting vAddr 12 from ssd_addr 0 to hdd_addr 12
+evicting vAddr 39 from ram_addr 1 to ssd_addr 8
+evicting vAddr 23 from ram_addr 2 to ssd_addr 3
+page_fault of page 8 from hhd_addr 8 to ram_addr 1
+page_fault of page 11 from hhd_addr 11 to ram_addr 2
+evicting vAddr 26 from ram_addr 0 to ssd_addr 0
+page_fault of page 18 from hhd_addr 18 to ram_addr 0
+thread 0 is trying to read vAddr 20
+thread 1 is trying to read vAddr 24
+page_fault of page 17 from ssd_addr 9 to ram_addr 1
+thread 4 is trying to read vAddr 22
+evicting vAddr 13 from ssd_addr 1 to hdd_addr 13
+page_fault of page 2 from ssd_addr 4 to ram_addr 2
+thread 0 is trying to read vAddr 21
+evicting vAddr 14 from ssd_addr 11 to hdd_addr 14
+thread 2 is trying to read vAddr 23
+page_fault of page 11 from ssd_addr 4 to ram_addr 0
+evicting vAddr 18 from ssd_addr 4 to hdd_addr 18
+thread 3 is trying to read vAddr 19
+evicting vAddr 17 from ram_addr 1 to ssd_addr 1
+evicting vAddr 2 from ram_addr 2 to ssd_addr 11
+page_fault of page 15 from hhd_addr 15 to ram_addr 1
+page_fault of page 43 from hhd_addr 43 to ram_addr 2
+evicting vAddr 11 from ram_addr 0 to ssd_addr 4
+page_fault of page 24 from hhd_addr 24 to ram_addr 0
+thread 1 is trying to read vAddr 25
+evicting vAddr 22 from ssd_addr 6 to hdd_addr 22
+thread 4 is trying to read vAddr 23
+page_fault of page 21 from ssd_addr 5 to ram_addr 2
+thread 1 is trying to read vAddr 26
+page_fault of page 20 from ssd_addr 7 to ram_addr 2
+thread 2 is trying to read vAddr 24
+evicting vAddr 23 from ssd_addr 3 to hdd_addr 23
+thread 0 is trying to read vAddr 22
+evicting vAddr 26 from ssd_addr 0 to hdd_addr 26
+evicting vAddr 15 from ram_addr 1 to ssd_addr 6
+page_fault of page 9 from hhd_addr 9 to ram_addr 1
+evicting vAddr 20 from ram_addr 2 to ssd_addr 3
+page_fault of page 47 from hhd_addr 47 to ram_addr 2
+evicting vAddr 24 from ram_addr 0 to ssd_addr 0
+page_fault of page 40 from hhd_addr 40 to ram_addr 0
+thread 3 is trying to read vAddr 20
+evicting vAddr 27 from ssd_addr 10 to hdd_addr 27
+thread 1 is trying to read vAddr 27
+evicting vAddr 34 from ssd_addr 2 to hdd_addr 34
+thread 4 is trying to read vAddr 24
+page_fault of page 2 from ssd_addr 11 to ram_addr 0
+thread 1 is trying to read vAddr 28
+evicting vAddr 39 from ssd_addr 8 to hdd_addr 39
+evicting vAddr 9 from ram_addr 1 to ssd_addr 10
+page_fault of page 5 from hhd_addr 5 to ram_addr 1
+evicting vAddr 47 from ram_addr 2 to ssd_addr 2
+page_fault of page 18 from hhd_addr 18 to ram_addr 2
+evicting vAddr 2 from ram_addr 0 to ssd_addr 8
+page_fault of page 4 from hhd_addr 4 to ram_addr 0
+thread 2 is trying to read vAddr 25
+evicting vAddr 40 from ssd_addr 11 to hdd_addr 40
+thread 3 is trying to read vAddr 21
+page_fault of page 21 from ssd_addr 7 to ram_addr 2
+thread 2 is trying to read vAddr 26
+evicting vAddr 43 from ssd_addr 5 to hdd_addr 43
+thread 0 is trying to read vAddr 23
+evicting vAddr 5 from ram_addr 1 to ssd_addr 11
+page_fault of page 20 from ssd_addr 3 to ram_addr 0
+page_fault of page 41 from hhd_addr 41 to ram_addr 1
+thread 3 is trying to read vAddr 22
+evicting vAddr 47 from ssd_addr 2 to hdd_addr 47
+evicting vAddr 21 from ram_addr 2 to ssd_addr 5
+thread 1 is trying to read vAddr 29
+evicting vAddr 2 from ssd_addr 8 to hdd_addr 2
+page_fault of page 3 from hhd_addr 3 to ram_addr 2
+evicting vAddr 20 from ram_addr 0 to ssd_addr 2
+page_fault of page 48 from hhd_addr 48 to ram_addr 0
+evicting vAddr 41 from ram_addr 1 to ssd_addr 8
+thread 4 is trying to read vAddr 25
+page_fault of page 43 from hhd_addr 43 to ram_addr 1
+thread 0 is trying to read vAddr 24
+evicting vAddr 4 from ssd_addr 3 to hdd_addr 4
+page_fault of page 17 from ssd_addr 1 to ram_addr 2
+thread 3 is trying to read vAddr 23
+evicting vAddr 5 from ssd_addr 11 to hdd_addr 5
+thread 2 is trying to read vAddr 27
+evicting vAddr 48 from ram_addr 0 to ssd_addr 3
+page_fault of page 19 from hhd_addr 19 to ram_addr 0
+page_fault of page 41 from ssd_addr 8 to ram_addr 1
+evicting vAddr 17 from ram_addr 2 to ssd_addr 11
+thread 2 is trying to read vAddr 28
+evicting vAddr 9 from ssd_addr 10 to hdd_addr 9
+page_fault of page 30 from hhd_addr 30 to ram_addr 2
+evicting vAddr 11 from ssd_addr 4 to hdd_addr 11
+thread 0 is trying to read vAddr 25
+evicting vAddr 41 from ram_addr 1 to ssd_addr 10
+page_fault of page 5 from hhd_addr 5 to ram_addr 1
+page_fault of page 43 from ssd_addr 8 to ram_addr 2
+thread 3 is trying to read vAddr 24
+page_fault of page 3 from ssd_addr 1 to ram_addr 2
+thread 3 is trying to read vAddr 25
+evicting vAddr 15 from ssd_addr 6 to hdd_addr 15
+evicting vAddr 19 from ram_addr 0 to ssd_addr 4
+page_fault of page 0 from hhd_addr 0 to ram_addr 0
+thread 2 is trying to read vAddr 29
+evicting vAddr 17 from ssd_addr 11 to hdd_addr 17
+evicting vAddr 3 from ram_addr 2 to ssd_addr 6
+page_fault of page 13 from hhd_addr 13 to ram_addr 2
+thread 4 is trying to read vAddr 26
+evicting vAddr 18 from ssd_addr 7 to hdd_addr 18
+evicting vAddr 5 from ram_addr 1 to ssd_addr 11
+page_fault of page 25 from hhd_addr 25 to ram_addr 1
+thread 3 is trying to read vAddr 26
+evicting vAddr 0 from ram_addr 0 to ssd_addr 7
+evicting vAddr 19 from ssd_addr 4 to hdd_addr 19
+page_fault of page 22 from hhd_addr 22 to ram_addr 0
+page_fault of page 5 from ssd_addr 11 to ram_addr 1
+thread 0 is trying to read vAddr 26
+page_fault of page 41 from ssd_addr 10 to ram_addr 1
+thread 0 is trying to read vAddr 27
+evicting vAddr 20 from ssd_addr 2 to hdd_addr 20
+evicting vAddr 13 from ram_addr 2 to ssd_addr 4
+page_fault of page 18 from hhd_addr 18 to ram_addr 2
+thread 4 is trying to read vAddr 27
+evicting vAddr 21 from ssd_addr 5 to hdd_addr 21
+evicting vAddr 41 from ram_addr 1 to ssd_addr 2
+page_fault of page 16 from hhd_addr 16 to ram_addr 1
+evicting vAddr 22 from ram_addr 0 to ssd_addr 5
+thread 3 is trying to read vAddr 27
+evicting vAddr 24 from ssd_addr 0 to hdd_addr 24
+page_fault of page 42 from hhd_addr 42 to ram_addr 0
+thread 0 is trying to read vAddr 28
+page_fault of page 25 from ssd_addr 11 to ram_addr 1
+thread 0 is trying to read vAddr 29
+evicting vAddr 30 from ssd_addr 8 to hdd_addr 30
+evicting vAddr 18 from ram_addr 2 to ssd_addr 0
+thread 4 is trying to read vAddr 28
+evicting vAddr 41 from ssd_addr 2 to hdd_addr 41
+page_fault of page 11 from hhd_addr 11 to ram_addr 2
+evicting vAddr 25 from ram_addr 1 to ssd_addr 8
+page_fault of page 15 from hhd_addr 15 to ram_addr 1
+evicting vAddr 42 from ram_addr 0 to ssd_addr 2
+thread 3 is trying to read vAddr 28
+evicting vAddr 43 from ssd_addr 1 to hdd_addr 43
+page_fault of page 2 from hhd_addr 2 to ram_addr 0
+evicting vAddr 11 from ram_addr 2 to ssd_addr 1
+page_fault of page 24 from hhd_addr 24 to ram_addr 2
+thread 4 is trying to read vAddr 29
+page_fault of page 22 from ssd_addr 5 to ram_addr 1
+thread 3 is trying to read vAddr 29
+page_fault of page 8 from ssd_addr 9 to ram_addr 1
+PAGE_TABLE (vAddr | ram-ssd-hdd-ref | addr | content)
+0) 0101 | 7 | 1
+1) 0011 | 1 | 2
+2) 1001 | 0 | 3
+3) 0101 | 6 | 4
+4) 0011 | 4 | 5
+5) 0101 | 10 | 6
+6) 0011 | 6 | 7
+7) 0011 | 7 | 8
+8) 1001 | 1 | 9
+9) 0011 | 9 | 10
+10) 0011 | 10 | 11
+11) 0101 | 1 | 12
+12) 0011 | 12 | 13
+13) 0101 | 4 | 14
+14) 0011 | 14 | 15
+15) 0101 | 5 | 16
+16) 0101 | 11 | 17
+17) 0011 | 17 | 18
+18) 0101 | 0 | 19
+19) 0011 | 19 | 20
+20) 0011 | 20 | 21
+21) 0011 | 21 | 22
+22) 0101 | 9 | 23
+23) 0011 | 23 | 24
+24) 1001 | 2 | 25
+25) 0101 | 8 | 26
+26) 0011 | 26 | 27
+27) 0011 | 27 | 28
+28) 0011 | 28 | 29
+29) 0011 | 29 | 30
+30) 0011 | 30 | 31
+31) 0011 | 31 | 32
+32) 0011 | 32 | 33
+33) 0011 | 33 | 34
+34) 0011 | 34 | 35
+35) 0011 | 35 | 36
+36) 0011 | 36 | 37
+37) 0011 | 37 | 38
+38) 0011 | 38 | 39
+39) 0011 | 39 | 40
+40) 0011 | 40 | 41
+41) 0011 | 41 | 42
+42) 0101 | 2 | 43
+43) 0011 | 43 | 44
+44) 0011 | 44 | 45
+45) 0011 | 45 | 46
+46) 0011 | 46 | 47
+47) 0011 | 47 | 48
+48) 0101 | 3 | 49
+49) 0011 | 49 | 50
+MEM_MAP (RAM/SSD)
+23 | 1 1 1 
+44 | 1 1 1 1 1 1 1 1 1 1 1 1 
+MEMORY CONTENT (ram, ssd, hdd):
+3 9 25 
+19 12 43 49 14 16 4 1 26 23 6 17 
+0 2 0 0 5 0 7 8 0 10 11 0 13 0 15 0 0 18 0 20 21 22 0 24 0 0 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 0 44 45 46 47 48 0 50 

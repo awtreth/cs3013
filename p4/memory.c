@@ -11,7 +11,7 @@
 
 
 //Access time (in seconds)
-#define TIME_FACTOR 1000
+
 #define RAM_TIME .01/TIME_FACTOR
 #define SSD_TIME .1/TIME_FACTOR
 #define HDD_TIME 2.5/TIME_FACTOR
@@ -103,6 +103,7 @@ vAddr evict_select_random(int mem_bit){//assume memory is full
 			}
 			pthread_mutex_unlock(&ptable_mtx[i]);
 		}
+		
 		i = (i+1)%PAGE_TABLE_SIZE;
 	}
 	printf("Not supposed to be here. evict_select_random\n");
@@ -113,22 +114,20 @@ vAddr evict_select_random(int mem_bit){//assume memory is full
  * */
 vAddr evict_select_clock(int mem_bit) {
 	
-	vAddr i = mem_map[mem_bit].cursor;
+	uint16_t cursor = mem_map[mem_bit].cursor;
+	vAddr i = cursor;
 	
 	do {
-		if(get_bit(&page_table[i].flags, mem_bit)){
-			printf("before %d\n", i);
-			pthread_mutex_lock(&ptable_mtx[i]);
-			printf("after %d\n", i);
-			if(!get_bit(&page_table[i].flags, mem_bit)){
-				pthread_mutex_unlock(&ptable_mtx[i]);
-				continue;
+		if(!pthread_mutex_trylock(&ptable_mtx[i])){
+			if(get_bit(&page_table[i].flags, mem_bit)){
+				mem_map[mem_bit].cursor = (i+1)%PAGE_TABLE_SIZE;
+				return i;
 			}
-			mem_map[mem_bit].cursor = (i+1)%PAGE_TABLE_SIZE;
-			return i;
+			pthread_mutex_unlock(&ptable_mtx[i]);
 		}
+			
 		i = (i+1)%PAGE_TABLE_SIZE;//increment iterator (circular)
-	}while(i != mem_map[mem_bit].cursor);//checked all the memory
+	}while(1);//checked all the memory
 	
 	printf("Not supposed to be here. evict_select_clock\n");
 	//not supposed to reach this line
@@ -140,7 +139,9 @@ vAddr evict_select_clock(int mem_bit) {
  */
 vAddr evict_select_clock2(int mem_bit) {
 	
-	vAddr i = mem_map[mem_bit].cursor;
+	uint16_t cursor = mem_map[mem_bit].cursor;
+	
+	vAddr i = cursor;
 
 	do {//first chance
 		//TODO: ptable_mutex_lock
@@ -157,11 +158,11 @@ vAddr evict_select_clock2(int mem_bit) {
 			pthread_mutex_unlock(&ptable_mtx[i]);
 		}
 		i = (i+1)%PAGE_TABLE_SIZE;//increment iterator (circular)
-	}while(i != mem_map[mem_bit].cursor);//checked all the memory
+	}while(1);//checked all the memory
 
 	//this page will potentially go to ssd
 	
-	i = evict_select_clock(mem_bit);//second loop
+	//i = evict_select_clock(mem_bit);//second loop
 	
 	set_bit(&page_table[i].flags, R_BIT, 1);//this page will potentially go to ssd
 	return i;
@@ -226,7 +227,7 @@ int find_empty(int mem_bit){
 }
 
 //Evict the page in ram_addr position in RAM memory
-void evict(vAddr ram_evicted, int release) {//user has already locked ram_evicted
+void evict(vAddr ram_evicted, int release_mutex) {//user has already locked ram_evicted
 	
 	int ssd_addr = find_empty(SSD_BIT);//find a place in ssd to put the evicted page
 	int ram_addr = page_table[ram_evicted].addr;
@@ -239,7 +240,7 @@ void evict(vAddr ram_evicted, int release) {//user has already locked ram_evicte
 		ssd_addr = page_table[ssd_evicted].addr;
 		page_table[ssd_evicted].addr = hdd_addr;
 		
-		printf("evicting from ssd_addr %d to hdd_addr %d\n", ssd_addr, hdd_addr);
+printf("evicting vAddr %d from ssd_addr %d to hdd_addr %d\n", ssd_evicted, ssd_addr, hdd_addr);
 		set_bit(&page_table[ssd_evicted].flags, SSD_BIT, 0);
 		set_bit(&page_table[ssd_evicted].flags, HDD_BIT, 1);
 		
@@ -249,7 +250,7 @@ void evict(vAddr ram_evicted, int release) {//user has already locked ram_evicte
 		pthread_mutex_unlock(&ptable_mtx[ssd_evicted]);
 	}
 	
-	printf("evicting from ram_addr %d to ssd_addr %d\n", ram_addr, ssd_addr);
+printf("evicting vAddr %d from ram_addr %d to ssd_addr %d\n", ram_evicted, ram_addr, ssd_addr);
 	set_bit(&page_table[ram_evicted].flags, RAM_BIT, 0);
 	set_bit(&page_table[ram_evicted].flags, SSD_BIT, 1);
 	page_table[ram_evicted].addr = ssd_addr;
@@ -257,7 +258,7 @@ void evict(vAddr ram_evicted, int release) {//user has already locked ram_evicte
 	usleep(RAM_TIME*1e6 + SSD_TIME*1e6);//access time
 	ssd_m[ssd_addr] = ram_m[ram_addr];
 	
-	if(release)pthread_mutex_unlock(&ptable_mtx[ram_evicted]);
+	if(release_mutex) pthread_mutex_unlock(&ptable_mtx[ram_evicted]);
 	
 }
 
@@ -287,21 +288,20 @@ int page_fault(vAddr address, vAddr ram_evicted, int ram_addr){//assume the spec
 			pthread_mutex_unlock(&mem_map[SSD_BIT].mtx);
 		}
 		
-		printf("page_fault of page %d from ssd_addr %d to ram_addr %d\n", address, ssd_addr, ram_addr);
+printf("page_fault of page %d from ssd_addr %d to ram_addr %d\n", address, ssd_addr, ram_addr);
 		usleep( RAM_TIME*1e6 );
 		ram_m[ram_addr] = tmp;
 		
 		
 	}else if(get_bit(&page_table[address].flags, HDD_BIT)){ //assume HDD_BIT is set
 		int hdd_addr = address;
-		//int ram_addr = find_empty(RAM_BIT);
 				
 		set_bit(&page_table[address].flags, HDD_BIT, 0);//unset page_table HDD_BIT
 		
 		if (ram_evicted!=NULL_VADDR)
 			evict(ram_evicted,0);
 		
-		printf("page_fault of page %d from hhd_addr %d to ram_addr %d\n", address, hdd_addr, ram_addr);
+printf("page_fault of page %d from hhd_addr %d to ram_addr %d\n", address, hdd_addr, ram_addr);
 		usleep( (RAM_TIME+HDD_TIME)*1e6 );
 		ram_m[ram_addr] = hdd_m[hdd_addr];
 		hdd_m[hdd_addr] = 0;//not necessary (here just for visibility)
@@ -357,7 +357,7 @@ vAddr create_page() {
 
 uint32_t get_value(vAddr address, int* valid) {
 	if(address < 0 || address >= PAGE_TABLE_SIZE){
-		*valid = 0;
+		if(valid!=NULL)*valid = 0;
 		return 0 ;
 	}
 	
@@ -381,7 +381,7 @@ uint32_t get_value(vAddr address, int* valid) {
 			
 		}
 		
-		*valid = 1;
+		if(valid!=NULL)*valid = 1;
 		
 		set_bit(&page_table[address].flags, R_BIT, 1);
 		usleep(RAM_TIME*1e6);
@@ -389,6 +389,7 @@ uint32_t get_value(vAddr address, int* valid) {
 		pthread_mutex_unlock(&ptable_mtx[address]);
 		return value;
 	}
+	pthread_mutex_unlock(&ptable_mtx[address]);
 	*valid = 0;
 	return 0;
 }
@@ -405,7 +406,7 @@ void store_value(vAddr address, uint32_t *value) {
 		if(get_bit(&page_table[address].flags, RAM_BIT)){
 			ram_addr = page_table[address].addr;
 		}else{
-			pthread_mutex_unlock(&ptable_mtx[address]);
+			//pthread_mutex_unlock(&ptable_mtx[address]);
 			vAddr ram_evicted = NULL_VADDR;
 	
 			ram_addr = find_empty(RAM_BIT);//find a place in RAM
@@ -413,7 +414,7 @@ void store_value(vAddr address, uint32_t *value) {
 				ram_evicted = evict_select(RAM_BIT);
 				ram_addr = page_table[ram_evicted].addr;
 			}
-			pthread_mutex_lock(&ptable_mtx[address]);
+			//pthread_mutex_lock(&ptable_mtx[address]);
 			ram_addr = page_fault(address, ram_evicted, ram_addr);
 			if(ram_evicted!=NULL_VADDR) pthread_mutex_unlock(&ptable_mtx[ram_evicted]);
 		}
@@ -423,6 +424,7 @@ void store_value(vAddr address, uint32_t *value) {
 		ram_m[ram_addr] = *value;
 		pthread_mutex_unlock(&ptable_mtx[address]);
 	}
+	pthread_mutex_unlock(&ptable_mtx[address]);
 }
 
 void free_page(vAddr address) {
@@ -461,12 +463,14 @@ void print_page_entry(page_entry_t entry) {
 		printf("%d\n", ssd_m[entry.addr]);
 	if(get_bit(&entry.flags, HDD_BIT))
 		printf("%d\n", hdd_m[entry.addr]);
+	if(entry.flags == 0)
+		printf("\n");
 
 }
 
 void print_page_table() {
 	int j;
-			
+	printf("PAGE_TABLE (vAddr | ram-ssd-hdd-ref | addr | content)\n");
 	for (j = 0; j < PAGE_TABLE_SIZE; j++){
 		printf("%d) ", j);
 		print_page_entry(page_table[j]);
@@ -482,6 +486,7 @@ void print_mem_map(int mem_bit) {
 }
 
 void print_mem_maps() {
+	printf("MEM_MAP (RAM/SSD)\n");
 	print_mem_map(RAM_BIT);
 	print_mem_map(SSD_BIT);
 }
@@ -496,7 +501,28 @@ void print_memory(uint32_t* mem, int size){
 
 //print all memory content (ram, sdd and hdd)
 void print_memory_all() {
+	printf("MEMORY CONTENT (ram, ssd, hdd):\n");
 	print_memory(ram_m, RAM_SIZE);
 	print_memory(ssd_m, SSD_SIZE);
 	print_memory(hdd_m, HDD_SIZE);
+}
+
+void print_memory_state() {
+	print_page_table();
+	print_mem_maps();
+	print_memory_all();
+}
+
+
+void memoryMaxer(int n) {
+	
+	int i;
+	vAddr indexes[n];
+	for (i = 0; i < n; ++i) {
+		indexes[i] = create_page();
+		if(indexes[i]>=0) {
+			uint32_t value = i+1;
+			store_value(indexes[i], &value);
+		}
+	}
 }

@@ -7,9 +7,11 @@
 #define CLOCK_EVICT		1
 #define CLOCK2_EVICT	2//second chance
 
-#define RAM_SIZE 3
-#define SSD_SIZE 12
-#define HDD_SIZE 50
+#define RAM_SIZE 25
+#define SSD_SIZE 100
+#define HDD_SIZE 1000
+
+#define TIME_FACTOR 1 //Divide the default times by this number (RAM: 0.01s, SSD: 0.1s, HDD:2.5s)
 
 #define PAGE_TABLE_SIZE HDD_SIZE
 
@@ -29,10 +31,9 @@ void store_value(vAddr address, uint32_t *value);
 
 void free_page(vAddr address);
 
-void print_memory_all();
+void print_memory_state();
 
-void print_page_table();
+void memoryMaxer(int n);
 
-void print_mem_maps();
 
 #endif

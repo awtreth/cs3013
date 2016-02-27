@@ -1,0 +1,80 @@
+Read README.txt first
+
+
+In all tests you can provide up to 2 command line arguments
+
+arg1: eviction algorithm (0-Random; 2-Clock; 3-Clock with 2nd Chance)
+arg2: seed for random number generations (it is set to time(NULL) if it is not provided)
+
+OBS: test_single wait for user input (there are "enter to continue" messages)
+
+
+Common Arguments:
+
+RAM_SIZE = 3; SSD = 12 and HDD = 50
+
+TIME_FACTOR = 100
+int test_multi* you can set the following constants
+
+#define N_THREADS 5 		//number of threads
+#define READS_PER_THREAD   30   //number of operations per thread
+
+seed = 10
+
+
+Basically I designed 3 tests:
+
+
+1) test_single
+
+Single thread application that try to test all API features. It is good to analyse the eviction algorithms (in all test cases).
+All tests were 
+
+Test cases:
+
+	1- memoryMaxer: try to create pages beyond the PAGE_TABLE_SIZE (the last creations are ignored). This function also test store_value and page evictions
+
+	2- get_value: memoryMaxer writes known values in each page table (v = vAddr+1). Then I check all pages with get_value. It also test the page fault handler
+	
+	3- free, get and create: randomly release some pages, get some values and create new pages. Double-check dynamical behavior of the last functions
+	
+	4- store and get: store random values and get values from random pages. Double-check dynamical behavior of the last functions
+
+	Output: this output is good to check the effect of each operation. It's also good to see the different algorithms working.
+
+
+For the next tests you can set the following constants
+
+#define N_THREADS 5 		//number of threads
+#define READS_PER_THREAD   30   //number of operations per thread
+
+
+The following tests are good to find breaks. Not check the output
+
+2) test_multi_integrity
+
+	1- Run memoryMaxer (store known values in known page vAddr) - This is the worst case, where the number of page faults and page evictions are high
+	
+	2- Create N_THREADS and perform READS_PER_THREAD get_value operations in random vAddresses
+	
+	At the end you expect that the values pointed by each vAddr are the same, although they might be in different locatio (RAM, SSD or HDD).
+	It's expected that no dead-lock occurs
+
+	Output: around line 100 and at the end you can see a "picture" of the memory state. Note the integrity of the value-vAddr map
+
+
+2) test_multi_misc
+	
+	Create N_THREADS and perform READS_PER_THREAD random operations (create_page, free_page, get_value and store_value) at random frequency with random parameters
+	
+	This tests try to check the behavior in dynamical situations
+	
+	It's not supposed to break or block. Also good to test eviciton algorithm performance
+	
+	Output: not so useful. However, at the end you see a "picture" of the memory state.
+
+
+
+OBS:
+
+

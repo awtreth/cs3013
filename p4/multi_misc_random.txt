@@ -1,0 +1,287 @@
+thread 0 stored value 78 in page 8 (if it's addressed)
+thread 1 couldn't get value from page 27
+thread 2 stored value 7 in page 47 (if it's addressed)
+thread 3 released page 28
+thread 4 created page 0 (page == -1 means full memory)
+thread 1 created page 1 (page == -1 means full memory)
+thread 4 stored value 68 in page 18 (if it's addressed)
+thread 3 stored value 62 in page 31 (if it's addressed)
+thread 4 created page 2 (page == -1 means full memory)
+evicting vAddr 0 from ram_addr 0 to ssd_addr 0
+thread 0 created page 3 (page == -1 means full memory)
+thread 0 stored value 88 in page 27 (if it's addressed)
+thread 2 released page 15
+thread 1 released page 12
+evicting vAddr 1 from ram_addr 1 to ssd_addr 1
+thread 4 created page 4 (page == -1 means full memory)
+thread 3 released page 31
+thread 1 couldn't get value from page 20
+thread 1 couldn't get value from page 38
+thread 3 released page 21
+thread 0 released page 43
+thread 1 released page 27
+thread 3 couldn't get value from page 24
+page_fault of page 0 from ssd_addr 0 to ram_addr 2
+thread 4 got value 0 from page 0
+thread 2 released page 37
+thread 3 released page 22
+thread 4 stored value 92 in page 4 (if it's addressed)
+thread 0 couldn't get value from page 21
+thread 1 couldn't get value from page 47
+thread 2 stored value 13 in page 34 (if it's addressed)
+thread 1 released page 47
+thread 3 stored value 0 in page 17 (if it's addressed)
+thread 0 stored value 52 in page 26 (if it's addressed)
+thread 4 couldn't get value from page 39
+thread 0 released page 11
+thread 1 couldn't get value from page 17
+thread 2 stored value 24 in page 43 (if it's addressed)
+thread 3 released page 21
+thread 0 released page 5
+thread 4 stored value 20 in page 21 (if it's addressed)
+page_fault of page 2 from ssd_addr 0 to ram_addr 0
+thread 1 got value 0 from page 2
+thread 2 stored value 0 in page 19 (if it's addressed)
+thread 3 released page 41
+thread 0 released page 3
+thread 3 stored value 18 in page 22 (if it's addressed)
+evicting vAddr 0 from ram_addr 2 to ssd_addr 2
+thread 2 released page 25
+thread 3 created page 5 (page == -1 means full memory)
+thread 4 couldn't get value from page 22
+evicting vAddr 2 from ram_addr 0 to ssd_addr 3
+thread 1 created page 6 (page == -1 means full memory)
+thread 2 stored value 84 in page 48 (if it's addressed)
+thread 1 released page 1
+thread 4 released page 31
+thread 0 released page 36
+evicting vAddr 4 from ram_addr 1 to ssd_addr 4
+evicting vAddr 5 from ram_addr 2 to ssd_addr 5
+thread 1 created page 7 (page == -1 means full memory)
+thread 3 created page 8 (page == -1 means full memory)
+evicting vAddr 6 from ram_addr 0 to ssd_addr 6
+thread 1 created page 9 (page == -1 means full memory)
+thread 0 couldn't get value from page 31
+evicting vAddr 7 from ram_addr 1 to ssd_addr 7
+thread 4 created page 10 (page == -1 means full memory)
+thread 2 released page 30
+evicting vAddr 8 from ram_addr 2 to ssd_addr 8
+thread 0 created page 11 (page == -1 means full memory)
+thread 3 stored value 43 in page 30 (if it's addressed)
+thread 1 stored value 96 in page 27 (if it's addressed)
+thread 2 stored value 76 in page 49 (if it's addressed)
+thread 4 released page 49
+evicting vAddr 9 from ram_addr 0 to ssd_addr 9
+thread 2 created page 12 (page == -1 means full memory)
+thread 0 stored value 3 in page 30 (if it's addressed)
+evicting vAddr 10 from ram_addr 1 to ssd_addr 10
+thread 2 created page 13 (page == -1 means full memory)
+thread 1 released page 24
+thread 4 released page 5
+evicting vAddr 11 from ram_addr 2 to ssd_addr 11
+thread 2 created page 14 (page == -1 means full memory)
+thread 1 released page 23
+thread 3 couldn't get value from page 1
+thread 1 stored value 80 in page 28 (if it's addressed)
+thread 0 released page 29
+evicting vAddr 12 from ram_addr 0 to ssd_addr 0
+thread 2 created page 15 (page == -1 means full memory)
+evicting vAddr 13 from ram_addr 1 to ssd_addr 1
+thread 4 created page 16 (page == -1 means full memory)
+evicting vAddr 14 from ram_addr 2 to ssd_addr 5
+thread 2 stored value 85 in page 45 (if it's addressed)
+thread 3 created page 17 (page == -1 means full memory)
+evicting vAddr 0 from ssd_addr 2 to hdd_addr 0
+thread 3 couldn't get value from page 21
+page_fault of page 7 from ssd_addr 7 to ram_addr 0
+thread 0 stored value 54 in page 7 (if it's addressed)
+thread 4 released page 34
+thread 3 released page 13
+thread 2 released page 32
+evicting vAddr 16 from ram_addr 1 to ssd_addr 2
+evicting vAddr 17 from ram_addr 2 to ssd_addr 1
+thread 1 created page 18 (page == -1 means full memory)
+thread 0 created page 19 (page == -1 means full memory)
+page_fault of page 4 from ssd_addr 4 to ram_addr 0
+thread 3 got value 92 from page 4
+evicting vAddr 15 from ssd_addr 7 to hdd_addr 15
+evicting vAddr 14 from ssd_addr 5 to hdd_addr 14
+thread 4 couldn't get value from page 40
+thread 3 released page 47
+thread 1 couldn't get value from page 5
+evicting vAddr 16 from ssd_addr 2 to hdd_addr 16
+evicting vAddr 4 from ram_addr 0 to ssd_addr 7
+thread 2 created page 20 (page == -1 means full memory)
+evicting vAddr 18 from ram_addr 1 to ssd_addr 5
+thread 0 created page 21 (page == -1 means full memory)
+evicting vAddr 2 from ssd_addr 3 to hdd_addr 2
+evicting vAddr 19 from ram_addr 2 to ssd_addr 2
+thread 3 stored value 24 in page 21 (if it's addressed)
+thread 4 created page 22 (page == -1 means full memory)
+thread 3 stored value 25 in page 36 (if it's addressed)
+page_fault of page 6 from ssd_addr 6 to ram_addr 1
+thread 2 stored value 67 in page 6 (if it's addressed)
+evicting vAddr 20 from ram_addr 0 to ssd_addr 3
+evicting vAddr 4 from ssd_addr 7 to hdd_addr 4
+thread 1 created page 23 (page == -1 means full memory)
+thread 4 released page 49
+thread 2 couldn't get value from page 47
+thread 3 released page 11
+thread 2 released page 7
+thread 1 stored value 91 in page 11 (if it's addressed)
+thread 3 released page 19
+evicting vAddr 22 from ram_addr 2 to ssd_addr 2
+thread 2 stored value 7 in page 43 (if it's addressed)
+thread 3 created page 24 (page == -1 means full memory)
+evicting vAddr 6 from ram_addr 1 to ssd_addr 7
+page_fault of page 2 from hhd_addr 2 to ram_addr 1
+evicting vAddr 23 from ram_addr 0 to ssd_addr 4
+thread 1 created page 25 (page == -1 means full memory)
+evicting vAddr 24 from ram_addr 2 to ssd_addr 11
+page_fault of page 16 from hhd_addr 16 to ram_addr 2
+page_fault of page 22 from ssd_addr 2 to ram_addr 0
+thread 3 stored value 22 in page 22 (if it's addressed)
+thread 2 released page 21
+thread 1 released page 4
+thread 0 got value 0 from page 2
+evicting vAddr 2 from ram_addr 1 to ssd_addr 6
+thread 3 created page 26 (page == -1 means full memory)
+thread 2 released page 24
+thread 4 stored value 77 in page 16 (if it's addressed)
+thread 0 released page 33
+thread 3 released page 37
+evicting vAddr 16 from ram_addr 2 to ssd_addr 11
+thread 0 created page 27 (page == -1 means full memory)
+thread 4 stored value 68 in page 27 (if it's addressed)
+thread 3 released page 42
+thread 1 couldn't get value from page 28
+evicting vAddr 23 from ssd_addr 4 to hdd_addr 23
+thread 0 released page 29
+evicting vAddr 2 from ssd_addr 6 to hdd_addr 2
+thread 0 released page 21
+thread 0 released page 40
+evicting vAddr 26 from ram_addr 1 to ssd_addr 4
+evicting vAddr 6 from ssd_addr 7 to hdd_addr 6
+thread 2 created page 28 (page == -1 means full memory)
+evicting vAddr 22 from ram_addr 0 to ssd_addr 6
+thread 2 released page 2
+thread 3 created page 29 (page == -1 means full memory)
+thread 4 released page 22
+thread 0 stored value 73 in page 28 (if it's addressed)
+evicting vAddr 28 from ram_addr 1 to ssd_addr 6
+thread 0 created page 30 (page == -1 means full memory)
+evicting vAddr 27 from ram_addr 2 to ssd_addr 7
+page_fault of page 23 from hhd_addr 23 to ram_addr 2
+page_fault of page 26 from ssd_addr 4 to ram_addr 0
+evicting vAddr 8 from ssd_addr 8 to hdd_addr 8
+thread 2 got value 0 from page 26
+page_fault of page 9 from ssd_addr 9 to ram_addr 0
+thread 4 got value 0 from page 9
+thread 4 stored value 36 in page 21 (if it's addressed)
+thread 3 released page 27
+thread 1 got value 92 from page 23
+evicting vAddr 23 from ram_addr 2 to ssd_addr 7
+evicting vAddr 17 from ssd_addr 1 to hdd_addr 17
+thread 2 created page 31 (page == -1 means full memory)
+evicting vAddr 30 from ram_addr 1 to ssd_addr 8
+page_fault of page 14 from hhd_addr 14 to ram_addr 1
+evicting vAddr 10 from ssd_addr 10 to hdd_addr 10
+evicting vAddr 9 from ram_addr 0 to ssd_addr 1
+thread 4 created page 32 (page == -1 means full memory)
+evicting vAddr 9 from ssd_addr 1 to hdd_addr 9
+thread 0 got value 0 from page 14
+thread 4 couldn't get value from page 36
+evicting vAddr 31 from ram_addr 2 to ssd_addr 10
+page_fault of page 15 from hhd_addr 15 to ram_addr 2
+thread 0 stored value 77 in page 22 (if it's addressed)
+evicting vAddr 32 from ram_addr 0 to ssd_addr 1
+thread 4 couldn't get value from page 39
+thread 2 created page 33 (page == -1 means full memory)
+evicting vAddr 16 from ssd_addr 11 to hdd_addr 16
+thread 1 got value 0 from page 15
+thread 2 stored value 67 in page 1 (if it's addressed)
+thread 1 couldn't get value from page 3
+evicting vAddr 12 from ssd_addr 0 to hdd_addr 12
+evicting vAddr 33 from ram_addr 0 to ssd_addr 11
+thread 0 created page 34 (page == -1 means full memory)
+evicting vAddr 25 from ssd_addr 2 to hdd_addr 25
+evicting vAddr 14 from ram_addr 1 to ssd_addr 0
+thread 4 created page 35 (page == -1 means full memory)
+evicting vAddr 14 from ssd_addr 0 to hdd_addr 14
+thread 4 couldn't get value from page 5
+thread 4 released page 43
+evicting vAddr 18 from ssd_addr 5 to hdd_addr 18
+evicting vAddr 15 from ram_addr 2 to ssd_addr 2
+thread 2 created page 36 (page == -1 means full memory)
+evicting vAddr 34 from ram_addr 0 to ssd_addr 0
+evicting vAddr 15 from ssd_addr 2 to hdd_addr 15
+page_fault of page 16 from hhd_addr 16 to ram_addr 0
+evicting vAddr 35 from ram_addr 1 to ssd_addr 5
+page_fault of page 25 from hhd_addr 25 to ram_addr 1
+evicting vAddr 36 from ram_addr 2 to ssd_addr 2
+thread 0 got value 77 from page 16
+thread 4 created page 37 (page == -1 means full memory)
+thread 1 got value 92 from page 25
+page_fault of page 32 from ssd_addr 1 to ram_addr 0
+thread 0 got value 0 from page 32
+evicting vAddr 16 from ssd_addr 1 to hdd_addr 16
+evicting vAddr 25 from ram_addr 1 to ssd_addr 1
+thread 1 created page 38 (page == -1 means full memory)
+PAGE_TABLE (vAddr | ram-ssd-hdd-ref | addr | content)
+0) 0011 | 0 | 0
+1) 0000 | 0 | 
+2) 0000 | 0 | 
+3) 0000 | 0 | 
+4) 0000 | 0 | 
+5) 0000 | 0 | 
+6) 0011 | 6 | 67
+7) 0000 | 0 | 
+8) 0010 | 8 | 0
+9) 0011 | 9 | 0
+10) 0010 | 10 | 92
+11) 0000 | 0 | 
+12) 0010 | 12 | 0
+13) 0000 | 0 | 
+14) 0011 | 14 | 0
+15) 0011 | 15 | 0
+16) 0011 | 16 | 77
+17) 0010 | 17 | 0
+18) 0010 | 18 | 92
+19) 0000 | 0 | 
+20) 0100 | 3 | 92
+21) 0000 | 0 | 
+22) 0000 | 0 | 
+23) 0101 | 7 | 92
+24) 0000 | 0 | 
+25) 0101 | 1 | 92
+26) 0101 | 9 | 0
+27) 0000 | 0 | 
+28) 0101 | 6 | 73
+29) 0100 | 4 | 22
+30) 0100 | 8 | 73
+31) 0100 | 10 | 92
+32) 1001 | 0 | 0
+33) 0100 | 11 | 0
+34) 0100 | 0 | 0
+35) 0100 | 5 | 0
+36) 0100 | 2 | 0
+37) 1000 | 2 | 0
+38) 1000 | 1 | 92
+39) 0000 | 0 | 
+40) 0000 | 0 | 
+41) 0000 | 0 | 
+42) 0000 | 0 | 
+43) 0000 | 0 | 
+44) 0000 | 0 | 
+45) 0000 | 0 | 
+46) 0000 | 0 | 
+47) 0000 | 0 | 
+48) 0000 | 0 | 
+49) 0000 | 0 | 
+MEM_MAP (RAM/SSD)
+0 | 1 1 1 
+0 | 1 1 1 1 1 1 1 1 1 1 1 1 
+MEMORY CONTENT (ram, ssd, hdd):
+0 92 0 
+0 92 0 92 22 0 73 92 73 0 92 0 
+0 0 0 0 0 0 67 0 0 0 92 0 0 0 0 0 77 0 92 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
